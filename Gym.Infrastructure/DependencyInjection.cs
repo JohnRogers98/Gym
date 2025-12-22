@@ -1,0 +1,74 @@
+﻿using Gym.Domain.CalendarEventAggregate;
+using Gym.Domain.InstructorAggregate;
+using Gym.Domain.TrainingAggregate;
+using Gym.Infrastructure.Configurations;
+using Gym.Infrastructure.Entities.Repositories.Instructors;
+using Gym.Infrastructure.Entities.Repositories.Trainings;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using MongoConsoleApp.Repositories.CalendarEvents;
+using MongoDB.Bson.Serialization.Conventions;
+using MongoDB.Driver;
+
+namespace Gym.Infrastructure
+{
+    public static class DependencyInjection
+    {
+        static DependencyInjection()
+        {
+            var camelCaseConvention = new ConventionPack { new CamelCaseElementNameConvention() };
+            ConventionRegistry.Register("CamelCase", camelCaseConvention, type => true);
+        }
+
+        public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
+        {
+            MongoDbOptions mongoDbOptions = configuration.GetSection("MongodDb").Get<MongoDbOptions>() ?? MongoDbOptions.Default;
+            
+            services.AddMongoInfrastructure(mongoDbOptions ?? MongoDbOptions.Default);
+            services.AddRepositories();
+            services.AddQueryServices();
+            
+            return services;
+        }
+
+        private static IServiceCollection AddMongoInfrastructure(this IServiceCollection services, MongoDbOptions mongoDbOptions)
+        {
+            services.AddSingleton<IMongoClient>(_ => new MongoClient(mongoDbOptions.ConnectionString));
+            services.AddSingleton<IMongoDatabase>(sp => sp.GetRequiredService<IMongoClient>().GetDatabase(mongoDbOptions.DatabaseName));
+
+            services.AddMongoCollection<InstructorEntity>(mongoDbOptions.CollectionOptions.Instructors);
+            services.AddMongoCollection<TrainingEntity>(mongoDbOptions.CollectionOptions.Trainings);
+            services.AddMongoCollection<CalendarEventEntity>(mongoDbOptions.CollectionOptions.CalendarEvents);
+
+            return services;
+        }
+
+        private static IServiceCollection AddMongoCollection<T>(this IServiceCollection services, String collectionName)
+        {
+            services.AddSingleton<IMongoCollection<T>>(sp =>
+            {
+                var database = sp.GetRequiredService<IMongoDatabase>();
+                return database.GetCollection<T>(collectionName);
+            });
+
+            return services;
+        }
+
+        private static IServiceCollection AddRepositories(this IServiceCollection services)
+        {
+            services.TryAddSingleton<IInstructorRepository, InstructorRepository>();
+            services.TryAddSingleton<ITrainingRepository, TrainingRepository>();
+            services.TryAddSingleton<ICalendarEventRepository, CalendarEventRepository>();
+            return services;
+        }
+
+        private static IServiceCollection AddQueryServices(this IServiceCollection services)
+        {
+            services.TryAddSingleton<IInstructorQueryService, InstructorRepository>();
+            services.TryAddSingleton<ITrainingQueryService, TrainingRepository>();
+            services.TryAddSingleton<ICalendarEventQueryService, CalendarEventRepository>();
+            return services;
+        }
+    }
+}

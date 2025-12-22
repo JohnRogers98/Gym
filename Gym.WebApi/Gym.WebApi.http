@@ -1,0 +1,63 @@
+﻿@Gym.WebApi_HostAddress = http://localhost:5284
+
+### GetInstructor
+GET {{Gym.WebApi_HostAddress}}/api/instructors/6941c40f2069e8a0a412f10d
+
+### ListInstructors
+GET {{Gym.WebApi_HostAddress}}/api/instructors
+
+### CreateInstructor
+POST {{Gym.WebApi_HostAddress}}/api/instructors
+Content-Type: application/json
+
+{
+    "firstName": "test_firstName",
+    "lastName": "test_lastName"
+}
+
+
+
+### GetTraining
+GET {{Gym.WebApi_HostAddress}}/api/trainings/693ec754633885c0552c22a3
+
+### ListTrainings
+GET {{Gym.WebApi_HostAddress}}/api/trainings
+
+### CreateTraining
+POST {{Gym.WebApi_HostAddress}}/api/trainings
+Content-Type: application/json
+
+{
+    "name": "test_training",
+    "description": "some test data"
+}
+
+
+
+### GetCalendarEvent
+GET {{Gym.WebApi_HostAddress}}/api/calendar-events/693ec754633885c0552c22a4
+
+### ListCalendarEvents
+GET {{Gym.WebApi_HostAddress}}/api/calendar-events
+
+### CreateCalendarEvent
+POST {{Gym.WebApi_HostAddress}}/api/calendar-events
+Content-Type: application/json
+
+{
+  "start": "2025-12-20T10:00:00",
+  "end": "2025-12-20T11:30:00",
+  "training": {
+    "id": "693ec754633885c0552c22a3",
+    "name": "Kangoo",
+    "description": null
+  },
+  "maxClientCount": 15,
+  "instructors": [
+    {
+      "id": "6941c40f2069e8a0a412f10d",
+      "firstName": "Bob",
+      "lastName": "Minion"
+    }
+  ]
+}

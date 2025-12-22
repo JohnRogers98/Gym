@@ -1,0 +1,9 @@
+<Solution>
+  <Project Path="Gym.Application.Tests/Gym.Application.Tests.csproj" Id="482f5b75-34f5-4092-addd-4cfddd19232e" />
+  <Project Path="Gym.Application/Gym.Application.csproj" Id="b31db3c8-506f-4d4f-bf8a-26717d3ff42c" />
+  <Project Path="Gym.CompositionRoot/Gym.CompositionRoot.csproj" Id="9a8155cd-ffda-46cb-afee-7fb77b821cff" />
+  <Project Path="Gym.Domain/Gym.Domain.csproj" Id="769121ba-d3d4-48b8-b38a-46247e31d969" />
+  <Project Path="Gym.Infrastructure/Gym.Infrastructure.csproj" />
+  <Project Path="Gym.WebApi/Gym.WebApi.csproj" Id="de7882f4-a18d-43f0-aab2-e6b777371fe8" />
+  <Project Path="Gym.WebDto/Gym.WebDto.csproj" Id="19f12ed8-27b8-49a8-8d3c-4cf93619a012" />
+</Solution>
