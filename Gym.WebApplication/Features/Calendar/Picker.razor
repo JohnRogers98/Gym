@@ -1,0 +1,24 @@
+﻿
+<MudContainer>
+    
+    <MudDatePicker PickerVariant="PickerVariant.Static"     
+        Date="@DateTime.Today" 
+        MinDate="@DateTime.Today" MaxDate="@DateTime.Today.AddDays(14)" 
+        Color="Color.Primary" 
+        FirstDayOfWeek="DayOfWeek.Monday"
+        DateChanged="@this.OnDateChanged" />
+
+</MudContainer>
+
+
+@code {
+
+    [Parameter]
+    public EventCallback<DateOnly> OnDatePicked { get; set; }
+
+    private async void OnDateChanged(DateTime? pickedDate)
+    {
+        if (pickedDate.HasValue)
+            await OnDatePicked.InvokeAsync(pickedDate.Value.ToDateOnly());
+    }
+}

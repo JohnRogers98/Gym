@@ -5,5 +5,6 @@
   <Project Path="Gym.Domain/Gym.Domain.csproj" Id="769121ba-d3d4-48b8-b38a-46247e31d969" />
   <Project Path="Gym.Infrastructure/Gym.Infrastructure.csproj" />
   <Project Path="Gym.WebApi/Gym.WebApi.csproj" Id="de7882f4-a18d-43f0-aab2-e6b777371fe8" />
+  <Project Path="Gym.WebApplication/Gym.WebApplication.csproj" Id="6196cc29-cb9a-468d-bfda-dbcd84bef184" />
   <Project Path="Gym.WebDto/Gym.WebDto.csproj" Id="19f12ed8-27b8-49a8-8d3c-4cf93619a012" />
 </Solution>

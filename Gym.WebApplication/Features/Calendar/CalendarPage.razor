@@ -1,0 +1,40 @@
+﻿@page "/calendar"
+@using Gym.WebApplication.Features.Calendar.Services
+
+@inject ICalendarService CalendarService
+
+@if (_calendarItems is null)
+{
+    <MudSkeleton />
+}
+else
+{
+    <Picker OnDatePicked="@this.DatePicked"></Picker>
+    
+    <ItemsContainer CalendarItems="@_selectedItems" OnSelectedCalendarItem="@this.Subscribe"></ItemsContainer>
+}
+
+
+@code {
+    private IEnumerable<CalendarItemViewModel> _calendarItems = default!;
+
+    private IEnumerable<CalendarItemViewModel> _selectedItems = default!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _calendarItems = await CalendarService.GetAllCalendarItemsAsync();
+
+        _selectedItems = _calendarItems.Where(aCalendarEvent => aCalendarEvent.start.ToDateOnly() == DateTime.Now.ToDateOnly());
+    }
+
+    private void DatePicked(DateOnly pickedDate)
+    {
+        _selectedItems = _calendarItems?.Where(aCalendarEvent => aCalendarEvent.start.ToDateOnly() == pickedDate) ?? Enumerable.Empty<CalendarItemViewModel>();
+        base.StateHasChanged();
+    }
+
+    private void Subscribe(CalendarItemViewModel selectdCalendarEvent)
+    {
+        Console.WriteLine($"Subscibe to {selectdCalendarEvent.training.name}");
+    }
+}

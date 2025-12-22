@@ -1,0 +1,18 @@
+﻿
+<MudContainer>
+    <MudGrid Spacing="3">
+        @foreach (var item in CalendarItems)
+        {
+            <MudItem xs="12" sm="6" md="4" lg="3">
+                <ItemCard CalendarItem="@item" OnSelected="@(async (CalendarItemViewModel item) => await OnSelectedCalendarItem.InvokeAsync(item))" />
+            </MudItem>
+        }
+    </MudGrid>
+</MudContainer>
+
+
+@code {
+    [Parameter, EditorRequired] public IEnumerable<CalendarItemViewModel> CalendarItems { get; set; } = default!;
+
+    [Parameter] public EventCallback<CalendarItemViewModel> OnSelectedCalendarItem { get; set; }
+}

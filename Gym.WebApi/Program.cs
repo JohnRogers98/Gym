@@ -1,4 +1,4 @@
-using Gym.CompositionRoot.Extensions;
+﻿using Gym.CompositionRoot.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,6 +21,17 @@ var configuration = new ConfigurationBuilder()
 
 builder.Services.AddCompositionRoot(configuration);
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowWebApplication",
+        policy =>
+        {
+            policy.WithOrigins(configuration["WebApplicationUrl"]!)
+                  .AllowAnyHeader()
+                  .AllowAnyMethod();
+        });
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -28,6 +39,8 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
+
+app.UseCors("AllowWebApplication");
 
 app.UseHttpsRedirection();
 
