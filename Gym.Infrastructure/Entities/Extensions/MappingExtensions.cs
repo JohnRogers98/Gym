@@ -7,7 +7,7 @@ using MongoConsoleApp.Repositories.CalendarEvents;
 
 namespace Gym.Infrastructure.Entities.Extensions
 {
-    public static class MappingExtensions
+    internal static class MappingExtensions
     {
         public static Instructor ToDomain(this InstructorEntity entity)
         {

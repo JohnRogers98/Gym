@@ -3,6 +3,7 @@
   <Project Path="Gym.Application/Gym.Application.csproj" Id="b31db3c8-506f-4d4f-bf8a-26717d3ff42c" />
   <Project Path="Gym.CompositionRoot/Gym.CompositionRoot.csproj" Id="9a8155cd-ffda-46cb-afee-7fb77b821cff" />
   <Project Path="Gym.Domain/Gym.Domain.csproj" Id="769121ba-d3d4-48b8-b38a-46247e31d969" />
+  <Project Path="Gym.Infrastructure.Tests/Gym.Infrastructure.Tests.csproj" Id="87bbe6e7-8100-4cfa-a63a-97cfbd6ecbfe" />
   <Project Path="Gym.Infrastructure/Gym.Infrastructure.csproj" />
   <Project Path="Gym.WebApi/Gym.WebApi.csproj" Id="de7882f4-a18d-43f0-aab2-e6b777371fe8" />
   <Project Path="Gym.WebApplication/Gym.WebApplication.csproj" Id="6196cc29-cb9a-468d-bfda-dbcd84bef184" />

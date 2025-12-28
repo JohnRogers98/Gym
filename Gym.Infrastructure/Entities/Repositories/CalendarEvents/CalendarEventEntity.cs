@@ -4,7 +4,7 @@ using MongoDB.Bson;
 
 namespace MongoConsoleApp.Repositories.CalendarEvents
 {
-    public class CalendarEventEntity
+    internal class CalendarEventEntity
     {
         public ObjectId Id { get; set; }
 

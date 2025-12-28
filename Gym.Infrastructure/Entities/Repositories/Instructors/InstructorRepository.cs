@@ -5,7 +5,7 @@ using MongoDB.Driver;
 
 namespace Gym.Infrastructure.Entities.Repositories.Instructors
 {
-    public class InstructorRepository(IMongoCollection<InstructorEntity> _instructorCollection) : IInstructorRepository, IInstructorQueryService
+    internal class InstructorRepository(IMongoCollection<InstructorEntity> _instructorCollection) : IInstructorRepository, IInstructorQueryService
     {
         public InstructorId NextIdentity() => InstructorId.From(ObjectId.GenerateNewId().ToString());
 

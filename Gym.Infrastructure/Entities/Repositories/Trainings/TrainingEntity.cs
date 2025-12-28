@@ -2,7 +2,7 @@
 
 namespace Gym.Infrastructure.Entities.Repositories.Trainings
 {
-    public class TrainingEntity
+    internal class TrainingEntity
     {
         public ObjectId Id { get; set; }
         public required String Name { get; set; }

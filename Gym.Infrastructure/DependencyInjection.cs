@@ -4,12 +4,16 @@ using Gym.Domain.TrainingAggregate;
 using Gym.Infrastructure.Configurations;
 using Gym.Infrastructure.Entities.Repositories.Instructors;
 using Gym.Infrastructure.Entities.Repositories.Trainings;
+using Gym.Infrastructure.Telegram;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using MongoConsoleApp.Repositories.CalendarEvents;
 using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
+using System.Runtime.CompilerServices;
+
+[assembly: InternalsVisibleTo("Gym.Infrastructure.Tests")]
 
 namespace Gym.Infrastructure
 {
@@ -28,6 +32,11 @@ namespace Gym.Infrastructure
             services.AddMongoInfrastructure(mongoDbOptions ?? MongoDbOptions.Default);
             services.AddRepositories();
             services.AddQueryServices();
+
+            if (configuration["TG_BOT_TOKEN"] is not null)
+            {
+                services.AddTelegramInfrastructure(configuration["TG_BOT_TOKEN"]!);
+            }
             
             return services;
         }
@@ -68,6 +77,12 @@ namespace Gym.Infrastructure
             services.TryAddSingleton<IInstructorQueryService, InstructorRepository>();
             services.TryAddSingleton<ITrainingQueryService, TrainingRepository>();
             services.TryAddSingleton<ICalendarEventQueryService, CalendarEventRepository>();
+            return services;
+        }
+
+        private static IServiceCollection AddTelegramInfrastructure(this IServiceCollection services, String botToken)
+        {
+            services.AddSingleton<TelegramBotToken>(_ => TelegramBotToken.From(botToken));
             return services;
         }
     }

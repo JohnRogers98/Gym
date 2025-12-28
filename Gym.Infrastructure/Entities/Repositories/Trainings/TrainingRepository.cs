@@ -4,8 +4,8 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 
 namespace Gym.Infrastructure.Entities.Repositories.Trainings 
-{ 
-    public class TrainingRepository(IMongoCollection<TrainingEntity> _trainingCollection) : ITrainingRepository, ITrainingQueryService
+{
+    internal class TrainingRepository(IMongoCollection<TrainingEntity> _trainingCollection) : ITrainingRepository, ITrainingQueryService
     {
         public TrainingId NextIdentity() => TrainingId.From(ObjectId.GenerateNewId().ToString());
 

@@ -5,7 +5,7 @@ using MongoDB.Driver;
 
 namespace MongoConsoleApp.Repositories.CalendarEvents
 {
-    public class CalendarEventRepository(IMongoCollection<CalendarEventEntity> _calendarEventCollection) : ICalendarEventRepository, ICalendarEventQueryService
+    internal class CalendarEventRepository(IMongoCollection<CalendarEventEntity> _calendarEventCollection) : ICalendarEventRepository, ICalendarEventQueryService
     {
         public CalendarEventId NextIdentity() => CalendarEventId.From(ObjectId.GenerateNewId().ToString());
 
