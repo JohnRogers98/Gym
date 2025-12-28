@@ -1,6 +1,5 @@
 ﻿using Gym.Domain;
-using Gym.Domain.Users;
-using Gym.Domain.Users.Authentication;
+using Gym.Domain.UserAggregate.Authentication;
 using System.Collections.Specialized;
 using System.Security.Cryptography;
 using System.Text;
@@ -23,7 +22,7 @@ namespace Gym.Infrastructure.Telegram
             if(computedHash == webAppInitData.GetHash())
             {
                 User tgUser = webAppInitData.GetUser();
-                return Result<ValidatedTelegramUserInfo>.Ok(ValidatedTelegramUserInfo.From(TelegramUserId.From(tgUser.Id)));
+                return Result<ValidatedTelegramUserInfo>.Ok(ValidatedTelegramUserInfo.From(Domain.UserAggregate.TelegramId.From(tgUser.Id)));
             }
             else
             {

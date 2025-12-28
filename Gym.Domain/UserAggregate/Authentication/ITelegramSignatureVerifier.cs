@@ -1,4 +1,4 @@
-﻿namespace Gym.Domain.Users.Authentication
+﻿namespace Gym.Domain.UserAggregate.Authentication
 {
     public interface ITelegramSignatureVerifier
     {

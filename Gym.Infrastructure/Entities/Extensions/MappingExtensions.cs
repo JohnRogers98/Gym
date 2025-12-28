@@ -1,14 +1,32 @@
 ﻿using Gym.Domain.CalendarEventAggregate;
 using Gym.Domain.InstructorAggregate;
 using Gym.Domain.TrainingAggregate;
+using Gym.Domain.UserAggregate;
 using Gym.Infrastructure.Entities.Repositories.Instructors;
 using Gym.Infrastructure.Entities.Repositories.Trainings;
+using Gym.Infrastructure.Entities.Repositories.Users;
 using MongoConsoleApp.Repositories.CalendarEvents;
 
 namespace Gym.Infrastructure.Entities.Extensions
 {
     internal static class MappingExtensions
     {
+        public static User ToDomain(this UserEntity entity)
+        {
+            var isParsed = Enum.TryParse<UserRole>(entity.Role, true, out UserRole userRole);
+            if (!isParsed)
+            {
+                throw new ArgumentException($"Failed to parse role for user {entity.Id}");
+            }
+
+            return User.Restore(UserId.From(entity.Id.ToString()), userRole, TelegramId.From(entity.TelegramId ?? default));
+        }
+
+        public static UserEntity ToEntity(this User user)
+        {
+            return new() { Id = user.Id.Value.ToObjectId(), Role = user.Role.ToString(), TelegramId = user.TelegramId?.Value };
+        }
+
         public static Instructor ToDomain(this InstructorEntity entity)
         {
             return Instructor.Restore(InstructorId.From(entity.Id.ToString()), entity.FirstName, entity.LastName);

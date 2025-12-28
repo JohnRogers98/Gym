@@ -25,7 +25,7 @@ namespace MongoConsoleApp.Repositories.CalendarEvents
             var foundedEntity = await _calendarEventCollection.Find(eCalendarEvent => eCalendarEvent.Id == id.Value.ToObjectId())
                 .FirstOrDefaultAsync(cancellationToken);
 
-            return foundedEntity is not null ? foundedEntity.ToDomain() : null; 
+            return foundedEntity?.ToDomain(); 
         }
 
         public async Task<IEnumerable<CalendarEvent>> GetAllAsync(CancellationToken cancellationToken)

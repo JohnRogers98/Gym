@@ -25,7 +25,7 @@ namespace Gym.Infrastructure.Entities.Repositories.Instructors
             var foundedEntity = await _instructorCollection.Find(eInstructor => eInstructor.Id == id.Value.ToObjectId())
                 .FirstOrDefaultAsync(cancellationToken);
 
-            return foundedEntity is not null ? foundedEntity.ToDomain() : null; 
+            return foundedEntity?.ToDomain();
         }
 
         public async Task<IEnumerable<Instructor>> GetAllAsync(CancellationToken cancellationToken)

@@ -1,9 +1,12 @@
 ﻿using Gym.Domain.CalendarEventAggregate;
 using Gym.Domain.InstructorAggregate;
 using Gym.Domain.TrainingAggregate;
+using Gym.Domain.UserAggregate;
+using Gym.Domain.UserAggregate.Authentication;
 using Gym.Infrastructure.Configurations;
 using Gym.Infrastructure.Entities.Repositories.Instructors;
 using Gym.Infrastructure.Entities.Repositories.Trainings;
+using Gym.Infrastructure.Entities.Repositories.Users;
 using Gym.Infrastructure.Telegram;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -49,6 +52,7 @@ namespace Gym.Infrastructure
             services.AddMongoCollection<InstructorEntity>(mongoDbOptions.CollectionOptions.Instructors);
             services.AddMongoCollection<TrainingEntity>(mongoDbOptions.CollectionOptions.Trainings);
             services.AddMongoCollection<CalendarEventEntity>(mongoDbOptions.CollectionOptions.CalendarEvents);
+            services.AddMongoCollection<UserEntity>(mongoDbOptions.CollectionOptions.Users);
 
             return services;
         }
@@ -69,6 +73,7 @@ namespace Gym.Infrastructure
             services.TryAddSingleton<IInstructorRepository, InstructorRepository>();
             services.TryAddSingleton<ITrainingRepository, TrainingRepository>();
             services.TryAddSingleton<ICalendarEventRepository, CalendarEventRepository>();
+            services.TryAddSingleton<IUserRepository, UserRepository>();
             return services;
         }
 
@@ -77,12 +82,14 @@ namespace Gym.Infrastructure
             services.TryAddSingleton<IInstructorQueryService, InstructorRepository>();
             services.TryAddSingleton<ITrainingQueryService, TrainingRepository>();
             services.TryAddSingleton<ICalendarEventQueryService, CalendarEventRepository>();
+            services.TryAddSingleton<IUserQueryService, UserRepository>();
             return services;
         }
 
         private static IServiceCollection AddTelegramInfrastructure(this IServiceCollection services, String botToken)
         {
             services.AddSingleton<TelegramBotToken>(_ => TelegramBotToken.From(botToken));
+            services.AddSingleton<ITelegramSignatureVerifier, TelegramSignatureVerifier>();
             return services;
         }
     }
