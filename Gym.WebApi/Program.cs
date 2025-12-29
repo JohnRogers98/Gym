@@ -1,4 +1,5 @@
 ﻿using Gym.CompositionRoot.Extensions;
+using Gym.WebApi.Controllers.Api.Users.Jwt;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,6 +21,7 @@ var configuration = new ConfigurationBuilder()
 
 
 builder.Services.AddCompositionRoot(configuration);
+builder.Services.AddSingleton<IAccessTokenGenerator, AccessTokenGenerator>();
 
 builder.Services.AddCors(options =>
 {
