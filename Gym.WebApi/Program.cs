@@ -1,5 +1,6 @@
 ﻿using Gym.CompositionRoot.Extensions;
 using Gym.WebApi.Controllers.Api.Users.Jwt;
+using Gym.WebApi.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,25 +15,13 @@ builder.Services.AddOpenApi(options =>
 
 builder.Services.AddAutoMapper(cfg => { }, typeof(Program).Assembly);
 
-var configuration = new ConfigurationBuilder()
-    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-    .AddEnvironmentVariables("DOTNET_")
-    .Build();
-
-
-builder.Services.AddCompositionRoot(configuration);
+builder.Services.AddCompositionRoot(builder.Configuration);
 builder.Services.AddSingleton<IAccessTokenGenerator, AccessTokenGenerator>();
 
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowWebApplication",
-        policy =>
-        {
-            policy.WithOrigins(configuration["WebApplicationUrl"]!)
-                  .AllowAnyHeader()
-                  .AllowAnyMethod();
-        });
-});
+builder.Services.AddCorsPolicies(builder.Configuration);
+
+builder.Services.AddJwtAuthentication(builder.Configuration);
+builder.Services.AddAuthorizationPolicies();
 
 var app = builder.Build();
 
@@ -42,9 +31,11 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
-app.UseCors("AllowWebApplication");
+app.UseCors(nameof(CorsPolicy.AllowWebApplication));
 
 app.UseHttpsRedirection();
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 

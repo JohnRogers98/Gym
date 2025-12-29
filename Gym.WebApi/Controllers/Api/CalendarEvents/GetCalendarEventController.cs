@@ -1,14 +1,17 @@
 ﻿using AutoMapper;
 using Gym.Application.Services.CalendarEventApi;
 using Gym.Application.Services.CalendarEventApi.GetCalendarEventById;
+using Gym.WebApi.Extensions;
 using Gym.WebDto.Responses.CalendarEvent;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Gym.WebApi.Controllers.Api.CalendarEvents
 {
     [Route("api/calendar-events")]
     [ApiController]
+    [Authorize(Policy = nameof(SecurityPolicy.RequireAuthenticated))]
     public class GetCalendarEventController(IMediator _mediator, IMapper _mapper) : ControllerBase
     {
         [HttpGet("{id}")]
