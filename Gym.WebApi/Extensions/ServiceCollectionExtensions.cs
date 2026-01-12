@@ -66,6 +66,7 @@ namespace Gym.WebApi.Extensions
                     {
                         policy.WithOrigins(configuration["WebApplicationUrl"]!)
                               .AllowAnyHeader()
+                              .AllowCredentials()
                               .AllowAnyMethod();
                     });
             });

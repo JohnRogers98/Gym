@@ -1,5 +1,7 @@
 using Gym.WebApplication;
+using Gym.WebApplication.Extensions;
 using Gym.WebApplication.Features.Calendar.Services;
+using Gym.WebApplication.Features.Login.Services;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using MudBlazor.Services;
@@ -12,7 +14,9 @@ builder.Services.AddAutoMapper(cfg => { }, typeof(Program).Assembly);
 
 builder.Services.AddMudServices();
 
-builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("https://localhost:7246") });
+builder.Services.AddHttpClient();
+
 builder.Services.AddScoped<ICalendarService, CalendarService>();
+builder.Services.AddScoped<IWebAppAuthService, WebAppAuthService>();
 
 await builder.Build().RunAsync();
