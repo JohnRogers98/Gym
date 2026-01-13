@@ -15,6 +15,7 @@ using MongoConsoleApp.Repositories.CalendarEvents;
 using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
 using System.Runtime.CompilerServices;
+using Telegram.Bot;
 
 [assembly: InternalsVisibleTo("Gym.Infrastructure.Tests")]
 
@@ -90,6 +91,10 @@ namespace Gym.Infrastructure
         {
             services.AddSingleton<TelegramBotToken>(_ => TelegramBotToken.From(botToken));
             services.AddSingleton<ITelegramSignatureVerifier, TelegramSignatureVerifier>();
+            services.AddSingleton<INotificationService, TelegramBotNotificationService>();
+
+            services.AddSingleton<ITelegramBotClient>(_ => new TelegramBotClient(botToken, cancellationToken: CancellationToken.None));
+
             return services;
         }
     }
