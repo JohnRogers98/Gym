@@ -5,6 +5,7 @@ using Gym.Application.Services.InstructorApi;
 using Gym.Application.Services.InstructorApi.CreateInstructor;
 using Gym.Application.Services.TrainingApi;
 using Gym.Application.Services.TrainingApi.CreateTraining;
+using Gym.Application.Services.UserApi;
 using Gym.WebDto.Dto;
 using Gym.WebDto.Requests.CalendarEvent;
 using Gym.WebDto.Requests.Instructor;
@@ -12,6 +13,7 @@ using Gym.WebDto.Requests.Training;
 using Gym.WebDto.Responses.CalendarEvent;
 using Gym.WebDto.Responses.Instructor;
 using Gym.WebDto.Responses.Training;
+using Gym.WebDto.Responses.Users;
 
 namespace Gym.WebApi.Mappings
 {
@@ -39,6 +41,8 @@ namespace Gym.WebApi.Mappings
 
             CreateMap<CalendarEventDetails, GetCalendarEventResponse>();
             CreateMap<CalendarEventDetails, CalendarEventDto>();
+
+            CreateMap<UserDetails, WebAppAuthResponse>();
         }
     }
 }

@@ -1,7 +1,10 @@
 ﻿@page "/calendar"
 @using Gym.WebApplication.Features.Calendar.Services
 
+@attribute [Authorize]
+
 @inject ICalendarService CalendarService
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
 @if (_calendarItems is null)
 {
