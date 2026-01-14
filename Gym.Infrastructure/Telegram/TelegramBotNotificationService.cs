@@ -11,9 +11,9 @@ namespace Gym.Infrastructure.Telegram
         /// <param name="user"></param>
         /// <param name="message"></param>
         /// <returns></returns>
-        public async Task SendMessageAsync(UserId userId, String message)
+        public async Task SendMessageAsync(UserId userId, String message, CancellationToken cancellationToken)
         {
-            User? user = await _userQueryService.GetByIdAsync(userId, CancellationToken.None);
+            User? user = await _userQueryService.GetByIdAsync(userId, cancellationToken);
             if (user?.TelegramId is not null)
             {
                 await _botClient.SendMessage(user.TelegramId.Value, message);

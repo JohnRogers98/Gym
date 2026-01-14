@@ -1,6 +1,6 @@
 ﻿namespace Gym.Domain.InstructorAggregate
 {
-    public class Instructor
+    public class Instructor : AggregateRoot
     {
         public InstructorId Id { get; }
         public String FirstName { get; private set; }

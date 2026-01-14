@@ -2,6 +2,6 @@
 {
     public interface INotificationService
     {
-        Task SendMessageAsync(UserId userId, String message);
+        Task SendMessageAsync(UserId userId, String message, CancellationToken cancellationToken);
     }
 }

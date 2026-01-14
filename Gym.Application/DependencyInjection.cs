@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Gym.Application.Services.DomainEventPublisher;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Runtime.CompilerServices;
 
@@ -15,6 +16,8 @@ namespace Gym.Application
                 cfg.LicenseKey = configuration["MEDIATR_LICENSE_KEY"];
                 cfg.RegisterServicesFromAssembly(typeof(DependencyInjection).Assembly);
             });
+
+            services.AddSingleton<IDomainEventPublisher, DomainEventPublisher>();
 
             return services;
         }

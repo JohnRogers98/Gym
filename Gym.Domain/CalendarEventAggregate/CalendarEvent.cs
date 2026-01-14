@@ -1,6 +1,6 @@
 ﻿namespace Gym.Domain.CalendarEventAggregate
 {
-    public class CalendarEvent
+    public class CalendarEvent : AggregateRoot
     {
         public CalendarEventId Id { get; }
 

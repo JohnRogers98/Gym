@@ -1,6 +1,8 @@
-﻿namespace Gym.Domain.UserAggregate
+﻿using Gym.Domain.UserAggregate.Events;
+
+namespace Gym.Domain.UserAggregate
 {
-    public class User
+    public class User : AggregateRoot
     {
         public UserId Id { get; }
         public TelegramId? TelegramId { get; private set; }
@@ -14,7 +16,11 @@
         }
 
         public static User Create(UserId id, UserRole role, TelegramId? telegramId)
-            => new (id, role, telegramId);
+        {
+            User user = new(id, role, telegramId);
+            user.AddDomainEvent(CreatedNewClientDomainEvent.Create(id));
+            return user;
+        }
 
         public static User Restore(UserId id, UserRole role, TelegramId? telegramId)
             => new(id, role, telegramId);
