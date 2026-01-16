@@ -1,4 +1,5 @@
-﻿using Gym.Domain.UserAggregate;
+﻿using Gym.Domain._Shared;
+using Gym.Domain.UserAggregate;
 using Gym.Infrastructure.Entities.Extensions;
 using MongoDB.Bson;
 using MongoDB.Driver;

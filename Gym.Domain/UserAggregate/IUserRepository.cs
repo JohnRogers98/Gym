@@ -1,4 +1,6 @@
-﻿namespace Gym.Domain.UserAggregate
+﻿using Gym.Domain._Shared;
+
+namespace Gym.Domain.UserAggregate
 {
     public interface IUserRepository
     {

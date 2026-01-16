@@ -1,4 +1,4 @@
-﻿namespace Gym.Domain.UserAggregate
+﻿namespace Gym.Domain._Shared
 {
     public class UserId
     {

@@ -1,4 +1,5 @@
-﻿using Gym.Domain.UserAggregate;
+﻿using Gym.Domain._Shared;
+using Gym.Domain.UserAggregate;
 using Telegram.Bot;
 
 namespace Gym.Infrastructure.Telegram

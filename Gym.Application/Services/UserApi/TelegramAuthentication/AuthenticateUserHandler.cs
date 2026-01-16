@@ -1,6 +1,7 @@
 ﻿using Gym.Application.Extensions;
 using Gym.Application.Services.DomainEventPublisher;
 using Gym.Domain;
+using Gym.Domain._Shared;
 using Gym.Domain.UserAggregate;
 using Gym.Domain.UserAggregate.Authentication;
 using MediatR;

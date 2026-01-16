@@ -1,4 +1,5 @@
-﻿using Gym.Domain.UserAggregate.Events;
+﻿using Gym.Domain._Shared;
+using Gym.Domain.UserAggregate.Events;
 
 namespace Gym.Domain.UserAggregate
 {
