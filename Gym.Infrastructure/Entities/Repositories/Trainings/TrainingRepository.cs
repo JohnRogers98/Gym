@@ -1,11 +1,12 @@
 ﻿using Gym.Domain.TrainingAggregate;
 using Gym.Infrastructure.Entities.Extensions;
+using Gym.Infrastructure.Entities.Extensions.Mappings;
 using MongoDB.Bson;
 using MongoDB.Driver;
 
 namespace Gym.Infrastructure.Entities.Repositories.Trainings 
 {
-    internal class TrainingRepository(IMongoCollection<TrainingEntity> _trainingCollection) : ITrainingRepository, ITrainingQueryService
+    internal class TrainingRepository(IMongoCollection<TrainingEntity> _trainingCollection, MongoUnitOfWork _mongoUnitOfWork) : ITrainingRepository, ITrainingQueryService
     {
         public TrainingId NextIdentity() => TrainingId.From(ObjectId.GenerateNewId().ToString());
 
@@ -13,7 +14,9 @@ namespace Gym.Infrastructure.Entities.Repositories.Trainings
         {
             TrainingEntity trainingEntity = training.ToEntity();
 
-            await _trainingCollection.ReplaceOneAsync(eTraining => eTraining.Id == training.Id.Value.ToObjectId(),
+            await _trainingCollection.ReplaceOneAsync(
+                _mongoUnitOfWork.Session,
+                eTraining => eTraining.Id == training.Id.Value.ToObjectId(),
                 trainingEntity,
                 new ReplaceOptions { IsUpsert = true },
                 cancellationToken);
@@ -21,7 +24,7 @@ namespace Gym.Infrastructure.Entities.Repositories.Trainings
 
         public async Task<Training?> GetByIdAsync(TrainingId id, CancellationToken cancellationToken)
         {
-            var foundedEntity = await _trainingCollection.Find(eTraining => eTraining.Id == id.Value.ToObjectId())
+            var foundedEntity = await _trainingCollection.Find(_mongoUnitOfWork.Session, eTraining => eTraining.Id == id.Value.ToObjectId())
                 .FirstOrDefaultAsync(cancellationToken);
 
             return foundedEntity?.ToDomain();
@@ -31,14 +34,14 @@ namespace Gym.Infrastructure.Entities.Repositories.Trainings
         {
             List<Training> allTrainigs = new();
 
-            await _trainingCollection.Find(Builders<TrainingEntity>.Filter.Empty)
+            await _trainingCollection.Find(_mongoUnitOfWork.Session, Builders<TrainingEntity>.Filter.Empty)
                 .ForEachAsync(eTraining => allTrainigs.Add(eTraining.ToDomain()));
 
             return allTrainigs;
         }
 
         public async Task<Boolean> ExistsAsync(TrainingId id, CancellationToken cancellationToken) 
-            => await _trainingCollection.Find(eTraining => eTraining.Id == id.Value.ToObjectId()).AnyAsync(cancellationToken);
+            => await _trainingCollection.Find(_mongoUnitOfWork.Session, eTraining => eTraining.Id == id.Value.ToObjectId()).AnyAsync(cancellationToken);
 
     }
 }

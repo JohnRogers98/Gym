@@ -1,11 +1,13 @@
 ﻿using Gym.Domain.CalendarEventAggregate;
+using Gym.Infrastructure.Entities;
 using Gym.Infrastructure.Entities.Extensions;
+using Gym.Infrastructure.Entities.Extensions.Mappings;
 using MongoDB.Bson;
 using MongoDB.Driver;
 
 namespace MongoConsoleApp.Repositories.CalendarEvents
 {
-    internal class CalendarEventRepository(IMongoCollection<CalendarEventEntity> _calendarEventCollection) : ICalendarEventRepository, ICalendarEventQueryService
+    internal class CalendarEventRepository(IMongoCollection<CalendarEventEntity> _calendarEventCollection, MongoUnitOfWork _mongoUnitOfWork) : ICalendarEventRepository, ICalendarEventQueryService
     {
         public CalendarEventId NextIdentity() => CalendarEventId.From(ObjectId.GenerateNewId().ToString());
 
@@ -14,6 +16,7 @@ namespace MongoConsoleApp.Repositories.CalendarEvents
             CalendarEventEntity calendarEventEntity = calendarEvent.ToEntity();
 
             await _calendarEventCollection.ReplaceOneAsync(
+                _mongoUnitOfWork.Session,
                 eCalendarEvent => eCalendarEvent.Id == calendarEventEntity.Id,
                 calendarEventEntity,
                 new ReplaceOptions { IsUpsert = true },
@@ -22,7 +25,7 @@ namespace MongoConsoleApp.Repositories.CalendarEvents
 
         public async Task<CalendarEvent?> GetByIdAsync(CalendarEventId id, CancellationToken cancellationToken)
         {
-            var foundedEntity = await _calendarEventCollection.Find(eCalendarEvent => eCalendarEvent.Id == id.Value.ToObjectId())
+            var foundedEntity = await _calendarEventCollection.Find(_mongoUnitOfWork.Session, eCalendarEvent => eCalendarEvent.Id == id.Value.ToObjectId())
                 .FirstOrDefaultAsync(cancellationToken);
 
             return foundedEntity?.ToDomain(); 
@@ -32,14 +35,14 @@ namespace MongoConsoleApp.Repositories.CalendarEvents
         {
             List<CalendarEvent> allCalendarEvents = new();
 
-            await _calendarEventCollection.Find(Builders<CalendarEventEntity>.Filter.Empty)
+            await _calendarEventCollection.Find(_mongoUnitOfWork.Session, Builders<CalendarEventEntity>.Filter.Empty)
                 .ForEachAsync(eCalendarEvent => allCalendarEvents.Add(eCalendarEvent.ToDomain()));
 
             return allCalendarEvents;
         }
 
         public async Task<Boolean> ExistsAsync(CalendarEventId id, CancellationToken cancellationToken) 
-            => await _calendarEventCollection.Find(eCalendarEvent => eCalendarEvent.Id == id.Value.ToObjectId()).AnyAsync(cancellationToken);
+            => await _calendarEventCollection.Find(_mongoUnitOfWork.Session, eCalendarEvent => eCalendarEvent.Id == id.Value.ToObjectId()).AnyAsync(cancellationToken);
 
     }
 }

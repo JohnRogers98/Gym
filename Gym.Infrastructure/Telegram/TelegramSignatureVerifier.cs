@@ -1,4 +1,4 @@
-﻿using Gym.Domain;
+﻿using Gym.Domain._Common;
 using Gym.Domain.UserAggregate.Authentication;
 using System.Collections.Specialized;
 using System.Security.Cryptography;

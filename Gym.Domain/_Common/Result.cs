@@ -1,4 +1,4 @@
-﻿namespace Gym.Domain
+﻿namespace Gym.Domain._Common
 {
     public record Result<T>
     {

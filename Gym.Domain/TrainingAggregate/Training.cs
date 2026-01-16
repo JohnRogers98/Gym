@@ -1,4 +1,6 @@
-﻿namespace Gym.Domain.TrainingAggregate
+﻿using Gym.Domain._Common;
+
+namespace Gym.Domain.TrainingAggregate
 {
     public class Training : AggregateRoot
     {

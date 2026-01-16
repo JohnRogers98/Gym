@@ -1,6 +1,7 @@
-﻿using Gym.Domain._Shared;
+﻿using Gym.Domain._Common;
+using Gym.Domain._Shared;
 
-namespace Gym.Domain.UserAggregate.Events
+namespace Gym.Domain.ClientAggregate.Events
 {
     public class CreatedNewClientDomainEvent : DomainEvent
     {

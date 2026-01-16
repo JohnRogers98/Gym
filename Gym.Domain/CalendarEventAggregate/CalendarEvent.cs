@@ -1,4 +1,6 @@
-﻿namespace Gym.Domain.CalendarEventAggregate
+﻿using Gym.Domain._Common;
+
+namespace Gym.Domain.CalendarEventAggregate
 {
     public class CalendarEvent : AggregateRoot
     {

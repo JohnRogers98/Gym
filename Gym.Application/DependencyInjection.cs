@@ -14,10 +14,11 @@ namespace Gym.Application
             services.AddMediatR(cfg =>
             {
                 cfg.LicenseKey = configuration["MEDIATR_LICENSE_KEY"];
+                cfg.Lifetime = ServiceLifetime.Scoped;
                 cfg.RegisterServicesFromAssembly(typeof(DependencyInjection).Assembly);
             });
 
-            services.AddSingleton<IDomainEventPublisher, DomainEventPublisher>();
+            services.AddScoped<IDomainEventPublisher, DomainEventPublisher>();
 
             return services;
         }

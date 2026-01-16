@@ -1,9 +1,13 @@
-﻿using Gym.Domain.CalendarEventAggregate;
+﻿using Gym.Domain._Common;
+using Gym.Domain.CalendarEventAggregate;
+using Gym.Domain.ClientAggregate;
 using Gym.Domain.InstructorAggregate;
 using Gym.Domain.TrainingAggregate;
 using Gym.Domain.UserAggregate;
 using Gym.Domain.UserAggregate.Authentication;
 using Gym.Infrastructure.Configurations;
+using Gym.Infrastructure.Entities;
+using Gym.Infrastructure.Entities.Repositories.Clients;
 using Gym.Infrastructure.Entities.Repositories.Instructors;
 using Gym.Infrastructure.Entities.Repositories.Trainings;
 using Gym.Infrastructure.Entities.Repositories.Users;
@@ -50,10 +54,14 @@ namespace Gym.Infrastructure
             services.AddSingleton<IMongoClient>(_ => new MongoClient(mongoDbOptions.ConnectionString));
             services.AddSingleton<IMongoDatabase>(sp => sp.GetRequiredService<IMongoClient>().GetDatabase(mongoDbOptions.DatabaseName));
 
+            services.AddScoped<IUnitOfWork, MongoUnitOfWork>();
+            services.AddScoped<MongoUnitOfWork>();
+
             services.AddMongoCollection<InstructorEntity>(mongoDbOptions.CollectionOptions.Instructors);
             services.AddMongoCollection<TrainingEntity>(mongoDbOptions.CollectionOptions.Trainings);
             services.AddMongoCollection<CalendarEventEntity>(mongoDbOptions.CollectionOptions.CalendarEvents);
             services.AddMongoCollection<UserEntity>(mongoDbOptions.CollectionOptions.Users);
+            services.AddMongoCollection<ClientEntity>(mongoDbOptions.CollectionOptions.Clients);
 
             return services;
         }
@@ -71,19 +79,21 @@ namespace Gym.Infrastructure
 
         private static IServiceCollection AddRepositories(this IServiceCollection services)
         {
-            services.TryAddSingleton<IInstructorRepository, InstructorRepository>();
-            services.TryAddSingleton<ITrainingRepository, TrainingRepository>();
-            services.TryAddSingleton<ICalendarEventRepository, CalendarEventRepository>();
-            services.TryAddSingleton<IUserRepository, UserRepository>();
+            services.TryAddScoped<IInstructorRepository, InstructorRepository>();
+            services.TryAddScoped<ITrainingRepository, TrainingRepository>();
+            services.TryAddScoped<ICalendarEventRepository, CalendarEventRepository>();
+            services.TryAddScoped<IUserRepository, UserRepository>();
+            services.TryAddScoped<IClientRepository, ClientRepository>();
             return services;
         }
 
         private static IServiceCollection AddQueryServices(this IServiceCollection services)
         {
-            services.TryAddSingleton<IInstructorQueryService, InstructorRepository>();
-            services.TryAddSingleton<ITrainingQueryService, TrainingRepository>();
-            services.TryAddSingleton<ICalendarEventQueryService, CalendarEventRepository>();
-            services.TryAddSingleton<IUserQueryService, UserRepository>();
+            services.TryAddScoped<IInstructorQueryService, InstructorRepository>();
+            services.TryAddScoped<ITrainingQueryService, TrainingRepository>();
+            services.TryAddScoped<ICalendarEventQueryService, CalendarEventRepository>();
+            services.TryAddScoped<IUserQueryService, UserRepository>();
+            services.TryAddScoped<IClientQueryService, ClientRepository>();
             return services;
         }
 
@@ -91,7 +101,7 @@ namespace Gym.Infrastructure
         {
             services.AddSingleton<TelegramBotToken>(_ => TelegramBotToken.From(botToken));
             services.AddSingleton<ITelegramSignatureVerifier, TelegramSignatureVerifier>();
-            services.AddSingleton<INotificationService, TelegramBotNotificationService>();
+            services.AddScoped<INotificationService, TelegramBotNotificationService>();
 
             services.AddSingleton<ITelegramBotClient>(_ => new TelegramBotClient(botToken, cancellationToken: CancellationToken.None));
 

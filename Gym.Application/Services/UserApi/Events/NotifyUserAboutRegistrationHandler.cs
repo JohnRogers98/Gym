@@ -1,6 +1,6 @@
 ﻿using Gym.Application.Services.DomainEventPublisher;
+using Gym.Domain.ClientAggregate.Events;
 using Gym.Domain.UserAggregate;
-using Gym.Domain.UserAggregate.Events;
 using MediatR;
 
 namespace Gym.Application.Services.UserApi.Events

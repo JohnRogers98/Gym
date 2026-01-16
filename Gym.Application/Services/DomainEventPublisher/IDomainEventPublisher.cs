@@ -1,4 +1,4 @@
-﻿using Gym.Domain;
+﻿using Gym.Domain._Common;
 
 namespace Gym.Application.Services.DomainEventPublisher
 {

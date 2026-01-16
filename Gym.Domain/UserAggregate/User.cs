@@ -1,5 +1,5 @@
-﻿using Gym.Domain._Shared;
-using Gym.Domain.UserAggregate.Events;
+﻿using Gym.Domain._Common;
+using Gym.Domain._Shared;
 
 namespace Gym.Domain.UserAggregate
 {
@@ -19,7 +19,6 @@ namespace Gym.Domain.UserAggregate
         public static User Create(UserId id, UserRole role, TelegramId? telegramId)
         {
             User user = new(id, role, telegramId);
-            user.AddDomainEvent(CreatedNewClientDomainEvent.Create(id));
             return user;
         }
 

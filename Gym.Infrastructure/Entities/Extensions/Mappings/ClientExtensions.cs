@@ -1,0 +1,19 @@
+﻿using Gym.Domain._Shared;
+using Gym.Domain.ClientAggregate;
+using Gym.Infrastructure.Entities.Repositories.Clients;
+
+namespace Gym.Infrastructure.Entities.Extensions.Mappings
+{
+    internal static class ClientExtensions
+    {
+        public static Client ToDomain(this ClientEntity entity)
+        {
+            return Client.Restore(ClientId.From(entity.Id.ToString()), UserId.From(entity.UserId.ToString()));
+        }
+
+        public static ClientEntity ToEntity(this Client client)
+        {
+            return new() { Id = client.Id.Value.ToObjectId(), UserId = client.UserId.Value.ToObjectId()};
+        }
+    }
+}

@@ -1,4 +1,4 @@
-﻿using Gym.Domain;
+﻿using Gym.Domain._Common;
 using MediatR;
 
 namespace Gym.Application.Services.DomainEventPublisher
