@@ -1,4 +1,5 @@
-﻿using Gym.Domain.CalendarEventAggregate;
+﻿using Gym.Domain._Shared;
+using Gym.Domain.CalendarEventAggregate;
 using Gym.Infrastructure.Entities;
 using Gym.Infrastructure.Entities.Extensions;
 using Gym.Infrastructure.Entities.Extensions.Mappings;

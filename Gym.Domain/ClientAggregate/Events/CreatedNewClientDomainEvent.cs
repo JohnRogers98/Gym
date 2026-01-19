@@ -5,7 +5,7 @@ namespace Gym.Domain.ClientAggregate.Events
 {
     public class CreatedNewClientDomainEvent : DomainEvent
     {
-        public UserId UserId { get; set; }
+        public UserId UserId { get; private set; }
 
         private CreatedNewClientDomainEvent(UserId userId) => (UserId) = (userId);
 

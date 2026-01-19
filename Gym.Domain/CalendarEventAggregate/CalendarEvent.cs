@@ -1,4 +1,5 @@
 ﻿using Gym.Domain._Common;
+using Gym.Domain._Shared;
 
 namespace Gym.Domain.CalendarEventAggregate
 {

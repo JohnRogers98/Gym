@@ -1,4 +1,5 @@
-﻿using Gym.Domain.CalendarEventAggregate;
+﻿using Gym.Domain._Shared;
+using Gym.Domain.CalendarEventAggregate;
 using Gym.Domain.InstructorAggregate;
 using Gym.Domain.TrainingAggregate;
 using Gym.Infrastructure.Entities.Repositories.Instructors;

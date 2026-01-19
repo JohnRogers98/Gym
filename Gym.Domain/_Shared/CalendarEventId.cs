@@ -1,4 +1,4 @@
-﻿namespace Gym.Domain.CalendarEventAggregate
+﻿namespace Gym.Domain._Shared
 {
     public record CalendarEventId
     {

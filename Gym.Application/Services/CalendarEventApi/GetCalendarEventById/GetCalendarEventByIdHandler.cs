@@ -1,4 +1,5 @@
 ﻿using Gym.Application.Extensions;
+using Gym.Domain._Shared;
 using Gym.Domain.CalendarEventAggregate;
 using MediatR;
 

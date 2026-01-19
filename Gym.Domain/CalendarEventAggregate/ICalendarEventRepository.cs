@@ -1,4 +1,6 @@
-﻿namespace Gym.Domain.CalendarEventAggregate
+﻿using Gym.Domain._Shared;
+
+namespace Gym.Domain.CalendarEventAggregate
 {
     public interface ICalendarEventRepository
     {
