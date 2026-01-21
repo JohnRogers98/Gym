@@ -1,6 +1,7 @@
 ﻿using Gym.Domain._Common;
 using Gym.Domain._Exceptions;
 using Gym.Domain._Shared;
+using Gym.Domain.BookingAggregate.Errors;
 using Gym.Domain.BookingAggregate.Events;
 
 namespace Gym.Domain.BookingAggregate
@@ -40,7 +41,7 @@ namespace Gym.Domain.BookingAggregate
 
             if (Status != BookingStatus.Upcoming)
             {
-                throw new DomainException($"Current booking status - {Status} incorrect for operation.");
+                throw new DomainException(IncorrectBookingStatusStateError.Create(Id, Status));
             }
 
             Status = BookingStatus.Cancelled;
@@ -51,7 +52,7 @@ namespace Gym.Domain.BookingAggregate
         {
             if (Status != BookingStatus.Cancelled)
             {
-                throw new DomainException($"Current booking status - {Status} incorrect for operation.");
+                throw new DomainException(IncorrectBookingStatusStateError.Create(Id, Status));
             }
 
             Status = BookingStatus.Upcoming;
@@ -62,7 +63,7 @@ namespace Gym.Domain.BookingAggregate
         {
             if (Status != BookingStatus.Upcoming)
             {
-                throw new DomainException($"Current booking status - {Status} incorrect for operation.");
+                throw new DomainException(IncorrectBookingStatusStateError.Create(Id, Status));
             }
 
             Status = BookingStatus.Completed;

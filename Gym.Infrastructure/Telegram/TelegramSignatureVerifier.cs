@@ -1,5 +1,6 @@
 ﻿using Gym.Domain._Common;
 using Gym.Domain.UserAggregate.Authentication;
+using Gym.Domain.UserAggregate.Errors;
 using System.Collections.Specialized;
 using System.Security.Cryptography;
 using System.Text;
@@ -26,7 +27,7 @@ namespace Gym.Infrastructure.Telegram
             }
             else
             {
-                return Result<ValidatedTelegramUserInfo>.Fail("Hash is not valid");
+                return Result<ValidatedTelegramUserInfo>.Fail(TelegramInitDataInvalidHashError.Create());
             }
         }
 

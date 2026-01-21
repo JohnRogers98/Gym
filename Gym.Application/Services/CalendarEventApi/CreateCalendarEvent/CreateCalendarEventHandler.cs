@@ -1,4 +1,5 @@
 ﻿using Gym.Application.Extensions;
+using Gym.Domain._Shared;
 using Gym.Domain.CalendarEventAggregate;
 using MediatR;
 
@@ -13,6 +14,7 @@ namespace Gym.Application.Services.CalendarEventApi.CreateCalendarEvent
                 request.start,
                 request.end,
                 request.training.ToInfo(),
+                new HashSet<UserId>(),
                 request.maxClientCount,
                 request.instructors.ToInfos());
 

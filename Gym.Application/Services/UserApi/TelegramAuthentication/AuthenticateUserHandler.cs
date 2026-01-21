@@ -22,7 +22,7 @@ namespace Gym.Application.Services.UserApi.TelegramAuthentication
             Result<ValidatedTelegramUserInfo> verificationResult = _telegramSignatureVerifier.Verify(request.escapedInitData);
 
             if (!verificationResult.Success)
-                throw new ArgumentException(verificationResult.Error);
+                throw new ArgumentException(verificationResult.Error!.GetErrorMessage());
 
             User? user = await _userQueryService.GetByTelegramIdAsync(verificationResult.Data!.Id, cancellationToken);
 

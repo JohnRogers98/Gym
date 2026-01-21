@@ -10,6 +10,8 @@ namespace MongoConsoleApp.Repositories.CalendarEvents
 
         public required DateTime Start {  get; set; }
         public DateTime? End { get; set; }
+
+        public IEnumerable<ObjectId>? Bookings { get; set; }
         
         public Int32? MaxClientCount { get; set; }
 

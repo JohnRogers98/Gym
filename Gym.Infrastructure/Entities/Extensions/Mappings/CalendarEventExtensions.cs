@@ -23,7 +23,14 @@ namespace Gym.Infrastructure.Entities.Extensions.Mappings
                 }
             }
 
-            return CalendarEvent.Restore(CalendarEventId.From(entity.Id.ToString()), entity.Start, entity.End, trainingInfo, entity.MaxClientCount, instructors);
+            return CalendarEvent.Restore(
+                CalendarEventId.From(entity.Id.ToString()),
+                entity.Start,
+                entity.End,
+                trainingInfo,
+                entity.Bookings?.Select(x => UserId.From(x.ToString())) ?? new HashSet<UserId>(),
+                entity.MaxClientCount,
+                instructors);
         }
 
         public static CalendarEventEntity ToEntity(this CalendarEvent calendarEvent)
@@ -50,6 +57,7 @@ namespace Gym.Infrastructure.Entities.Extensions.Mappings
                 Start = calendarEvent.Start,
                 End = calendarEvent.End,
                 Training = trainingEntity,
+                Bookings = calendarEvent.Bookings.Select(anUserId => anUserId.Value.ToObjectId()),
                 MaxClientCount = calendarEvent.MaxClientCount,
                 Instructors = instructorEntities
             };
