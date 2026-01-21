@@ -1,4 +1,5 @@
 ﻿using Gym.Domain._Common;
+using Gym.Domain.BookingAggregate;
 using Gym.Domain.CalendarEventAggregate;
 using Gym.Domain.ClientAggregate;
 using Gym.Domain.InstructorAggregate;
@@ -7,6 +8,7 @@ using Gym.Domain.UserAggregate;
 using Gym.Domain.UserAggregate.Authentication;
 using Gym.Infrastructure.Configurations;
 using Gym.Infrastructure.Entities;
+using Gym.Infrastructure.Entities.Repositories.Bookings;
 using Gym.Infrastructure.Entities.Repositories.Clients;
 using Gym.Infrastructure.Entities.Repositories.Instructors;
 using Gym.Infrastructure.Entities.Repositories.Trainings;
@@ -62,6 +64,7 @@ namespace Gym.Infrastructure
             services.AddMongoCollection<CalendarEventEntity>(mongoDbOptions.CollectionOptions.CalendarEvents);
             services.AddMongoCollection<UserEntity>(mongoDbOptions.CollectionOptions.Users);
             services.AddMongoCollection<ClientEntity>(mongoDbOptions.CollectionOptions.Clients);
+            services.AddMongoCollection<BookingEntity>(mongoDbOptions.CollectionOptions.Clients);
 
             return services;
         }
@@ -84,6 +87,7 @@ namespace Gym.Infrastructure
             services.TryAddScoped<ICalendarEventRepository, CalendarEventRepository>();
             services.TryAddScoped<IUserRepository, UserRepository>();
             services.TryAddScoped<IClientRepository, ClientRepository>();
+            services.TryAddScoped<IBookingRepository, BookingRepository>();
             return services;
         }
 
@@ -94,6 +98,7 @@ namespace Gym.Infrastructure
             services.TryAddScoped<ICalendarEventQueryService, CalendarEventRepository>();
             services.TryAddScoped<IUserQueryService, UserRepository>();
             services.TryAddScoped<IClientQueryService, ClientRepository>();
+            services.TryAddScoped<IBookingQueryService, BookingRepository>();
             return services;
         }
 
