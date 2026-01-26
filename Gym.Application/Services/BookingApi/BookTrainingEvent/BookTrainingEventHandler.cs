@@ -42,15 +42,15 @@ namespace Gym.Application.Services.BookingApi.BookTrainingEvent
 
                 await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
-                Result<Booking> bookingResult = _trainingBookingService.MakeEventBooking(calendarEvent, client);
+                Result<Booking> bookingResult = _trainingBookingService.MakeEventBooking(calendarEvent!, client!);
                 if (bookingResult.Success is false)
                 {
                     await _unitOfWork.RollbackAsync(cancellationToken);
                     throw new Exception($"Booking operation failed. {bookingResult.Error!.GetErrorMessage()}");
                 }
 
-                await _calendarEventRepository.SaveAsync(calendarEvent, cancellationToken);
-                await _clientRepository.SaveAsync(client, cancellationToken);
+                await _calendarEventRepository.SaveAsync(calendarEvent!, cancellationToken);
+                await _clientRepository.SaveAsync(client!, cancellationToken);
                 await _bookingRepository.SaveAsync(bookingResult.Data!, cancellationToken);
 
                 await _unitOfWork.CommitAsync(cancellationToken);
