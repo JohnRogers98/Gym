@@ -23,22 +23,23 @@ namespace Gym.Application.Services.BookingApi.BookTrainingEvent
     {
         public async Task<BookingDetails> Handle(BookTrainingEventCommand request, CancellationToken cancellationToken)
         {
-            Client? client = await _clientQueryService.GetByUserIdAsync(UserId.From(request.userId), cancellationToken);
-            CalendarEvent? calendarEvent = await _calendarEventQueryService.GetByIdAsync(CalendarEventId.From(request.calendarEventId), cancellationToken);
-
-            if (calendarEvent is null || client is null)
+            if (!await _clientQueryService.ExistsByUserIdAsync(UserId.From(request.userId), cancellationToken) 
+                || !await _calendarEventQueryService.ExistsAsync(CalendarEventId.From(request.calendarEventId), cancellationToken))
             {
                 throw new ArgumentException("Argument ids not exist.");
             }
 
             ExclusiveAccessResult exclusiveAccessResult  = await _exclusiveAccessCoordinator
-                .TryAcquireAsync(calendarEvent.Id.Value, nameof(BookTrainingEventHandler), cancellationToken);
+                .TryAcquireAsync(request.calendarEventId, nameof(BookTrainingEventHandler), cancellationToken);
             if (exclusiveAccessResult.Result is false) 
             {
                 throw new Exception("Resource is under lock.");
             }
             try
             {
+                Client? client = await _clientQueryService.GetByUserIdAsync(UserId.From(request.userId), cancellationToken);
+                CalendarEvent? calendarEvent = await _calendarEventQueryService.GetByIdAsync(CalendarEventId.From(request.calendarEventId), cancellationToken);
+
                 await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
                 Result<Booking> bookingResult = _trainingBookingService.MakeEventBooking(calendarEvent, client);
@@ -60,7 +61,7 @@ namespace Gym.Application.Services.BookingApi.BookTrainingEvent
             }
             finally{
                 await _exclusiveAccessCoordinator
-                    .ReleaseAsync(calendarEvent.Id.Value, nameof(BookTrainingEventHandler), exclusiveAccessResult.AccessKey!, cancellationToken);
+                    .ReleaseAsync(request.calendarEventId, nameof(BookTrainingEventHandler), exclusiveAccessResult.AccessKey!, cancellationToken);
             }
         }
     }
