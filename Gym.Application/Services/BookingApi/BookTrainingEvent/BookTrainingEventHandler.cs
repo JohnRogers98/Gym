@@ -33,7 +33,7 @@ namespace Gym.Application.Services.BookingApi.BookTrainingEvent
 
             ExclusiveAccessResult exclusiveAccessResult  = await _exclusiveAccessCoordinator
                 .TryAcquireAsync(calendarEvent.Id.Value, nameof(BookTrainingEventHandler), cancellationToken);
-            if (exclusiveAccessResult.result is false) 
+            if (exclusiveAccessResult.Result is false) 
             {
                 throw new Exception("Resource is under lock.");
             }
@@ -60,7 +60,7 @@ namespace Gym.Application.Services.BookingApi.BookTrainingEvent
             }
             finally{
                 await _exclusiveAccessCoordinator
-                    .ReleaseAsync(calendarEvent.Id.Value, nameof(BookTrainingEventHandler), exclusiveAccessResult.accessId!.Value, cancellationToken);
+                    .ReleaseAsync(calendarEvent.Id.Value, nameof(BookTrainingEventHandler), exclusiveAccessResult.AccessKey!, cancellationToken);
             }
         }
     }

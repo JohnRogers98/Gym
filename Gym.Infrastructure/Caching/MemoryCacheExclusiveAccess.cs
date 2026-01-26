@@ -5,26 +5,33 @@ namespace Gym.Infrastructure.Caching
 {
     internal class MemoryCacheExclusiveAccess : IExclusiveAccessCoordinator
     {
-        private static readonly ConcurrentDictionary<ExclusiveAccessKey, Boolean> _exclusiveAccessLock = new();
+        private static readonly ConcurrentDictionary<ResourceOperation, AccessKey> _exclusiveAccessLock = new();
 
         public async Task<ExclusiveAccessResult> TryAcquireAsync(String aggregateId, String operation, CancellationToken cancellationToken = default)
         {
-            String lockedOperationKey = $"{aggregateId}:{operation}";
-            Guid accessKey = Guid.NewGuid();
-            ExclusiveAccessKey exclusiveAccessKey = new(lockedOperationKey, accessKey);
+            ResourceOperation resourceOperation = new($"{aggregateId}:{operation}");
+            AccessKey accessKey = new(Guid.NewGuid().ToString());
 
-            _exclusiveAccessLock.TryAdd(exclusiveAccessKey, true);
+            var isSuccess = _exclusiveAccessLock.TryAdd(resourceOperation, accessKey);
 
-            return ExclusiveAccessResult.Successful(accessKey);
+            if (isSuccess)
+                return ExclusiveAccessResult.Successful(accessKey.Value);
+            else
+                return ExclusiveAccessResult.Denied();
         }
 
-        public async Task<Boolean> ReleaseAsync(String aggregateId, String operation, Guid accessKey, CancellationToken cancellationToken = default)
+        public async Task<Boolean> ReleaseAsync(String aggregateId, String operation, String accessKey, CancellationToken cancellationToken = default)
         {
-            String lockedOperationKey = $"{aggregateId}:{operation}";
-            ExclusiveAccessKey exclusiveAccessKey = new(lockedOperationKey, accessKey);
-            return _exclusiveAccessLock.Remove(exclusiveAccessKey, out _);
+            ResourceOperation resourceOperation = new($"{aggregateId}:{operation}");
+
+            KeyValuePair<ResourceOperation, AccessKey> lockPair = new(
+                new ResourceOperation($"{aggregateId}:{operation}"), new AccessKey(accessKey)); 
+
+            return _exclusiveAccessLock.TryRemove(lockPair);
         }
 
-        private record ExclusiveAccessKey(String lockedOperationKey, Guid accessKey);
+        private record ResourceOperation(String Value);
+
+        private record AccessKey(String Value);
     }
 }

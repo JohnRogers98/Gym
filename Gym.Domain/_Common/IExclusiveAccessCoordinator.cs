@@ -3,12 +3,12 @@
     public interface IExclusiveAccessCoordinator
     {
         Task<ExclusiveAccessResult> TryAcquireAsync(String aggregateId, String operation, CancellationToken cancellationToken = default);
-        Task<Boolean> ReleaseAsync(String aggregateId, String operation, Guid accessKey, CancellationToken cancellationToken = default);
+        Task<Boolean> ReleaseAsync(String aggregateId, String operation, String accessKey, CancellationToken cancellationToken = default);
     }
 
-    public record ExclusiveAccessResult(Boolean result, Guid? accessId)
+    public record ExclusiveAccessResult(Boolean Result, String? AccessKey)
     {
-        public static ExclusiveAccessResult Successful(Guid accessId) => new(true, accessId);
-        public static ExclusiveAccessResult Denied(Guid accessId) => new(false, default);
+        public static ExclusiveAccessResult Successful(String accessKey) => new(true, accessKey);
+        public static ExclusiveAccessResult Denied() => new(false, default);
     }
 }
