@@ -1,4 +1,5 @@
 ﻿using Gym.Application.Extensions;
+using Gym.Application.Services.DomainEventPublisher;
 using Gym.Domain._Common;
 using Gym.Domain._Shared;
 using Gym.Domain._Shared.Services;
@@ -16,6 +17,7 @@ namespace Gym.Application.Services.BookingApi.BookTrainingEvent
         IClientQueryService _clientQueryService,
         IClientRepository _clientRepository,
         IBookingRepository _bookingRepository,
+        IDomainEventPublisher _domainEventPublisher,
         IUnitOfWork _unitOfWork,
         IExclusiveAccessCoordinator _exclusiveAccessCoordinator) : IRequestHandler<BookTrainingEventCommand, BookingDetails>
     {
@@ -51,6 +53,8 @@ namespace Gym.Application.Services.BookingApi.BookTrainingEvent
                 await _bookingRepository.SaveAsync(bookingResult.Data!, cancellationToken);
 
                 await _unitOfWork.CommitAsync(cancellationToken);
+
+                await _domainEventPublisher.PublishAsync(bookingResult.Data!.DomainEvents, cancellationToken);
 
                 return bookingResult.Data!.ToDetails();
             }
