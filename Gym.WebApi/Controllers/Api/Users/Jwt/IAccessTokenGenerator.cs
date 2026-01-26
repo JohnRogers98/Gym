@@ -18,6 +18,7 @@ namespace Gym.WebApi.Controllers.Api.Users.Jwt
         public String Generate(UserDetails userDetails)
         {
             var claimsIdentity = new ClaimsIdentity([
+                new Claim(ClaimTypes.NameIdentifier, userDetails.id),
                 new Claim(JwtRegisteredClaimNames.Sub, userDetails.id),
                 new Claim(ClaimTypes.Role, userDetails.role),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())

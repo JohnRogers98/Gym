@@ -15,7 +15,7 @@ namespace Gym.WebApi.Controllers.Api.Users
     [AllowAnonymous]
     public class WebAppAuthController(IMediator _mediator, IMapper _mapper, IAccessTokenGenerator _accessTokenGenerator) : ControllerBase
     {
-        [HttpPost("web-app-auth")]
+        [HttpPost("actions/web-app-auth")]
         public async Task<ActionResult<WebAppAuthResponse>> WebAppAuth(WebAppAuthRequest request)
         {
             UserDetails userDetails = await _mediator.Send(new AuthenticateUserCommand(request.initData));

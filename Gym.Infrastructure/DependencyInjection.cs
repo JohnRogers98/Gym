@@ -6,6 +6,7 @@ using Gym.Domain.InstructorAggregate;
 using Gym.Domain.TrainingAggregate;
 using Gym.Domain.UserAggregate;
 using Gym.Domain.UserAggregate.Authentication;
+using Gym.Infrastructure.Caching;
 using Gym.Infrastructure.Configurations;
 using Gym.Infrastructure.Entities;
 using Gym.Infrastructure.Entities.Repositories.Bookings;
@@ -42,6 +43,7 @@ namespace Gym.Infrastructure
             services.AddMongoInfrastructure(mongoDbOptions ?? MongoDbOptions.Default);
             services.AddRepositories();
             services.AddQueryServices();
+            services.AddCaching();
 
             if (configuration["TG_BOT_TOKEN"] is not null)
             {
@@ -110,6 +112,12 @@ namespace Gym.Infrastructure
 
             services.AddSingleton<ITelegramBotClient>(_ => new TelegramBotClient(botToken, cancellationToken: CancellationToken.None));
 
+            return services;
+        }
+
+        private static IServiceCollection AddCaching(this IServiceCollection services)
+        {
+            services.TryAddScoped<IExclusiveAccessCoordinator, MemoryCacheExclusiveAccess>();
             return services;
         }
     }

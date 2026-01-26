@@ -25,7 +25,7 @@ namespace Gym.WebApplication.Features.Login.Services
 
         public async Task Authenticate(String initData)
         {
-            var response = await _httpClient.PostAsJsonAsync("api/users/web-app-auth", new WebAppAuthRequest(initData));
+            var response = await _httpClient.PostAsJsonAsync("api/users/actions/web-app-auth", new WebAppAuthRequest(initData));
 
             if (!response.IsSuccessStatusCode)
                 throw new IOException($"{nameof(WebAppAuthService)} returned {response.StatusCode}");
