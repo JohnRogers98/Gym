@@ -8,20 +8,20 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Gym.WebApi.Controllers.Api.Bookings
+namespace Gym.WebApi.Controllers.Api.CalendarEvents.ClientOnly
 {
-    [Route("api/bookings")]
+    [Route("api/client-calendar-events/actions/book-training-event")]
     [ApiController]
     [Authorize(Policy = nameof(SecurityPolicy.ClientOnly))]
     public class BookTrainingEventController(IMediator _mediator, IMapper _mapper) : ControllerBase
     {
-        [HttpPost("actions/book-training-event")]
+        [HttpPost]
         public async Task<ActionResult<BookTrainingEventResponse>> BookTrainingEvent(BookTrainingEventRequest request)
         {
             try
             {
                 BookingDetails bookingDetails = await _mediator.Send(
-                    new BookTrainingEventCommand(User.GetRequiredUserId(), request.calendarEventId));
+                    new BookTrainingEventCommand(User.GetRequiredUserId(), request.CalendarEventId));
 
                 return base.Ok(_mapper.Map<BookTrainingEventResponse>(bookingDetails));
             }

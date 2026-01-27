@@ -1,4 +1,7 @@
 ﻿namespace Gym.WebDto.Requests.Users
 {
-    public record WebAppAuthRequest(String initData);
+    public record WebAppAuthRequest
+    {
+        public required String InitData { get; init; }
+    }
 }

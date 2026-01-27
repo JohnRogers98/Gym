@@ -1,4 +1,7 @@
 ﻿namespace Gym.WebDto.Responses.Bookings
 {
-    public record BookTrainingEventResponse(String bookingId);
+    public record BookTrainingEventResponse
+    {
+        public required String BookingId { get; init; }
+    }
 }

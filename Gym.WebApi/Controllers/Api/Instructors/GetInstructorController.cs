@@ -9,12 +9,12 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Gym.WebApi.Controllers.Api.Instructors
 {
-    [Route("api/instructors")]
+    [Route("api/instructors/{id}")]
     [ApiController]
     [Authorize(Policy = nameof(SecurityPolicy.RequireAuthenticated))]
     public class GetInstructorController(IMediator _mediator, IMapper _mapper) : ControllerBase
     {
-        [HttpGet("{id}")]
+        [HttpGet]
         public async Task<GetInstructorResponse> GetInstructor(String id)
         {
             InstructorDetails instructorDetails = await _mediator.Send(new GetInstructorByIdQuery(id));

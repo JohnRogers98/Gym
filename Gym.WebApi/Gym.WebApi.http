@@ -44,14 +44,20 @@ Content-Type: application/json
 
 
 
-### GetCalendarEvent
-GET {{Gym.WebApi_HostAddress}}/api/calendar-events/693ec754633885c0552c22a4
+### GetAdminCalendarEvent
+GET {{Gym.WebApi_HostAddress}}/api/admin-calendar-events/693ec754633885c0552c22a4
 
-### ListCalendarEvents
-GET {{Gym.WebApi_HostAddress}}/api/calendar-events
+### GetClientCalendarEvent
+GET {{Gym.WebApi_HostAddress}}/api/client-calendar-events/693ec754633885c0552c22a4
+
+### ListAdminCalendarEvents
+GET {{Gym.WebApi_HostAddress}}/api/admin-calendar-events
+
+### ListClientCalendarEvents
+GET {{Gym.WebApi_HostAddress}}/api/client-calendar-events
 
 ### CreateCalendarEvent
-POST {{Gym.WebApi_HostAddress}}/api/calendar-events
+POST {{Gym.WebApi_HostAddress}}/api/admin-calendar-events
 Content-Type: application/json
 
 {
@@ -75,7 +81,7 @@ Content-Type: application/json
 
 
 ### BookTrainingEventController
-POST {{Gym.WebApi_HostAddress}}/api/bookings/actions/book-training-event
+POST {{Gym.WebApi_HostAddress}}/api/client-calendar-events/actions/book-training-event
 Content-Type: application/json
 
 {

@@ -1,9 +1,10 @@
 ﻿using Gym.WebDto.Dto;
 
-namespace Gym.WebDto.Requests.CalendarEvent
+namespace Gym.WebDto.Responses.CalendarEvent
 {
-    public record CreateCalendarEventRequest
+    public record CreateCalendarEventResponse
     {
+        public required String Id { get; init; }
         public DateTime Start { get; init; }
         public DateTime? End { get; init; }
         public required TrainingDto Training { get; init; }

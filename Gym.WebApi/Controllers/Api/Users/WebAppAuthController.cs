@@ -10,15 +10,15 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Gym.WebApi.Controllers.Api.Users
 {
-    [Route("api/users")]
+    [Route("api/users/actions/web-app-auth")]
     [ApiController]
     [AllowAnonymous]
     public class WebAppAuthController(IMediator _mediator, IMapper _mapper, IAccessTokenGenerator _accessTokenGenerator) : ControllerBase
     {
-        [HttpPost("actions/web-app-auth")]
+        [HttpPost]
         public async Task<ActionResult<WebAppAuthResponse>> WebAppAuth(WebAppAuthRequest request)
         {
-            UserDetails userDetails = await _mediator.Send(new AuthenticateUserCommand(request.initData));
+            UserDetails userDetails = await _mediator.Send(new AuthenticateUserCommand(request.InitData));
 
             String accessToken = _accessTokenGenerator.Generate(userDetails);
 

@@ -27,17 +27,17 @@ else
     {
         _calendarItems = await CalendarService.GetAllCalendarItemsAsync();
 
-        _selectedItems = _calendarItems.Where(aCalendarEvent => aCalendarEvent.start.ToDateOnly() == DateTime.Now.ToDateOnly());
+        _selectedItems = _calendarItems.Where(aCalendarEvent => aCalendarEvent.Start.ToDateOnly() == DateTime.Now.ToDateOnly());
     }
 
     private void DatePicked(DateOnly pickedDate)
     {
-        _selectedItems = _calendarItems?.Where(aCalendarEvent => aCalendarEvent.start.ToDateOnly() == pickedDate) ?? Enumerable.Empty<CalendarItemViewModel>();
+        _selectedItems = _calendarItems?.Where(aCalendarEvent => aCalendarEvent.Start.ToDateOnly() == pickedDate) ?? Enumerable.Empty<CalendarItemViewModel>();
         base.StateHasChanged();
     }
 
     private void Subscribe(CalendarItemViewModel selectdCalendarEvent)
     {
-        Console.WriteLine($"Subscibe to {selectdCalendarEvent.training.name}");
+        Console.WriteLine($"Subscibe to {selectdCalendarEvent.Training.Name}");
     }
 }

@@ -10,8 +10,8 @@ namespace Gym.WebApplication.Features.Calendar.Services
     {
         public async Task<IEnumerable<CalendarItemViewModel>> GetAllCalendarItemsAsync()
         {
-            var response = await _httpClient.GetFromJsonAsync<ListResponse<CalendarEventDto>>("api/calendar-events");
-            return _mapper.Map<IEnumerable<CalendarItemViewModel>>(response!.data);
+            var response = await _httpClient.GetFromJsonAsync<ListResponse<AdminCalendarEventDto>>("api/client-calendar-events");
+            return _mapper.Map<IEnumerable<CalendarItemViewModel>>(response!.Data);
         }
     }
 }

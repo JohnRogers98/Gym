@@ -7,18 +7,22 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Gym.WebApi.Controllers.Api.CalendarEvents
+namespace Gym.WebApi.Controllers.Api.CalendarEvents.ClientOnly
 {
-    [Route("api/calendar-events")]
+    [Route("api/client-calendar-events/{id}")]
     [ApiController]
-    [Authorize(Policy = nameof(SecurityPolicy.RequireAuthenticated))]
+    [Authorize(Policy = nameof(SecurityPolicy.ClientOnly))]
     public class GetCalendarEventController(IMediator _mediator, IMapper _mapper) : ControllerBase
     {
-        [HttpGet("{id}")]
-        public async Task<GetCalendarEventResponse> GetCalendarEvent(String id)
+        [HttpGet]
+        public async Task<GetClientCalendarEventResponse> GetCalendarEvent(String id)
         {
             CalendarEventDetails calendarEventDetails = await _mediator.Send(_mapper.Map<GetCalendarEventByIdQuery>(id));
-            return _mapper.Map<GetCalendarEventResponse>(calendarEventDetails);
+            
+            return _mapper.Map<GetClientCalendarEventResponse>(calendarEventDetails, opts =>
+            {
+                opts.Items["CurrentUserId"] = User.GetRequiredUserId();
+            });
         }
     }
 }

@@ -39,10 +39,26 @@ namespace Gym.WebApi.Mappings
             CreateMap<TrainingDto, TrainingDetails>();
 
             CreateMap<CreateCalendarEventRequest, CreateCalendarEventCommand>();
-            CreateMap<CalendarEventDetails, CreateCallendarEventResponse>();
+            CreateMap<CalendarEventDetails, CreateCalendarEventResponse>();
 
-            CreateMap<CalendarEventDetails, GetCalendarEventResponse>();
-            CreateMap<CalendarEventDetails, CalendarEventDto>();
+            CreateMap<CalendarEventDetails, GetAdminCalendarEventResponse>();
+            CreateMap<CalendarEventDetails, AdminCalendarEventDto>();
+
+            CreateMap<CalendarEventDetails, GetClientCalendarEventResponse>()
+              .ForMember(dest => dest.IsAlreadyBooked,
+                opt => opt.MapFrom((src, dest, _, context) =>
+                {
+                    var currentUserId = (String)context.Items["CurrentUserId"];
+                    return src.BookingUsers.Any(aUserId => aUserId == currentUserId);
+                }));
+
+            CreateMap<CalendarEventDetails, ClientCalendarEventDto>()
+              .ForMember(dest => dest.IsAlreadyBooked,
+                opt => opt.MapFrom((src, dest, _, context) =>
+                {
+                    var currentUserId = (String)context.Items["CurrentUserId"];
+                    return src.BookingUsers.Any(aUserId => aUserId == currentUserId);
+                }));
 
             CreateMap<UserDetails, WebAppAuthResponse>();
 

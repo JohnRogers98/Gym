@@ -1,4 +1,7 @@
 ﻿namespace Gym.WebDto.Requests.Bookings
 {
-    public record BookTrainingEventRequest(String calendarEventId);
+    public record BookTrainingEventRequest
+    {
+        public required String CalendarEventId { get; init; }
+    }
 }

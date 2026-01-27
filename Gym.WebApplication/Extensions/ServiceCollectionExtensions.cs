@@ -4,7 +4,7 @@ namespace Gym.WebApplication.Extensions
 {
     public static class ServiceCollectionExtensions
     {
-        public static IServiceCollection AddHttpClient(this IServiceCollection services) 
+        public static IServiceCollection AddHttpClient(this IServiceCollection services, IConfiguration configuration) 
         {
             services.AddScoped<CookieHandler>();
             services.AddScoped(sp =>
@@ -18,7 +18,7 @@ namespace Gym.WebApplication.Extensions
 
                 return new HttpClient(cookieHandler)
                 {
-                    BaseAddress = new Uri("https://localhost:7246")
+                    BaseAddress = new Uri(configuration["WebApiBaseUrl"]!)
                 };
             });
 

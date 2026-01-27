@@ -21,6 +21,7 @@ namespace Gym.Application.Extensions
                 calendarEvent.End,
                 calendarEvent.Training.ToDetails(),
                 calendarEvent.MaxClientCount,
+                calendarEvent.Bookings.Select(aUserId => aUserId.Value),
                 calendarEvent.Instructors.ToDetails());
         }
 
@@ -28,7 +29,7 @@ namespace Gym.Application.Extensions
             => new TrainingDetails(trainingInfo.Id.Value, trainingInfo.Name, trainingInfo.Description);
 
         public static TrainingInfo ToInfo(this TrainingDetails trainingDetails)
-            => TrainingInfo.Create(TrainingId.From(trainingDetails.id), trainingDetails.name, trainingDetails.description);
+            => TrainingInfo.Create(TrainingId.From(trainingDetails.Id), trainingDetails.Name, trainingDetails.Description);
 
         public static InstructorDetails ToDetails(this InstructorInfo instructorInfo)
             => new InstructorDetails(instructorInfo.Id.Value, instructorInfo.FirstName, instructorInfo.LastName);
@@ -37,7 +38,7 @@ namespace Gym.Application.Extensions
             => instructorInfo?.Select(info => info.ToDetails());
 
         public static InstructorInfo ToInfo(this InstructorDetails instructorDetails)
-            => InstructorInfo.Create(InstructorId.From(instructorDetails.id), instructorDetails.firstName, instructorDetails.lastName);
+            => InstructorInfo.Create(InstructorId.From(instructorDetails.Id), instructorDetails.FirstName, instructorDetails.LastName);
 
         public static IEnumerable<InstructorInfo>? ToInfos(this IEnumerable<InstructorDetails>? instructorDetails)
             => instructorDetails?.Select(details => details.ToInfo());
