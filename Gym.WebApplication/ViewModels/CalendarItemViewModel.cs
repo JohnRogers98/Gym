@@ -8,5 +8,6 @@
         public required TrainingViewModel Training { get; init; }
         public Int32? MaxClientCount { get; init; }
         public IEnumerable<InstructorViewModel>? Instructors { get; init; }
+        public Boolean IsAlreadyBooked { get; init; }
     }
 }

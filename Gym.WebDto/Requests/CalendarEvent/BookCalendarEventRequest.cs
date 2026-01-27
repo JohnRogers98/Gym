@@ -1,4 +1,4 @@
-﻿namespace Gym.WebDto.Requests.Bookings
+﻿namespace Gym.WebDto.Requests.CalendarEvent
 {
     public record BookTrainingEventRequest
     {

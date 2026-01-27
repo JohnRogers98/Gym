@@ -81,7 +81,7 @@ Content-Type: application/json
 
 
 ### BookTrainingEventController
-POST {{Gym.WebApi_HostAddress}}/api/client-calendar-events/actions/book-training-event
+POST {{Gym.WebApi_HostAddress}}/api/client-calendar-events/actions/book
 Content-Type: application/json
 
 {

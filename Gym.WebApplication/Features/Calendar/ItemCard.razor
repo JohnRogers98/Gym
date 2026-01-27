@@ -48,12 +48,24 @@
     </MudCardContent>
 
     <MudCardActions>
-        <MudButton FullWidth="true"
-                   Variant="Variant.Filled"
-                   Color="Color.Primary"
-                   OnClick="@(async (_) => await OnSelected.InvokeAsync(CalendarItem))">
-            Записаться
-        </MudButton>
+        @if(CalendarItem.IsAlreadyBooked)
+        {
+            <MudButton FullWidth="true"
+                       Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       Disabled="true">
+                Вы уже записаны
+            </MudButton>
+        }
+        else
+        {
+            <MudButton FullWidth="true"
+                       Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       OnClick="@(async (_) => await OnSelected.InvokeAsync(CalendarItem))">
+                Записаться
+            </MudButton>
+        }
     </MudCardActions>
 
 </MudCard>    

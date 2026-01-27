@@ -2,7 +2,7 @@
 using Gym.Application.Services.BookingApi;
 using Gym.Application.Services.BookingApi.BookTrainingEvent;
 using Gym.WebApi.Extensions;
-using Gym.WebDto.Requests.Bookings;
+using Gym.WebDto.Requests.CalendarEvent;
 using Gym.WebDto.Responses.Bookings;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -10,10 +10,10 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Gym.WebApi.Controllers.Api.CalendarEvents.ClientOnly
 {
-    [Route("api/client-calendar-events/actions/book-training-event")]
+    [Route("api/client-calendar-events/actions/book")]
     [ApiController]
     [Authorize(Policy = nameof(SecurityPolicy.ClientOnly))]
-    public class BookTrainingEventController(IMediator _mediator, IMapper _mapper) : ControllerBase
+    public class BookCalendarEventController(IMediator _mediator, IMapper _mapper) : ControllerBase
     {
         [HttpPost]
         public async Task<ActionResult<BookTrainingEventResponse>> BookTrainingEvent(BookTrainingEventRequest request)

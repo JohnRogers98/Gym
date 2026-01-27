@@ -13,7 +13,7 @@ namespace Gym.WebApplication.Mappings
             base.CreateMap<InstructorDto, InstructorViewModel>()
                   .ForMember(dest => dest.FullName, opt => opt.MapFrom((src, dest, _, context) => $"{src.FirstName} {src.LastName ?? String.Empty}"));
 
-            base.CreateMap<AdminCalendarEventDto, CalendarItemViewModel>();
+            base.CreateMap<ClientCalendarEventDto, CalendarItemViewModel>();
         }
     }
 }
