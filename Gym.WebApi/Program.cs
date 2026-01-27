@@ -33,7 +33,13 @@ if (app.Environment.IsDevelopment())
 
 app.UseCors(nameof(CorsPolicy.AllowWebApplication));
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection(); - НЕ ЗАБЫТЬ РАССКОММЕНТИРОВАТЬ
+
+//ВРЕМЕННОЕ РЕШЕНИЕ - УБРАТЬ(?)
+app.MapGet("/", () => "Gym API is running");
+app.MapGet("/health", () => Results.Ok(new { status = "Healthy", timestamp = DateTime.UtcNow }));
+app.MapGet("/ping", () => "pong");
+//ВРЕМЕННОЕ РЕШЕНИЕ
 
 app.UseAuthentication();
 

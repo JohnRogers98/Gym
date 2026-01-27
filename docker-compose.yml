@@ -6,31 +6,29 @@ services:
     container_name: gym-mongodb
     ports:
       - "27017:27017"
-    environment:
-      - MONGO_INITDB_DATABASE=my-test-db
     volumes:
       - mongodb_data:/data/db
     restart: unless-stopped
 
   gym-app:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    build: .
     container_name: gym-fullstack-app
     ports:
-      - "8080:80"
+      - "8081:8080"
+    env_file:
+      - .env
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - DOTNET_CLI_TELEMETRY_OPTOUT=1
-      - MongodDb__ConnectionString=mongodb://mongodb:27017/  # <-- используем имя сервиса
+      - ASPNETCORE_URLS=http://+:8080
+      - WebApplicationUrl=http://localhost:8080
+      - MongoDB__ConnectionString=mongodb://mongodb:27017/
+      - MongoDB__DatabaseName=gym-db
+      - Jwt__Secret=${JWT_SECRET}
+      - Tg__Bot__Token=${TG_BOT_TOKEN}
     depends_on:
       - mongodb
     restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:80/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
 
 volumes:
   mongodb_data:
