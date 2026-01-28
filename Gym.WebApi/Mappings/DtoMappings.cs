@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Gym.Application.Services.BookingApi;
 using Gym.Application.Services.CalendarEventApi;
 using Gym.Application.Services.CalendarEventApi.CreateCalendarEvent;
 using Gym.Application.Services.InstructorApi;
@@ -10,6 +11,7 @@ using Gym.WebDto.Dto;
 using Gym.WebDto.Requests.CalendarEvent;
 using Gym.WebDto.Requests.Instructor;
 using Gym.WebDto.Requests.Training;
+using Gym.WebDto.Responses.Bookings;
 using Gym.WebDto.Responses.CalendarEvent;
 using Gym.WebDto.Responses.Instructor;
 using Gym.WebDto.Responses.Training;
@@ -37,12 +39,30 @@ namespace Gym.WebApi.Mappings
             CreateMap<TrainingDto, TrainingDetails>();
 
             CreateMap<CreateCalendarEventRequest, CreateCalendarEventCommand>();
-            CreateMap<CalendarEventDetails, CreateCallendarEventResponse>();
+            CreateMap<CalendarEventDetails, CreateCalendarEventResponse>();
 
-            CreateMap<CalendarEventDetails, GetCalendarEventResponse>();
-            CreateMap<CalendarEventDetails, CalendarEventDto>();
+            CreateMap<CalendarEventDetails, GetAdminCalendarEventResponse>();
+            CreateMap<CalendarEventDetails, AdminCalendarEventDto>();
+
+            CreateMap<CalendarEventDetails, GetClientCalendarEventResponse>()
+              .ForMember(dest => dest.IsAlreadyBooked,
+                opt => opt.MapFrom((src, dest, _, context) =>
+                {
+                    var currentUserId = (String)context.Items["CurrentUserId"];
+                    return src.BookingUsers.Any(aUserId => aUserId == currentUserId);
+                }));
+
+            CreateMap<CalendarEventDetails, ClientCalendarEventDto>()
+              .ForMember(dest => dest.IsAlreadyBooked,
+                opt => opt.MapFrom((src, dest, _, context) =>
+                {
+                    var currentUserId = (String)context.Items["CurrentUserId"];
+                    return src.BookingUsers.Any(aUserId => aUserId == currentUserId);
+                }));
 
             CreateMap<UserDetails, WebAppAuthResponse>();
+
+            CreateMap<BookingDetails, BookTrainingEventResponse>();
         }
     }
 }

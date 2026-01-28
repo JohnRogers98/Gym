@@ -5,6 +5,13 @@ using System.Security.Claims;
 
 namespace Gym.WebApplication.Features.Login.Services
 {
+    public interface IWebAppAuthService
+    {
+        event Action<ClaimsPrincipal>? UserChanged;
+        ClaimsPrincipal CurrentUser { get; set; }
+        Task Authenticate(String initData);
+    }
+
     public class WebAppAuthService(HttpClient _httpClient) : IWebAppAuthService
     {
         public event Action<ClaimsPrincipal>? UserChanged;
@@ -25,7 +32,7 @@ namespace Gym.WebApplication.Features.Login.Services
 
         public async Task Authenticate(String initData)
         {
-            var response = await _httpClient.PostAsJsonAsync("api/users/web-app-auth", new WebAppAuthRequest(initData));
+            var response = await _httpClient.PostAsJsonAsync("api/users/actions/web-app-auth", new WebAppAuthRequest { InitData = initData });
 
             if (!response.IsSuccessStatusCode)
                 throw new IOException($"{nameof(WebAppAuthService)} returned {response.StatusCode}");
@@ -35,7 +42,7 @@ namespace Gym.WebApplication.Features.Login.Services
 
             var identity = new ClaimsIdentity(
             [
-                new Claim(ClaimTypes.Role, webAuthResponse.role),
+                new Claim(ClaimTypes.Role, webAuthResponse.Role),
             ], "WebApp Authentication");
 
             CurrentUser = new ClaimsPrincipal(identity);

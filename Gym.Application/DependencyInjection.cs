@@ -1,4 +1,5 @@
 ﻿using Gym.Application.Services.DomainEventPublisher;
+using Gym.Domain._Shared.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Runtime.CompilerServices;
@@ -19,6 +20,7 @@ namespace Gym.Application
             });
 
             services.AddScoped<IDomainEventPublisher, DomainEventPublisher>();
+            services.AddScoped<ITrainingBookingService, TrainingBookingService>();
 
             return services;
         }

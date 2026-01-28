@@ -1,5 +1,7 @@
 ﻿@page "/calendar"
 @using Gym.WebApplication.Features.Calendar.Services
+@using System.Collections.ObjectModel
+@using System.Collections.Specialized
 
 @attribute [Authorize]
 
@@ -14,30 +16,57 @@ else
 {
     <Picker OnDatePicked="@this.DatePicked"></Picker>
     
-    <ItemsContainer CalendarItems="@_selectedItems" OnSelectedCalendarItem="@this.Subscribe"></ItemsContainer>
+    <ItemsContainer CalendarItems="@_selectedItems" OnSelectedCalendarItem="@this.BookEvent"></ItemsContainer>
 }
 
 
 @code {
-    private IEnumerable<CalendarItemViewModel> _calendarItems = default!;
+    private List<CalendarItemViewModel> _calendarItems = default!;
 
-    private IEnumerable<CalendarItemViewModel> _selectedItems = default!;
+    private List<CalendarItemViewModel> _selectedItems = default!;
+
+    private DateOnly? _pickedDate = default; 
 
     protected override async Task OnInitializedAsync()
     {
-        _calendarItems = await CalendarService.GetAllCalendarItemsAsync();
+        var loadedCalendarEvents = await CalendarService.GetAllCalendarItemsAsync();
+        _calendarItems = new List<CalendarItemViewModel>(loadedCalendarEvents);
 
-        _selectedItems = _calendarItems.Where(aCalendarEvent => aCalendarEvent.start.ToDateOnly() == DateTime.Now.ToDateOnly());
+        _pickedDate = DateTime.Now.ToDateOnly();
+        this.RefreshSelectedItems();
     }
 
     private void DatePicked(DateOnly pickedDate)
     {
-        _selectedItems = _calendarItems?.Where(aCalendarEvent => aCalendarEvent.start.ToDateOnly() == pickedDate) ?? Enumerable.Empty<CalendarItemViewModel>();
+        _pickedDate = pickedDate;
+        this.RefreshSelectedItems();
         base.StateHasChanged();
     }
 
-    private void Subscribe(CalendarItemViewModel selectdCalendarEvent)
+    private async void BookEvent(CalendarItemViewModel selectdCalendarEvent)
     {
-        Console.WriteLine($"Subscibe to {selectdCalendarEvent.training.name}");
+        Boolean bookingSuccessful = await CalendarService.BookCalendarItem(selectdCalendarEvent);
+        if (bookingSuccessful)
+        {
+            var indexOfEvent = _calendarItems.IndexOf(selectdCalendarEvent);
+            if (indexOfEvent >= 0)
+            {
+                var eventWithUpdatedBookingStatus = selectdCalendarEvent with
+                {
+                    IsAlreadyBooked = true
+                };
+
+                _calendarItems[indexOfEvent] = eventWithUpdatedBookingStatus;
+                this.RefreshSelectedItems();
+            }
+
+            base.StateHasChanged();
+        }
+        else
+        {
+            Console.WriteLine("Booking status error.");
+        }
     }
+
+    private void RefreshSelectedItems() => _selectedItems = new(_calendarItems.Where(aCalendarEvent => aCalendarEvent.Start.ToDateOnly() == _pickedDate));
 }

@@ -8,23 +8,23 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Gym.WebApi.Controllers.Api.CalendarEvents
+namespace Gym.WebApi.Controllers.Api.CalendarEvents.AdminOnly
 {
-    [Route("api/calendar-events")]
+    [Route("api/admin-calendar-events")]
     [ApiController]
     [Authorize(Policy = nameof(SecurityPolicy.AdminOnly))]
     public class CreateCalendarEventController(IMediator _mediator, IMapper _mapper) : ControllerBase
     {
         [HttpPost]
-        public async Task<ActionResult<CreateCallendarEventResponse>> CreateCalendarEvent(CreateCalendarEventRequest request)
+        public async Task<ActionResult<CreateCalendarEventResponse>> CreateCalendarEvent(CreateCalendarEventRequest request)
         {
             CalendarEventDetails calendarEventDetails = await _mediator.Send(_mapper.Map<CreateCalendarEventCommand>(request));
 
             return base.CreatedAtAction(
                 nameof(GetCalendarEventController.GetCalendarEvent),
                 "GetCalendarEvent",
-                new { calendarEventDetails.id },
-                _mapper.Map<CreateCallendarEventResponse>(calendarEventDetails));
+                new { calendarEventDetails.Id },
+                _mapper.Map<CreateCalendarEventResponse>(calendarEventDetails));
             
         }
     }

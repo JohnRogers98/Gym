@@ -6,5 +6,6 @@ namespace Gym.Domain.CalendarEventAggregate
     {
         Task<CalendarEvent?> GetByIdAsync(CalendarEventId id, CancellationToken cancellationToken);
         Task<IEnumerable<CalendarEvent>> GetAllAsync(CancellationToken cancellationToken);
+        Task<Boolean> ExistsAsync(CalendarEventId id, CancellationToken cancellationToken);
     }
 }

@@ -1,5 +1,15 @@
 ﻿@Gym.WebApi_HostAddress = https://localhost:7246
 
+### AuthenticateWebAppUser
+POST {{Gym.WebApi_HostAddress}}/api/users/actions/web-app-auth
+Content-Type: application/json
+
+{
+  "initData": "tgWebAppData=user%3D%257B%2522id%2522%253A5265776755%252C%2522first_name%2522%253A%2522Andrey%2522%252C%2522last_name%2522%253A%2522Kardashian%2522%252C%2522username%2522%253A%2522john_rogers_zhuzhma%2522%252C%2522language_code%2522%253A%2522en%2522%252C%2522allows_write_to_pm%2522%253Atrue%252C%2522photo_url%2522%253A%2522https%253A%255C%252F%255C%252Ft.me%255C%252Fi%255C%252Fuserpic%255C%252F320%255C%252FBoKwKY5IpDRWz6uIog74D57Ss61WeT4Jf5zTwZZS-1eHFwRJR56ePM-6SrkBKkaV.svg%2522%257D%26chat_instance%3D4756907096746764373%26chat_type%3Dprivate%26auth_date%3D1766844573%26signature%3DeNGfNiBcoU6lw7RV9SNMKxZNVfpltKsRWBG0MwDi1mzuLHnq0z_KkCRFnThl071xnR7cyWZ_IxcS2pz80NFHBQ%26hash%3D95553035c77fe4aa746125e758e8393d89e8fd15b18ec8de1471903d4ce1d044"
+}
+
+
+
 ### GetInstructor
 GET {{Gym.WebApi_HostAddress}}/api/instructors/6941c40f2069e8a0a412f10d
 
@@ -34,14 +44,20 @@ Content-Type: application/json
 
 
 
-### GetCalendarEvent
-GET {{Gym.WebApi_HostAddress}}/api/calendar-events/693ec754633885c0552c22a4
+### GetAdminCalendarEvent
+GET {{Gym.WebApi_HostAddress}}/api/admin-calendar-events/693ec754633885c0552c22a4
 
-### ListCalendarEvents
-GET {{Gym.WebApi_HostAddress}}/api/calendar-events
+### GetClientCalendarEvent
+GET {{Gym.WebApi_HostAddress}}/api/client-calendar-events/693ec754633885c0552c22a4
+
+### ListAdminCalendarEvents
+GET {{Gym.WebApi_HostAddress}}/api/admin-calendar-events
+
+### ListClientCalendarEvents
+GET {{Gym.WebApi_HostAddress}}/api/client-calendar-events
 
 ### CreateCalendarEvent
-POST {{Gym.WebApi_HostAddress}}/api/calendar-events
+POST {{Gym.WebApi_HostAddress}}/api/admin-calendar-events
 Content-Type: application/json
 
 {
@@ -64,10 +80,10 @@ Content-Type: application/json
 
 
 
-### AuthenticateWebAppUser
-POST {{Gym.WebApi_HostAddress}}/api/users/web-app-auth
+### BookTrainingEventController
+POST {{Gym.WebApi_HostAddress}}/api/client-calendar-events/actions/book
 Content-Type: application/json
 
 {
-  "initData": "tgWebAppData=user%3D%257B%2522id%2522%253A5265776755%252C%2522first_name%2522%253A%2522Andrey%2522%252C%2522last_name%2522%253A%2522Kardashian%2522%252C%2522username%2522%253A%2522john_rogers_zhuzhma%2522%252C%2522language_code%2522%253A%2522en%2522%252C%2522allows_write_to_pm%2522%253Atrue%252C%2522photo_url%2522%253A%2522https%253A%255C%252F%255C%252Ft.me%255C%252Fi%255C%252Fuserpic%255C%252F320%255C%252FBoKwKY5IpDRWz6uIog74D57Ss61WeT4Jf5zTwZZS-1eHFwRJR56ePM-6SrkBKkaV.svg%2522%257D%26chat_instance%3D4756907096746764373%26chat_type%3Dprivate%26auth_date%3D1766844573%26signature%3DeNGfNiBcoU6lw7RV9SNMKxZNVfpltKsRWBG0MwDi1mzuLHnq0z_KkCRFnThl071xnR7cyWZ_IxcS2pz80NFHBQ%26hash%3D95553035c77fe4aa746125e758e8393d89e8fd15b18ec8de1471903d4ce1d044"
+  "calendarEventId" : "693ec754633885c0552c22a4"
 }

@@ -23,7 +23,7 @@ namespace Gym.WebApi.Controllers.Api.Trainings
             return base.CreatedAtAction(
                 nameof(GetTrainingController.GetTraining),
                 "GetTraining",
-                new { trainingDetails.id },
+                new { trainingDetails.Id },
                 _mapper.Map<CreateTrainingResponse>(trainingDetails));
         }
     }

@@ -11,9 +11,9 @@ namespace Gym.WebApplication.Mappings
             base.CreateMap<TrainingDto, TrainingViewModel>();
 
             base.CreateMap<InstructorDto, InstructorViewModel>()
-                .ConstructUsing(src => new InstructorViewModel(src.id, $"{src.firstName} {src.lastName ?? String.Empty}"));
+                  .ForMember(dest => dest.FullName, opt => opt.MapFrom((src, dest, _, context) => $"{src.FirstName} {src.LastName ?? String.Empty}"));
 
-            base.CreateMap<CalendarEventDto, CalendarItemViewModel>();
+            base.CreateMap<ClientCalendarEventDto, CalendarItemViewModel>();
         }
     }
 }

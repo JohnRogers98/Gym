@@ -6,7 +6,7 @@
         <CardHeaderAvatar>
             <div style="display: flex; flex-direction: column; align-items: center;">
                 <MudAvatar Size="Size.Large" Color="Color.Primary" Class="mb-1">
-                    @CalendarItem.start.Day
+                    @CalendarItem.Start.Day
                 </MudAvatar>
                 <MudText Color="Color.Primary" Typo="Typo.caption" Class="mt-1">
                     @this.GetMonthText()
@@ -17,11 +17,11 @@
         <CardHeaderContent>
             <MudStack Spacing="2">
                 <MudText Typo="Typo.h6" Class="text-truncate">
-                    @CalendarItem.training.name
+                    @CalendarItem.Training.Name
                 </MudText>
                 <MudText Color="Color.Default" Typo="Typo.body2">
                     <MudIcon Icon="@Icons.Material.Filled.AccessTime" Color="Color.Primary" Size="Size.Small" />
-                    @CalendarItem.start.ToString("HH:mm") - @CalendarItem.end?.ToString("HH:mm")
+                    @CalendarItem.Start.ToString("HH:mm") - @CalendarItem.End?.ToString("HH:mm")
                 </MudText>
             </MudStack>
         </CardHeaderContent>
@@ -30,17 +30,17 @@
     <MudDivider />
 
     <MudCardContent>
-        <MudText>@CalendarItem.training.description</MudText>
+        <MudText>@CalendarItem.Training.Description</MudText>
 
-        @if(CalendarItem.instructors?.Any() == true)
+        @if(CalendarItem.Instructors?.Any() == true)
         {
              <MudList T="InstructorDto" Dense="true" Gutters="false" Class="my-2">
-                @foreach (var instructor in CalendarItem.instructors)
+                @foreach (var instructor in CalendarItem.Instructors)
                 {
                     <MudListItem>
                         <MudIcon Icon="@Icons.Material.Filled.Person"
                                  Size="Size.Small"/>
-                        @instructor.fullName
+                        @instructor.FullName
                     </MudListItem>
                 }
             </MudList>
@@ -48,12 +48,24 @@
     </MudCardContent>
 
     <MudCardActions>
-        <MudButton FullWidth="true"
-                   Variant="Variant.Filled"
-                   Color="Color.Primary"
-                   OnClick="@(async (_) => await OnSelected.InvokeAsync(CalendarItem))">
-            Записаться
-        </MudButton>
+        @if(CalendarItem.IsAlreadyBooked)
+        {
+            <MudButton FullWidth="true"
+                       Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       Disabled="true">
+                Вы уже записаны
+            </MudButton>
+        }
+        else
+        {
+            <MudButton FullWidth="true"
+                       Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       OnClick="@(async (_) => await OnSelected.InvokeAsync(CalendarItem))">
+                Записаться
+            </MudButton>
+        }
     </MudCardActions>
 
 </MudCard>    
@@ -64,5 +76,5 @@
     
     [Parameter] public EventCallback<CalendarItemViewModel> OnSelected { get; set; }
 
-    private String GetMonthText() => CalendarItem.start.ToString("MMM");
+    private String GetMonthText() => CalendarItem.Start.ToString("MMM");
 }

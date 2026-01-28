@@ -1,4 +1,4 @@
 ﻿namespace Gym.Application.Services.InstructorApi
 {
-    public record InstructorDetails(String id, String firstName, String? lastName);
+    public record InstructorDetails(String Id, String FirstName, String? LastName);
 }

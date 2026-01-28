@@ -1,7 +1,9 @@
-﻿using Gym.Application.Services.CalendarEventApi;
+﻿using Gym.Application.Services.BookingApi;
+using Gym.Application.Services.CalendarEventApi;
 using Gym.Application.Services.InstructorApi;
 using Gym.Application.Services.TrainingApi;
 using Gym.Application.Services.UserApi;
+using Gym.Domain.BookingAggregate;
 using Gym.Domain.CalendarEventAggregate;
 using Gym.Domain.InstructorAggregate;
 using Gym.Domain.TrainingAggregate;
@@ -19,6 +21,7 @@ namespace Gym.Application.Extensions
                 calendarEvent.End,
                 calendarEvent.Training.ToDetails(),
                 calendarEvent.MaxClientCount,
+                calendarEvent.Bookings.Select(aUserId => aUserId.Value),
                 calendarEvent.Instructors.ToDetails());
         }
 
@@ -26,7 +29,7 @@ namespace Gym.Application.Extensions
             => new TrainingDetails(trainingInfo.Id.Value, trainingInfo.Name, trainingInfo.Description);
 
         public static TrainingInfo ToInfo(this TrainingDetails trainingDetails)
-            => TrainingInfo.Create(TrainingId.From(trainingDetails.id), trainingDetails.name, trainingDetails.description);
+            => TrainingInfo.Create(TrainingId.From(trainingDetails.Id), trainingDetails.Name, trainingDetails.Description);
 
         public static InstructorDetails ToDetails(this InstructorInfo instructorInfo)
             => new InstructorDetails(instructorInfo.Id.Value, instructorInfo.FirstName, instructorInfo.LastName);
@@ -35,7 +38,7 @@ namespace Gym.Application.Extensions
             => instructorInfo?.Select(info => info.ToDetails());
 
         public static InstructorInfo ToInfo(this InstructorDetails instructorDetails)
-            => InstructorInfo.Create(InstructorId.From(instructorDetails.id), instructorDetails.firstName, instructorDetails.lastName);
+            => InstructorInfo.Create(InstructorId.From(instructorDetails.Id), instructorDetails.FirstName, instructorDetails.LastName);
 
         public static IEnumerable<InstructorInfo>? ToInfos(this IEnumerable<InstructorDetails>? instructorDetails)
             => instructorDetails?.Select(details => details.ToInfo());
@@ -48,5 +51,8 @@ namespace Gym.Application.Extensions
 
         public static UserDetails ToDetails(this User user)
             => new UserDetails(user.Id.Value, user.Role.ToString(), user.TelegramId?.Value);
+
+        public static BookingDetails ToDetails(this Booking booking)
+           => new BookingDetails(booking.Id.Value);
     }
 }
