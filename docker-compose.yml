@@ -1,34 +1,47 @@
+# docker-compose.yml
 version: '3.8'
 
 services:
   mongodb:
-    image: mongo:7.0
+    image: mongo:7-jammy
     container_name: gym-mongodb
     ports:
       - "27017:27017"
     volumes:
       - mongodb_data:/data/db
-    restart: unless-stopped
+    networks:
+      - gym-net
 
-  gym-app:
-    build: .
-    container_name: gym-fullstack-app
+  backend:
+    build:
+      context: .
+      dockerfile: Gym.WebApi/Dockerfile
+    container_name: gym-backend
     ports:
-      - "8081:8080"
-    env_file:
-      - .env
+      - "8080:8080"
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
-      - DOTNET_CLI_TELEMETRY_OPTOUT=1
-      - ASPNETCORE_URLS=http://+:8080
-      - WebApplicationUrl=http://localhost:8080
-      - MongoDB__ConnectionString=mongodb://mongodb:27017/
-      - MongoDB__DatabaseName=gym-db
-      - Jwt__Secret=${JWT_SECRET}
-      - Tg__Bot__Token=${TG_BOT_TOKEN}
+      - JWT_SECRET=${JWT_SECRET}
+      - TG_BOT_TOKEN=${TG_BOT_TOKEN}
+      - WebApplicationUrl=http://localhost
     depends_on:
       - mongodb
-    restart: unless-stopped
+    networks:
+      - gym-net
+
+  ui:
+    build:
+      context: .
+      dockerfile: Gym.WebApplication/Dockerfile
+    container_name: gym-ui
+    ports:
+      - "80:80"
+    networks:
+      - gym-net
 
 volumes:
   mongodb_data:
+
+networks:
+  gym-net:
+    driver: bridge
