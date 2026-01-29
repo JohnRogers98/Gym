@@ -45,6 +45,11 @@
                 }
             </MudList>
         }
+
+        @if (CalendarItem.MaxClientCount.HasValue)
+        {
+            <MudProgressLinear Color="Color.Tertiary" Size="Size.Medium" Min="0" Max="@CalendarItem.MaxClientCount.Value" Value="@CalendarItem.CurrentClientCount" />
+        }
     </MudCardContent>
 
     <MudCardActions>
@@ -55,6 +60,15 @@
                        Color="Color.Primary"
                        Disabled="true">
                 Вы уже записаны
+            </MudButton>
+        }
+        else if (CalendarItem.IsFull())
+        {
+            <MudButton FullWidth="true"
+                       Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       Disabled="true">
+                Мест нет
             </MudButton>
         }
         else
