@@ -7,3 +7,4 @@ RUN dotnet publish "Gym.WebApplication/Gym.WebApplication.csproj" -c Release -o 
 FROM nginx:alpine AS final
 WORKDIR /usr/share/nginx/html
 COPY --from=build /app/publish/wwwroot .
+COPY nginx.conf /etc/nginx/nginx.conf 
