@@ -1,5 +1,7 @@
-﻿using Gym.Application.Services.DomainEventPublisher;
+﻿using Gym.Application.Aspects;
+using Gym.Application.Services.DomainEventPublisher;
 using Gym.Domain._Shared.Services;
+using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Runtime.CompilerServices;
@@ -17,6 +19,8 @@ namespace Gym.Application
                 cfg.LicenseKey = configuration["MEDIATR_LICENSE_KEY"];
                 cfg.Lifetime = ServiceLifetime.Scoped;
                 cfg.RegisterServicesFromAssembly(typeof(DependencyInjection).Assembly);
+
+                services.AddScoped(typeof(IPipelineBehavior<,>), typeof(LogAspect<,>));
             });
 
             services.AddScoped<IDomainEventPublisher, DomainEventPublisher>();
