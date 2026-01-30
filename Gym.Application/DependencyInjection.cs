@@ -20,7 +20,7 @@ namespace Gym.Application
                 cfg.Lifetime = ServiceLifetime.Scoped;
                 cfg.RegisterServicesFromAssembly(typeof(DependencyInjection).Assembly);
 
-                services.AddScoped(typeof(IPipelineBehavior<,>), typeof(LogAspect<,>));
+                services.AddSingleton(typeof(IPipelineBehavior<,>), typeof(LogAspect<,>));
             });
 
             services.AddScoped<IDomainEventPublisher, DomainEventPublisher>();
