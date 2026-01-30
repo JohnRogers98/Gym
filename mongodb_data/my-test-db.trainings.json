@@ -1,0 +1,35 @@
+[{
+  "_id": {
+    "$oid": "693ec754633885c0552c22a3"
+  },
+  "name": "Kangoo",
+  "description": null
+},
+{
+  "_id": {
+    "$oid": "694322a29355cb1fd26be088"
+  },
+  "name": "Качалка",
+  "description": "Накачаем всё!"
+},
+{
+  "_id": {
+    "$oid": "6943bfa7a4363ffd965e22f1"
+  },
+  "name": "Как жить разработчику",
+  "description": "Поймем все трудности бытия"
+},
+{
+  "_id": {
+    "$oid": "694515ff683816f83d4f79c0"
+  },
+  "name": "Press F",
+  "description": "Научимся pay respect"
+},
+{
+  "_id": {
+    "$oid": "6964df99214485526ab12762"
+  },
+  "name": "Бачата",
+  "description": "Потанцуем"
+}]
