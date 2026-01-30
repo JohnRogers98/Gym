@@ -53,7 +53,8 @@ else
             {
                 var eventWithUpdatedBookingStatus = selectdCalendarEvent with
                 {
-                    IsAlreadyBooked = true
+                    IsAlreadyBooked = true,
+                    CurrentClientCount = selectdCalendarEvent.CurrentClientCount + 1
                 };
 
                 _calendarItems[indexOfEvent] = eventWithUpdatedBookingStatus;

@@ -50,6 +50,11 @@ namespace Gym.WebApi.Mappings
                 {
                     var currentUserId = (String)context.Items["CurrentUserId"];
                     return src.BookingUsers.Any(aUserId => aUserId == currentUserId);
+                }))
+              .ForMember(dest => dest.CurrentClientCount,
+                opt => opt.MapFrom((src, dest, _, context) =>
+                {
+                    return src.BookingUsers?.Count();
                 }));
 
             CreateMap<CalendarEventDetails, ClientCalendarEventDto>()
@@ -58,6 +63,11 @@ namespace Gym.WebApi.Mappings
                 {
                     var currentUserId = (String)context.Items["CurrentUserId"];
                     return src.BookingUsers.Any(aUserId => aUserId == currentUserId);
+                }))
+              .ForMember(dest => dest.CurrentClientCount,
+                opt => opt.MapFrom((src, dest, _, context) =>
+                {
+                    return src.BookingUsers?.Count();
                 }));
 
             CreateMap<UserDetails, WebAppAuthResponse>();
