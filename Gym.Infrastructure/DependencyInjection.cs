@@ -66,7 +66,7 @@ namespace Gym.Infrastructure
             services.AddMongoCollection<CalendarEventEntity>(mongoDbOptions.CollectionOptions.CalendarEvents);
             services.AddMongoCollection<UserEntity>(mongoDbOptions.CollectionOptions.Users);
             services.AddMongoCollection<ClientEntity>(mongoDbOptions.CollectionOptions.Clients);
-            services.AddMongoCollection<BookingEntity>(mongoDbOptions.CollectionOptions.Clients);
+            services.AddMongoCollection<BookingEntity>(mongoDbOptions.CollectionOptions.Bookings);
 
             return services;
         }
