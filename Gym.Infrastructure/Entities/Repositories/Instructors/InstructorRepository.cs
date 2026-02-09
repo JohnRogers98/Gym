@@ -1,4 +1,4 @@
-﻿using Gym.Domain.InstructorAggregate;
+﻿using Gym.Domain.InstructorContext;
 using Gym.Infrastructure.Entities.Extensions;
 using Gym.Infrastructure.Entities.Extensions.Mappings;
 using MongoDB.Bson;

@@ -25,6 +25,7 @@ namespace Gym.Application
 
             services.AddScoped<IDomainEventPublisher, DomainEventPublisher>();
             services.AddScoped<ITrainingBookingService, TrainingBookingService>();
+            services.AddScoped<IChargeAccountService, ChargeAccountService>();
 
             return services;
         }

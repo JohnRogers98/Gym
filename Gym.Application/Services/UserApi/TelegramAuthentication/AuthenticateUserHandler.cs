@@ -1,10 +1,10 @@
-﻿using Gym.Application.Extensions;
-using Gym.Application.Services.DomainEventPublisher;
+﻿using Gym.Application.Services.DomainEventPublisher;
 using Gym.Domain._Common;
 using Gym.Domain._Shared;
-using Gym.Domain.ClientAggregate;
-using Gym.Domain.UserAggregate;
-using Gym.Domain.UserAggregate.Authentication;
+using Gym.Domain.AccountContext;
+using Gym.Domain.ClientContext;
+using Gym.Domain.UserContext;
+using Gym.Domain.UserContext.Authentication;
 using MediatR;
 
 namespace Gym.Application.Services.UserApi.TelegramAuthentication
@@ -14,12 +14,13 @@ namespace Gym.Application.Services.UserApi.TelegramAuthentication
         IUserRepository _userRepository,
         IUserQueryService _userQueryService,
         IClientRepository _clientRepository,
+        IAccountRepository _accountRepository,
         IUnitOfWork _unitOfWork,
-        IDomainEventPublisher _domainEventPublisher) : IRequestHandler<AuthenticateUserCommand, UserDetails>
+        IDomainEventPublisher _domainEventPublisher) : IRequestHandler<AuthenticateUser, UserDetails>
     {
-        public async Task<UserDetails> Handle(AuthenticateUserCommand request, CancellationToken cancellationToken)
+        public async Task<UserDetails> Handle(AuthenticateUser request, CancellationToken cancellationToken)
         {
-            Result<ValidatedTelegramUserInfo> verificationResult = _telegramSignatureVerifier.Verify(request.escapedInitData);
+            Result<ValidatedTelegramUserInfo> verificationResult = _telegramSignatureVerifier.Verify(request.EscapedInitData);
 
             if (!verificationResult.Success)
                 throw new ArgumentException(verificationResult.Error!.GetErrorMessage());
@@ -43,9 +44,14 @@ namespace Gym.Application.Services.UserApi.TelegramAuthentication
                 User newUser = User.Create(userId, UserRole.Client, telegramId);
                 await _userRepository.SaveAsync(newUser, cancellationToken);
 
-                await this.CreateClientFromRegisteredUser(userId, cancellationToken);
+                Client registeredClient = await this.CreateClientFromRegisteredUser(userId, cancellationToken);
+
+                Account registeredAccount = await this.CreateAccountFromRegisteredUser(userId, cancellationToken);
 
                 await _unitOfWork.CommitAsync();
+
+                await _domainEventPublisher.PublishAsync(registeredClient!.DomainEvents, cancellationToken);
+
                 return userId;
             }
             catch
@@ -55,11 +61,18 @@ namespace Gym.Application.Services.UserApi.TelegramAuthentication
             }
         }
 
-        private async Task CreateClientFromRegisteredUser(UserId registeredUserId, CancellationToken cancellationToken)
+        private async Task<Client> CreateClientFromRegisteredUser(UserId registeredUserId, CancellationToken cancellationToken)
         {
             Client client = Client.Create(_clientRepository.NextIdentity(), registeredUserId);
             await _clientRepository.SaveAsync(client, cancellationToken);
-            await _domainEventPublisher.PublishAsync(client!.DomainEvents, cancellationToken);
+            return client;
+        }
+
+        private async Task<Account> CreateAccountFromRegisteredUser(UserId registeredUserId, CancellationToken cancellationToken)
+        {
+            Account account = Account.Create(AccountId.From(registeredUserId), registeredUserId);
+            await _accountRepository.SaveAsync(account, cancellationToken);
+            return account;
         }
 
     }

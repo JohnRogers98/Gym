@@ -18,7 +18,7 @@ namespace Gym.WebApi.Controllers.Api.Trainings
         [HttpPost]
         public async Task<ActionResult<CreateTrainingResponse>> CreateTraining(CreateTrainingRequest request)
         {
-            TrainingDetails trainingDetails = await _mediator.Send(_mapper.Map<CreateTrainingCommand>(request));
+            TrainingDetails trainingDetails = await _mediator.Send(_mapper.Map<CreateTraining>(request));
             
             return base.CreatedAtAction(
                 nameof(GetTrainingController.GetTraining),

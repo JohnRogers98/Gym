@@ -1,6 +1,5 @@
-﻿using Gym.Domain._Common;
-using Gym.Domain._Shared;
-using Gym.Domain.UserAggregate;
+﻿using Gym.Domain._Shared;
+using Gym.Domain.UserContext;
 using Gym.Infrastructure.Entities.Extensions;
 using Gym.Infrastructure.Entities.Extensions.Mappings;
 using MongoDB.Bson;

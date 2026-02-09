@@ -21,7 +21,7 @@ namespace Gym.WebApi.Controllers.Api.CalendarEvents.ClientOnly
             try
             {
                 BookingDetails bookingDetails = await _mediator.Send(
-                    new BookTrainingEventCommand(User.GetRequiredUserId(), request.CalendarEventId));
+                    new BookTrainingEvent(User.GetRequiredUserId(), request.CalendarEventId));
 
                 return base.Ok(_mapper.Map<BookTrainingEventResponse>(bookingDetails));
             }
@@ -38,7 +38,6 @@ namespace Gym.WebApi.Controllers.Api.CalendarEvents.ClientOnly
 
                 return Conflict(problemDetails);
             }
-
         }
     }
 }

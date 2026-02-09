@@ -1,7 +1,7 @@
 ﻿using Gym.Application.Services.DomainEventPublisher;
-using Gym.Domain.BookingAggregate.Events;
-using Gym.Domain.CalendarEventAggregate;
-using Gym.Domain.UserAggregate;
+using Gym.Domain.AccountContext.Events;
+using Gym.Domain.CalendarEventContext;
+using Gym.Domain.UserContext;
 using MediatR;
 
 namespace Gym.Application.Services.BookingApi.Events

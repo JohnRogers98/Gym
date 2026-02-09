@@ -1,11 +1,11 @@
-﻿using Gym.Application.Extensions;
-using Gym.Application.Services.DomainEventPublisher;
+﻿using Gym.Application.Services.DomainEventPublisher;
 using Gym.Domain._Common;
+using Gym.Domain._Exceptions;
 using Gym.Domain._Shared;
 using Gym.Domain._Shared.Services;
-using Gym.Domain.BookingAggregate;
-using Gym.Domain.CalendarEventAggregate;
-using Gym.Domain.ClientAggregate;
+using Gym.Domain.AccountContext;
+using Gym.Domain.CalendarEventContext;
+using Gym.Domain.ClientContext;
 using MediatR;
 
 namespace Gym.Application.Services.BookingApi.BookTrainingEvent
@@ -15,53 +15,64 @@ namespace Gym.Application.Services.BookingApi.BookTrainingEvent
         ICalendarEventQueryService _calendarEventQueryService,
         ICalendarEventRepository _calendarEventRepository,
         IClientQueryService _clientQueryService,
-        IClientRepository _clientRepository,
-        IBookingRepository _bookingRepository,
+        IAccountRepository _accountRepository,
         IDomainEventPublisher _domainEventPublisher,
         IUnitOfWork _unitOfWork,
-        IExclusiveAccessCoordinator _exclusiveAccessCoordinator) : IRequestHandler<BookTrainingEventCommand, BookingDetails>
+        IExclusiveAccessCoordinator _exclusiveAccessCoordinator) : IRequestHandler<BookTrainingEvent, BookingDetails>
     {
-        public async Task<BookingDetails> Handle(BookTrainingEventCommand request, CancellationToken cancellationToken)
+        public async Task<BookingDetails> Handle(BookTrainingEvent request, CancellationToken cancellationToken)
         {
-            if (!await _clientQueryService.ExistsByUserIdAsync(UserId.From(request.userId), cancellationToken) 
-                || !await _calendarEventQueryService.ExistsAsync(CalendarEventId.From(request.calendarEventId), cancellationToken))
+            if (!await _clientQueryService.ExistsByUserIdAsync(UserId.From(request.UserId), cancellationToken) 
+                || !await _calendarEventQueryService.ExistsAsync(CalendarEventId.From(request.CalendarEventId), cancellationToken))
             {
                 throw new ArgumentException("Argument ids not exist.");
             }
 
             ExclusiveAccessResult exclusiveAccessResult  = await _exclusiveAccessCoordinator
-                .TryAcquireAsync(request.calendarEventId, nameof(BookTrainingEventHandler), cancellationToken);
+                .TryAcquireAsync(request.CalendarEventId, nameof(BookTrainingEventHandler), cancellationToken);
             if (exclusiveAccessResult.Result is false) 
             {
                 throw new Exception("Resource is under lock.");
             }
             try
             {
-                Client? client = await _clientQueryService.GetByUserIdAsync(UserId.From(request.userId), cancellationToken);
-                CalendarEvent? calendarEvent = await _calendarEventQueryService.GetByIdAsync(CalendarEventId.From(request.calendarEventId), cancellationToken);
+                Client? client = await _clientQueryService.GetByUserIdAsync(UserId.From(request.UserId), cancellationToken);
+                if (client == null)
+                {
+                    throw new ArgumentException($"User - {request.UserId} is not client");
+                }
+
+                AccountId accountId = AccountId.From(UserId.From(request.UserId));
+                Account account = await _accountRepository.GetByIdAsync(accountId, cancellationToken);
+                CalendarEvent? calendarEvent = await _calendarEventQueryService.GetByIdAsync(CalendarEventId.From(request.CalendarEventId), cancellationToken);
 
                 await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
-                Result<Booking> bookingResult = _trainingBookingService.MakeEventBooking(calendarEvent!, client!);
-                if (bookingResult.Success is false)
-                {
-                    await _unitOfWork.RollbackAsync(cancellationToken);
-                    throw new Exception($"Booking operation failed. {bookingResult.Error!.GetErrorMessage()}");
-                }
+                Booking booking = _trainingBookingService.MakeEventBooking(account, calendarEvent!);
 
                 await _calendarEventRepository.SaveAsync(calendarEvent!, cancellationToken);
-                await _clientRepository.SaveAsync(client!, cancellationToken);
-                await _bookingRepository.SaveAsync(bookingResult.Data!, cancellationToken);
+                await _accountRepository.SaveAsync(account, cancellationToken);
 
                 await _unitOfWork.CommitAsync(cancellationToken);
 
-                await _domainEventPublisher.PublishAsync(bookingResult.Data!.DomainEvents, cancellationToken);
+                await _domainEventPublisher.PublishAsync(account!.DomainEvents, cancellationToken);
+                await _domainEventPublisher.PublishAsync(calendarEvent!.DomainEvents, cancellationToken);
 
-                return bookingResult.Data!.ToDetails();
+                return booking.ToDetails();
+            }
+            catch (DomainException domainException)
+            {
+                await _unitOfWork.RollbackAsync(cancellationToken);
+                throw new Exception($"Booking operation failed. {domainException.Error!.GetErrorMessage()}");
+            }
+            catch
+            {
+                await _unitOfWork.RollbackAsync(cancellationToken);
+                throw;
             }
             finally{
                 await _exclusiveAccessCoordinator
-                    .ReleaseAsync(request.calendarEventId, nameof(BookTrainingEventHandler), exclusiveAccessResult.AccessKey!, cancellationToken);
+                    .ReleaseAsync(request.CalendarEventId, nameof(BookTrainingEventHandler), exclusiveAccessResult.AccessKey!, cancellationToken);
             }
         }
     }

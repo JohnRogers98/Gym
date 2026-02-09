@@ -18,7 +18,7 @@ namespace Gym.WebApi.Controllers.Api.Instructors
         [HttpPost]
         public async Task<ActionResult<CreateInstructorResponse>> CreateInstructor(CreateInstructorRequest request)
         {
-            InstructorDetails instructorDetails = await _mediator.Send(_mapper.Map<CreateInstructorCommand>(request));
+            InstructorDetails instructorDetails = await _mediator.Send(_mapper.Map<CreateInstructor>(request));
 
             return base.CreatedAtAction(
                 nameof(GetInstructorController.GetInstructor),

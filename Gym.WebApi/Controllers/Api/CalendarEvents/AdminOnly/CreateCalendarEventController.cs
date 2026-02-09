@@ -18,7 +18,7 @@ namespace Gym.WebApi.Controllers.Api.CalendarEvents.AdminOnly
         [HttpPost]
         public async Task<ActionResult<CreateCalendarEventResponse>> CreateCalendarEvent(CreateCalendarEventRequest request)
         {
-            CalendarEventDetails calendarEventDetails = await _mediator.Send(_mapper.Map<CreateCalendarEventCommand>(request));
+            CalendarEventDetails calendarEventDetails = await _mediator.Send(_mapper.Map<CreateCalendarEvent>(request));
 
             return base.CreatedAtAction(
                 nameof(GetCalendarEventController.GetCalendarEvent),

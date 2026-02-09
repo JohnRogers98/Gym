@@ -17,7 +17,7 @@ namespace Gym.WebApi.Controllers.Api.Instructors
         [HttpGet]
         public async Task<GetInstructorResponse> GetInstructor(String id)
         {
-            InstructorDetails instructorDetails = await _mediator.Send(new GetInstructorByIdQuery(id));
+            InstructorDetails instructorDetails = await _mediator.Send(new GetInstructorById(id));
             return _mapper.Map<GetInstructorResponse>(instructorDetails);
         }
     }

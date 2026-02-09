@@ -61,8 +61,8 @@ POST {{Gym.WebApi_HostAddress}}/api/admin-calendar-events
 Content-Type: application/json
 
 {
-  "start": "2026-01-22T10:00:00",
-  "end": "2026-01-22T11:30:00",
+  "start": "2026-02-13T10:00:00",
+  "end": "2026-01-13T11:30:00",
   "training": {
     "id": "693ec754633885c0552c22a3",
     "name": "Kangoo",
@@ -85,5 +85,16 @@ POST {{Gym.WebApi_HostAddress}}/api/client-calendar-events/actions/book
 Content-Type: application/json
 
 {
-  "calendarEventId" : "693ec754633885c0552c22a4"
+  "calendarEventId" : "69898ffb28565d1bf78e6a0f"
+}
+
+
+
+###
+POST {{Gym.WebApi_HostAddress}}/api/accounts/actions/charge
+Content-Type: application/json
+
+{
+  "clientId": "69899f8294127b0006926c9d",
+  "byCount": 1
 }
