@@ -15,7 +15,6 @@ namespace Gym.Application.Services.UserApi.TelegramAuthentication
         IUserQueryService _userQueryService,
         IClientRepository _clientRepository,
         IAccountRepository _accountRepository,
-        IUnitOfWork _unitOfWork,
         IDomainEventPublisher _domainEventPublisher) : IRequestHandler<AuthenticateUser, UserDetails>
     {
         public async Task<UserDetails> Handle(AuthenticateUser request, CancellationToken cancellationToken)
@@ -38,27 +37,16 @@ namespace Gym.Application.Services.UserApi.TelegramAuthentication
 
         private async Task<UserId> RegisterUser(TelegramId telegramId, CancellationToken cancellationToken)
         {
-            await _unitOfWork.BeginTransactionAsync();
-            try{
-                UserId userId = _userRepository.NextIdentity();
-                User newUser = User.Create(userId, UserRole.Client, telegramId);
-                await _userRepository.SaveAsync(newUser, cancellationToken);
+            UserId userId = _userRepository.NextIdentity();
+            User newUser = User.Create(userId, UserRole.Client, telegramId);
+            await _userRepository.SaveAsync(newUser, cancellationToken);
 
-                Client registeredClient = await this.CreateClientFromRegisteredUser(userId, cancellationToken);
+            Client registeredClient = await this.CreateClientFromRegisteredUser(userId, cancellationToken);
+            Account registeredAccount = await this.CreateAccountFromRegisteredUser(userId, cancellationToken);
 
-                Account registeredAccount = await this.CreateAccountFromRegisteredUser(userId, cancellationToken);
+            await _domainEventPublisher.PublishAsync(registeredClient!.DomainEvents, cancellationToken);
 
-                await _unitOfWork.CommitAsync();
-
-                await _domainEventPublisher.PublishAsync(registeredClient!.DomainEvents, cancellationToken);
-
-                return userId;
-            }
-            catch
-            {
-                await _unitOfWork.RollbackAsync();
-                throw;
-            }
+            return userId;
         }
 
         private async Task<Client> CreateClientFromRegisteredUser(UserId registeredUserId, CancellationToken cancellationToken)
