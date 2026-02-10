@@ -18,7 +18,7 @@ namespace Gym.WebApi.Controllers.Api.CalendarEvents.ClientOnly
         [HttpGet]
         public async Task<ListResponse<ClientCalendarEventDto>> ListClientCalendarEvents()
         {
-            IEnumerable<CalendarEventDetails> calendarEventDetails = await _mediator.Send(new GetAllCalendarEventsQuery());
+            IEnumerable<CalendarEventDetails> calendarEventDetails = await _mediator.Send(new GetAllCalendarEvents());
             return new (_mapper.Map<IEnumerable<ClientCalendarEventDto>>(calendarEventDetails, opts =>
             {
                 opts.Items["CurrentUserId"] = User.GetRequiredUserId();

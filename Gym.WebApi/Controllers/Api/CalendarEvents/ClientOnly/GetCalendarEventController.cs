@@ -17,7 +17,7 @@ namespace Gym.WebApi.Controllers.Api.CalendarEvents.ClientOnly
         [HttpGet]
         public async Task<GetClientCalendarEventResponse> GetCalendarEvent(String id)
         {
-            CalendarEventDetails calendarEventDetails = await _mediator.Send(_mapper.Map<GetCalendarEventByIdQuery>(id));
+            CalendarEventDetails calendarEventDetails = await _mediator.Send(_mapper.Map<GetCalendarEventById>(id));
             
             return _mapper.Map<GetClientCalendarEventResponse>(calendarEventDetails, opts =>
             {

@@ -17,7 +17,7 @@ namespace Gym.WebApi.Controllers.Api.Trainings
         [HttpGet]
         public async Task<GetTrainingResponse> GetTraining(String id)
         {
-            TrainingDetails trainingDetails = await _mediator.Send(new GetTrainingByIdQuery(id));
+            TrainingDetails trainingDetails = await _mediator.Send(new GetTrainingById(id));
             return _mapper.Map<GetTrainingResponse>(trainingDetails);
         }
     }

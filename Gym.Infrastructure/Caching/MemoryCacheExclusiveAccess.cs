@@ -5,7 +5,7 @@ namespace Gym.Infrastructure.Caching
 {
     internal class MemoryCacheExclusiveAccess : IExclusiveAccessCoordinator
     {
-        private static readonly ConcurrentDictionary<ResourceOperation, AccessKey> _exclusiveAccessLock = new();
+        private readonly ConcurrentDictionary<ResourceOperation, AccessKey> _exclusiveAccessLock = new();
 
         public async Task<ExclusiveAccessResult> TryAcquireAsync(String aggregateId, String operation, CancellationToken cancellationToken = default)
         {

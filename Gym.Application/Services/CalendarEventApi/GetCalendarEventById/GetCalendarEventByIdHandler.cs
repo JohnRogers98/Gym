@@ -1,15 +1,14 @@
-﻿using Gym.Application.Extensions;
-using Gym.Domain._Shared;
-using Gym.Domain.CalendarEventAggregate;
+﻿using Gym.Domain._Shared;
+using Gym.Domain.CalendarEventContext;
 using MediatR;
 
 namespace Gym.Application.Services.CalendarEventApi.GetCalendarEventById
 {
-    internal class GetCalendarEventByIdHandler(ICalendarEventRepository _calendarEventRepository) : IRequestHandler<GetCalendarEventByIdQuery, CalendarEventDetails>
+    internal class GetCalendarEventByIdHandler(ICalendarEventRepository _calendarEventRepository) : IRequestHandler<GetCalendarEventById, CalendarEventDetails>
     {
-        public async Task<CalendarEventDetails> Handle(GetCalendarEventByIdQuery request, CancellationToken cancellationToken)
+        public async Task<CalendarEventDetails> Handle(GetCalendarEventById request, CancellationToken cancellationToken)
         {
-            CalendarEvent? calendarEvent = await _calendarEventRepository.GetByIdAsync(CalendarEventId.From(request.id), cancellationToken);
+            CalendarEvent? calendarEvent = await _calendarEventRepository.GetByIdAsync(CalendarEventId.From(request.Id), cancellationToken);
 
             if (calendarEvent == null) throw new ArgumentException();
 

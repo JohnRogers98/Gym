@@ -18,7 +18,7 @@ namespace Gym.WebApi.Controllers.Api.Instructors
         [HttpGet]
         public async Task<ListResponse<InstructorDto>> ListInstructors()
         {
-            IEnumerable<InstructorDetails> instructorDetails = await _mediator.Send(new GetAllInstructorsQuery());
+            IEnumerable<InstructorDetails> instructorDetails = await _mediator.Send(new GetAllInstructors());
             return new (_mapper.Map<IEnumerable<InstructorDto>>(instructorDetails));
         }
     }

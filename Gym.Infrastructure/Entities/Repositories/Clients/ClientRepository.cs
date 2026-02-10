@@ -1,5 +1,5 @@
 ﻿using Gym.Domain._Shared;
-using Gym.Domain.ClientAggregate;
+using Gym.Domain.ClientContext;
 using Gym.Infrastructure.Entities.Extensions;
 using Gym.Infrastructure.Entities.Extensions.Mappings;
 using MongoDB.Bson;

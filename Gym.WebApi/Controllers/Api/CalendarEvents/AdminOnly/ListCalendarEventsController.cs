@@ -18,7 +18,7 @@ namespace Gym.WebApi.Controllers.Api.CalendarEvents.AdminOnly
         [HttpGet]
         public async Task<ListResponse<AdminCalendarEventDto>> ListCalendarEvents()
         {
-            IEnumerable<CalendarEventDetails> calendarEventDetails = await _mediator.Send(new GetAllCalendarEventsQuery());
+            IEnumerable<CalendarEventDetails> calendarEventDetails = await _mediator.Send(new GetAllCalendarEvents());
             return new (_mapper.Map<IEnumerable<AdminCalendarEventDto>>(calendarEventDetails));
         }
     }

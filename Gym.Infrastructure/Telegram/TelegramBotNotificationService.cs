@@ -1,5 +1,5 @@
 ﻿using Gym.Domain._Shared;
-using Gym.Domain.UserAggregate;
+using Gym.Domain.UserContext;
 using Telegram.Bot;
 
 namespace Gym.Infrastructure.Telegram

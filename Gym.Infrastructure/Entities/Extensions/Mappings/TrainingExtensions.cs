@@ -1,4 +1,4 @@
-﻿using Gym.Domain.TrainingAggregate;
+﻿using Gym.Domain.TrainingContext;
 using Gym.Infrastructure.Entities.Repositories.Trainings;
 
 namespace Gym.Infrastructure.Entities.Extensions.Mappings
