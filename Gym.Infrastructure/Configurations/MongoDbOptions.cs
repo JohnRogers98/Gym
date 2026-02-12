@@ -11,7 +11,8 @@
         String CalendarEvents,
         String Users,
         String Clients,
-        String Events)
+        String Events,
+        String Messages)
     {
         public static CollectionOptions Default => new CollectionOptions(
             "instructors",
@@ -19,6 +20,7 @@
             "calendar-events",
             "users",
             "clients",
-            "events");
+            "events",
+            "messages");
     }
 }

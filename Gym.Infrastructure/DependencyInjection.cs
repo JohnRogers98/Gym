@@ -15,6 +15,7 @@ using Gym.Infrastructure.Entities.Repositories.Instructors;
 using Gym.Infrastructure.Entities.Repositories.Trainings;
 using Gym.Infrastructure.Entities.Repositories.Users;
 using Gym.Infrastructure.EventStores;
+using Gym.Infrastructure.Outbox;
 using Gym.Infrastructure.Telegram;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -42,6 +43,7 @@ namespace Gym.Infrastructure
             MongoDbOptions mongoDbOptions = configuration.GetSection("MongodDb").Get<MongoDbOptions>() ?? MongoDbOptions.Default;
             
             services.AddMongoInfrastructure(mongoDbOptions ?? MongoDbOptions.Default);
+            services.AddMessagePublisher();
             services.AddRepositories();
             services.AddQueryServices();
             services.AddEventStore();
@@ -69,6 +71,7 @@ namespace Gym.Infrastructure
             services.AddMongoCollection<UserEntity>(mongoDbOptions.CollectionOptions.Users);
             services.AddMongoCollection<ClientEntity>(mongoDbOptions.CollectionOptions.Clients);
             services.AddMongoCollection<EventEntity>(mongoDbOptions.CollectionOptions.Events);
+            services.AddMongoCollection<MessageEntity>(mongoDbOptions.CollectionOptions.Messages);
 
             return services;
         }
@@ -81,6 +84,12 @@ namespace Gym.Infrastructure
                 return database.GetCollection<T>(collectionName);
             });
 
+            return services;
+        }
+
+        private static IServiceCollection AddMessagePublisher(this IServiceCollection services)
+        {
+            services.TryAddScoped<IMessagePublisher, OutboxStore>();
             return services;
         }
 
@@ -107,7 +116,13 @@ namespace Gym.Infrastructure
 
         private static IServiceCollection AddEventStore(this IServiceCollection services)
         {
-            services.AddScoped<IEventStore, EventStore>();
+            services.AddScoped<IEventStore>(sp => 
+            {
+                return new OutboxEventStoreAspect(
+                    new EventStore(sp.GetRequiredService<IMongoCollection<EventEntity>>(), sp.GetRequiredService<MongoUnitOfWork>()),
+                    sp.GetRequiredService<IMessagePublisher>()
+                    );
+            });
 
             services.AddScoped<AccountEventMapper>();
 
