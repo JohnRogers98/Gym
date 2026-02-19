@@ -2,8 +2,8 @@
 using Gym.Application.Services.InstructorApi;
 using Gym.Application.Services.InstructorApi.GetAllInstructors;
 using Gym.WebApi.Extensions;
-using Gym.WebDto.Dto;
 using Gym.WebDto.Responses;
+using Gym.WebDto.Responses.Instructor;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -12,7 +12,7 @@ namespace Gym.WebApi.Controllers.Api.Instructors
 {
     [Route("api/instructors")]
     [ApiController]
-    [Authorize(Policy = nameof(SecurityPolicy.RequireAuthenticated))]
+    [Authorize(Policy = nameof(SecurityPolicy.AuthenticatedOnly))]
     public class ListInstructorsController(IMediator _mediator, IMapper _mapper) : ControllerBase
     {
         [HttpGet]

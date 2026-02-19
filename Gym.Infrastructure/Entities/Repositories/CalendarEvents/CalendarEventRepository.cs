@@ -1,6 +1,6 @@
 ﻿using Gym.Domain._Shared;
 using Gym.Domain.CalendarEventContext;
-using Gym.Infrastructure.Entities;
+using Gym.Infrastructure;
 using Gym.Infrastructure.Entities.Extensions;
 using Gym.Infrastructure.Entities.Extensions.Mappings;
 using MongoDB.Bson;

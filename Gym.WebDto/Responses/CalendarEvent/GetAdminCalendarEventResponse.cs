@@ -1,4 +1,5 @@
-﻿using Gym.WebDto.Dto;
+﻿using Gym.WebDto.Responses.Instructor;
+using Gym.WebDto.Responses.Training;
 
 namespace Gym.WebDto.Responses.CalendarEvent
 {

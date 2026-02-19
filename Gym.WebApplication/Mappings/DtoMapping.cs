@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using Gym.WebApplication.ViewModels;
-using Gym.WebDto.Dto;
+using Gym.WebDto.Responses.CalendarEvent;
+using Gym.WebDto.Responses.Instructor;
+using Gym.WebDto.Responses.Training;
 
 namespace Gym.WebApplication.Mappings
 {

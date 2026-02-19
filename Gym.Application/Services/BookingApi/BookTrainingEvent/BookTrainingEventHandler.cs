@@ -1,5 +1,4 @@
-﻿using Gym.Application.Services.DomainEventPublisher;
-using Gym.Domain._Exceptions;
+﻿using Gym.Domain._Exceptions;
 using Gym.Domain._Shared;
 using Gym.Domain._Shared.Services;
 using Gym.Domain.AccountContext;
@@ -14,8 +13,7 @@ namespace Gym.Application.Services.BookingApi.BookTrainingEvent
         ICalendarEventQueryService _calendarEventQueryService,
         ICalendarEventRepository _calendarEventRepository,
         IClientQueryService _clientQueryService,
-        IAccountRepository _accountRepository,
-        IDomainEventPublisher _domainEventPublisher) : IRequestHandler<BookTrainingEvent, BookingDetails>
+        IAccountRepository _accountRepository) : IRequestHandler<BookTrainingEvent, BookingDetails>
     {
         public async Task<BookingDetails> Handle(BookTrainingEvent request, CancellationToken cancellationToken)
         {
@@ -41,9 +39,6 @@ namespace Gym.Application.Services.BookingApi.BookTrainingEvent
 
                 await _calendarEventRepository.SaveAsync(calendarEvent!, cancellationToken);
                 await _accountRepository.SaveAsync(account, cancellationToken);
-
-                await _domainEventPublisher.PublishAsync(account!.DomainEvents, cancellationToken);
-                await _domainEventPublisher.PublishAsync(calendarEvent!.DomainEvents, cancellationToken);
 
                 return booking.ToDetails();
             }

@@ -11,7 +11,7 @@ namespace Gym.WebApi.Controllers.Api.Trainings
 {
     [Route("api/trainings/{id}")]
     [ApiController]
-    [Authorize(Policy = nameof(SecurityPolicy.RequireAuthenticated))]
+    [Authorize(Policy = nameof(SecurityPolicy.AuthenticatedOnly))]
     public class GetTrainingController(IMediator _mediator, IMapper _mapper) : ControllerBase
     {
         [HttpGet]

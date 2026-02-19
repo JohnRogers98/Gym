@@ -2,8 +2,8 @@
 using Gym.Application.Services.CalendarEventApi;
 using Gym.Application.Services.CalendarEventApi.GetAllCalendarEvents;
 using Gym.WebApi.Extensions;
-using Gym.WebDto.Dto;
 using Gym.WebDto.Responses;
+using Gym.WebDto.Responses.CalendarEvent;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

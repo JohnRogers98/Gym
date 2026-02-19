@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using Gym.Application.Services.InstructorApi;
-using Gym.WebDto.Dto;
 using Gym.WebDto.Requests.Instructor;
 using Gym.WebDto.Responses.Instructor;
 

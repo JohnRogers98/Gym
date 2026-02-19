@@ -2,7 +2,6 @@
 using Gym.Application.Services.BookingApi;
 using Gym.Application.Services.CalendarEventApi;
 using Gym.Application.Services.CalendarEventApi.CreateCalendarEvent;
-using Gym.WebDto.Dto;
 using Gym.WebDto.Requests.CalendarEvent;
 using Gym.WebDto.Responses.Bookings;
 using Gym.WebDto.Responses.CalendarEvent;

@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
 using Gym.WebApplication.ViewModels;
-using Gym.WebDto.Dto;
 using Gym.WebDto.Requests.CalendarEvent;
 using Gym.WebDto.Responses;
+using Gym.WebDto.Responses.CalendarEvent;
 using System.Net.Http.Json;
 
 namespace Gym.WebApplication.Features.Calendar.Services

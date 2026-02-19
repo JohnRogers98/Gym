@@ -1,5 +1,6 @@
 ﻿using Gym.Domain._Common;
 using Gym.Domain._Shared;
+using Gym.Domain.UserContext.Events;
 
 namespace Gym.Domain.UserContext
 {
@@ -19,6 +20,7 @@ namespace Gym.Domain.UserContext
         public static User Create(UserId id, UserRole role, TelegramId? telegramId)
         {
             User user = new(id, role, telegramId);
+            user.AddDomainEvent(UserCreatedDomainEvent.Create(id));
             return user;
         }
 

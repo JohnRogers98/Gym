@@ -1,5 +1,7 @@
 ﻿using MediatR;
 using Microsoft.Extensions.Logging;
+using System.Collections;
+using System.Text;
 
 namespace Gym.Application.Aspects
 {
@@ -15,7 +17,21 @@ namespace Gym.Application.Aspects
 
             if (result is not null)
             {
-                _logger.LogInformation($"LogId - {logId}: {typeof(TResponse).Name} is returned. {result.ToString()}");
+                if (result is IEnumerable enumerable) 
+                {
+                    StringBuilder enumerableLog = new();
+                    enumerableLog.Append($"LogId - {logId}: Collection of elemnts is returned:");
+                    foreach (var item in enumerable)
+                    {
+                        enumerableLog.AppendLine($"\n {item}");
+                    }
+                    _logger.LogInformation(enumerableLog.ToString());
+                }
+                else
+                {
+                    _logger.LogInformation($"LogId - {logId}: {typeof(TResponse).Name} is returned. {result.ToString()}");
+                }
+                
             }
 
             return result;

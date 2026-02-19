@@ -34,7 +34,7 @@ namespace Gym.WebApi.Controllers.Api.CalendarEvents.ClientOnly
                     Detail = ex.Message,
                     Instance = HttpContext.Request.Path
                 };
-                problemDetails.Extensions["code"] = "BOOKING_CONFLICT";
+                problemDetails.Extensions["Code"] = "BOOKING_CONFLICT";
 
                 return Conflict(problemDetails);
             }

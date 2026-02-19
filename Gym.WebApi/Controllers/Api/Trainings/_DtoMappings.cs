@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using Gym.Application.Services.TrainingApi;
 using Gym.Application.Services.TrainingApi.CreateTraining;
-using Gym.WebDto.Dto;
 using Gym.WebDto.Requests.Training;
 using Gym.WebDto.Responses.Training;
 

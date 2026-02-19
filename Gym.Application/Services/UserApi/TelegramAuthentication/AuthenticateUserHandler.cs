@@ -1,5 +1,4 @@
-﻿using Gym.Application.Services.DomainEventPublisher;
-using Gym.Domain._Common;
+﻿using Gym.Domain._Common;
 using Gym.Domain._Shared;
 using Gym.Domain.AccountContext;
 using Gym.Domain.ClientContext;
@@ -12,30 +11,27 @@ namespace Gym.Application.Services.UserApi.TelegramAuthentication
     internal class AuthenticateUserHandler(
         ITelegramSignatureVerifier _telegramSignatureVerifier,
         IUserRepository _userRepository,
-        IUserQueryService _userQueryService,
+        IUserByTelegramIdFinder _userByTelegramIdFinder,
         IClientRepository _clientRepository,
-        IAccountRepository _accountRepository,
-        IDomainEventPublisher _domainEventPublisher) : IRequestHandler<AuthenticateUser, UserDetails>
+        IAccountRepository _accountRepository) : IRequestHandler<AuthenticateUser, UserDetails>
     {
         public async Task<UserDetails> Handle(AuthenticateUser request, CancellationToken cancellationToken)
         {
             Result<ValidatedTelegramUserInfo> verificationResult = _telegramSignatureVerifier.Verify(request.EscapedInitData);
-
             if (!verificationResult.Success)
                 throw new ArgumentException(verificationResult.Error!.GetErrorMessage());
 
-            User? user = await _userQueryService.GetByTelegramIdAsync(verificationResult.Data!.Id, cancellationToken);
+            User? user = await _userByTelegramIdFinder.GetByTelegramIdAsync(verificationResult.Data!.Id, cancellationToken);
 
             if(user is null)
             {
-                UserId registeredUserId = await this.RegisterUser(verificationResult.Data.Id, cancellationToken);
-                user = await _userQueryService.GetByIdAsync(registeredUserId, cancellationToken);
+                user = await this.RegisterUser(verificationResult.Data.Id, cancellationToken);
             }
 
             return user!.ToDetails();
         }
 
-        private async Task<UserId> RegisterUser(TelegramId telegramId, CancellationToken cancellationToken)
+        private async Task<User> RegisterUser(TelegramId telegramId, CancellationToken cancellationToken)
         {
             UserId userId = _userRepository.NextIdentity();
             User newUser = User.Create(userId, UserRole.Client, telegramId);
@@ -44,9 +40,7 @@ namespace Gym.Application.Services.UserApi.TelegramAuthentication
             Client registeredClient = await this.CreateClientFromRegisteredUser(userId, cancellationToken);
             Account registeredAccount = await this.CreateAccountFromRegisteredUser(userId, cancellationToken);
 
-            await _domainEventPublisher.PublishAsync(registeredClient!.DomainEvents, cancellationToken);
-
-            return userId;
+            return newUser;
         }
 
         private async Task<Client> CreateClientFromRegisteredUser(UserId registeredUserId, CancellationToken cancellationToken)

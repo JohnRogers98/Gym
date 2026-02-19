@@ -12,7 +12,9 @@
         String Users,
         String Clients,
         String Events,
-        String Messages)
+        String EventProjections,
+        String Messages,
+        String OutboxChangeStreams)
     {
         public static CollectionOptions Default => new CollectionOptions(
             "instructors",
@@ -21,6 +23,8 @@
             "users",
             "clients",
             "events",
-            "messages");
+            "event-projections",
+            "messages",
+            "outbox-changes-streams");
     }
 }

@@ -8,6 +8,11 @@ namespace Gym.Application.Aspects
     {
         public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
         {
+            if (request is not ITransactionalRequest transactionalRequest)
+            {
+                return await next();
+            }
+    
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
             try

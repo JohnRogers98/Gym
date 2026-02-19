@@ -18,7 +18,7 @@ namespace Gym.Domain.ClientContext
         public static Client Create(ClientId id, UserId userId)
         {
             Client client = new(id, userId);
-            client.AddDomainEvent(CreatedNewClientDomainEvent.Create(client.UserId));
+            client.AddDomainEvent(ClientCreatedDomainEvent.Create(client.UserId));
             return client;
         }
 
