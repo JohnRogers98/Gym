@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using Gym.Application.Services.AccountApi;
+using Gym.Abstractions.Query.EventStore;
 using Gym.Application.Services.AccountApi.GetAccountHistory;
 using Gym.WebApi.Extensions;
 using Gym.WebDto.Requests.Account;
@@ -24,10 +24,13 @@ namespace Gym.WebApi.Controllers.Api.Accounts.AuthenticatedOnly
                 opts.Items[nameof(Application.Services.AccountApi.GetAccountHistory.GetAccountHistory.ClientId)] = clientId;
             });
 
-            IEnumerable<AccountEventDetails> accountEventDetails = await _mediator.Send(getAccountHistory);
+            IEnumerable<EventProjection> eventProjections = await _mediator.Send(getAccountHistory);
 
             return base.Ok(
-                new ListResponse<AccountHistoryDto>(_mapper.Map<IEnumerable<AccountHistoryDto>>(accountEventDetails)));
+                new ListResponse<AccountHistoryDto>(
+                    _mapper.Map<IEnumerable<AccountHistoryDto>>(eventProjections)
+                )
+            );
         }
     }
 }

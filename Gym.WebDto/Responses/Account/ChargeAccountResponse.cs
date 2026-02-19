@@ -1,4 +1,4 @@
 ﻿namespace Gym.WebDto.Responses.Account
 {
-    public record ChargeAccountResponse;
+    public record ChargeAccountResponse(Int32 AvailableTrainingsCount);
 }

@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Gym.Application.Services.AccountApi;
 using Gym.Application.Services.AccountApi.ChargeAccount;
 using Gym.WebApi.Extensions;
 using Gym.WebDto.Requests.Account;
@@ -23,9 +22,9 @@ namespace Gym.WebApi.Controllers.Api.Accounts.AdminOnly
                 opts.Items[nameof(ChargeAccount.ClientId)] = clientId;
             });
 
-            AccountDetails accountDetails = await _mediator.Send(chargeAccount);
+            ChargeAccountResult chargeAccountResult = await _mediator.Send(chargeAccount);
 
-            return base.Ok(_mapper.Map<ChargeAccountResponse>(accountDetails));
+            return base.Ok(_mapper.Map<ChargeAccountResponse>(chargeAccountResult));
         }
     }
 }

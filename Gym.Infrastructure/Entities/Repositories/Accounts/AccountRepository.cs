@@ -4,7 +4,6 @@ using Gym.Domain.AccountContext;
 using Gym.Infrastructure.Entities.EventStores;
 using Gym.Infrastructure.Entities.EventStores.Deserializers;
 using Gym.Infrastructure.Entities.EventStores.Serializers;
-using Gym.Infrastructure.EventStores;
 using System.Text.RegularExpressions;
 
 namespace Gym.Infrastructure.Entities.Repositories.Accounts
@@ -48,6 +47,8 @@ namespace Gym.Infrastructure.Entities.Repositories.Accounts
             await _eventStore.SaveVersionedAsync(new StreamId(account.Id.Value), entities, this.GetLastFetchedVersion(account), cancellationToken);
 
             this.UpsertLastFetchedVersion(account, newVersion);
+
+            account.ClearDomainEvents();
         }
 
         private Int32 GetLastFetchedVersion(Account account) => _identityVersionMap.GetValueOrDefault(account);
@@ -64,7 +65,7 @@ namespace Gym.Infrastructure.Entities.Repositories.Accounts
                 AggregateType = nameof(Account),
                 Operation = domainEvent.GetType().Name,
                 Data = _eventSerializer.Serialize(domainEvent),
-                OccurredAt = domainEvent.OccuredOn
+                OccurredAt = domainEvent.OccurredOn
             };
         }
     }

@@ -7,14 +7,14 @@ namespace Gym.Domain.ClientContext.Events
     {
         public UserId UserId { get; private set; }
 
-        private ClientCreatedDomainEvent(DomainEventId id, DateTime occuredOn, UserId userId)
-            : base(id, occuredOn) 
+        private ClientCreatedDomainEvent(DomainEventId id, DateTime occurredOn, UserId userId)
+            : base(id, occurredOn) 
             => (UserId) = (userId);
 
         public static ClientCreatedDomainEvent Create(UserId userId)
             => new(DomainEventId.Generate(), DateTime.Now, userId);
 
-        public static ClientCreatedDomainEvent Restore(DomainEventId id, DateTime occuredOn, UserId userId)
-           => new(id, occuredOn, userId);
+        public static ClientCreatedDomainEvent Restore(DomainEventId id, DateTime occurredOn, UserId userId)
+           => new(id, occurredOn, userId);
     }
 }

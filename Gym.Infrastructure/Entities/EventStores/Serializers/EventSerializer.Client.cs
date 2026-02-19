@@ -1,7 +1,7 @@
 ﻿using Gym.Domain.ClientContext.Events;
 using Gym.Infrastructure.Entities.Repositories.Clients.EventsDto;
 
-namespace Gym.Infrastructure.EventStores.Serializers
+namespace Gym.Infrastructure.Entities.EventStores.Serializers
 {
     internal partial class EventSerializer
     {
@@ -9,7 +9,7 @@ namespace Gym.Infrastructure.EventStores.Serializers
         {
             return new ClientCreatedDto(
                 domainEvent.Id.Value.ToString(),
-                domainEvent.OccuredOn,
+                domainEvent.OccurredOn,
                 domainEvent.UserId.Value);
         }
     }

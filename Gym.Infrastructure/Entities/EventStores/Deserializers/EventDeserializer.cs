@@ -1,16 +1,15 @@
 ﻿using Gym.Domain._Common;
 using Gym.Domain.AccountContext.Events;
+using Gym.Domain.CalendarEventContext.Events;
 using Gym.Domain.ClientContext.Events;
 using Gym.Domain.UserContext.Events;
-using Gym.Infrastructure.Entities.EventStores;
-using Gym.Infrastructure.Entities.EventStores.Deserializers;
 using Gym.Infrastructure.Entities.Repositories.Accounts.EventsDto;
+using Gym.Infrastructure.Entities.Repositories.CalendarEvents.EventsDto;
 using Gym.Infrastructure.Entities.Repositories.Clients.EventsDto;
 using Gym.Infrastructure.Entities.Repositories.Users.EventsDto;
-using MongoDB.Bson.Serialization.Attributes;
 using System.Text.Json;
 
-namespace Gym.Infrastructure.EventStores.Deserializers
+namespace Gym.Infrastructure.Entities.EventStores.Deserializers
 {
     internal partial class EventDeserializer : IEventDeserializer
     {
@@ -20,7 +19,8 @@ namespace Gym.Infrastructure.EventStores.Deserializers
             [nameof(AccountCreatedDomainEvent)] = typeof(AccountCreatedDto),
             [nameof(TrainingBookedDomainEvent)] = typeof(TrainingBookedDto),
             [nameof(ClientCreatedDomainEvent)] = typeof(ClientCreatedDto),
-            [nameof(UserCreatedDomainEvent)] = typeof(UserCreatedDto)
+            [nameof(UserCreatedDomainEvent)] = typeof(UserCreatedDto),
+            [nameof(CalendarEventCreatedDomainEvent)] = typeof(CalendarEventCreatedDto),
         };
 
         public DomainEvent Deserialize(EventEntity eventEntity)

@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using Gym.Application.Services.UserApi;
+using Gym.Application.Services.UserApi.TelegramAuthentication;
 using Gym.WebDto.Responses.Users;
 
 namespace Gym.WebApi.Controllers.Api.Users
@@ -8,7 +8,7 @@ namespace Gym.WebApi.Controllers.Api.Users
     {
         public _DtoMappings() 
         {
-            CreateMap<UserDetails, WebAppAuthResponse>();
+            CreateMap<AuthenticateUserDetails, WebAppAuthResponse>();
         }
     }
 }

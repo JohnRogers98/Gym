@@ -11,6 +11,7 @@ namespace Gym.Domain.Tests
         public UserId UserId => field ??= UserId.From(Guid.NewGuid().ToString());
         public CalendarEventId CalendarEventId => field ??= CalendarEventId.From(Guid.NewGuid().ToString());
         public BookingId BookingId => field ??= BookingId.From(Guid.NewGuid().ToString());
+        public TrainingId TrainingId => field ??= TrainingId.From(Guid.NewGuid().ToString());
 
         public Account CreateAccount(Int32 availableTrainingsCount = default)
         {
@@ -30,7 +31,7 @@ namespace Gym.Domain.Tests
                 CalendarEventId.From(Guid.NewGuid().ToString()),
                 isExpired ? DateTime.MinValue : DateTime.MaxValue,
                 null,
-                TrainingInfo.Create(TrainingId.From(Guid.NewGuid().ToString()), "kangoo", null),
+                TrainingId,
                 maxClientCount: maxClientCount
                 );
         }

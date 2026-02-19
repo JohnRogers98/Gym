@@ -6,7 +6,7 @@
 
         public required String Operation { get; init; }
 
-        public required Dictionary<String, Object> Data { get; init; }
+        public required Dictionary<String, Object> Payload { get; init; }
 
         public required DateTime OccurredAt { get; init; }
     }

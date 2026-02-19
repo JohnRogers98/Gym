@@ -1,4 +1,5 @@
-﻿using Gym.Abstractions.Query.EventStore;
+﻿using Gym.Abstractions.Query.CalendarEvents;
+using Gym.Abstractions.Query.EventStore;
 using Gym.Domain._Common;
 using Gym.Domain.AccountContext;
 using Gym.Domain.CalendarEventContext;
@@ -17,14 +18,14 @@ using Gym.Infrastructure.Entities.Outbox;
 using Gym.Infrastructure.Entities.Outbox.Readers;
 using Gym.Infrastructure.Entities.Outbox.Updaters;
 using Gym.Infrastructure.Entities.Projections;
+using Gym.Infrastructure.Entities.Projections.CalendarEvents;
 using Gym.Infrastructure.Entities.Projections.Events;
 using Gym.Infrastructure.Entities.Repositories.Accounts;
+using Gym.Infrastructure.Entities.Repositories.CalendarEvents;
 using Gym.Infrastructure.Entities.Repositories.Clients;
 using Gym.Infrastructure.Entities.Repositories.Instructors;
 using Gym.Infrastructure.Entities.Repositories.Trainings;
 using Gym.Infrastructure.Entities.Repositories.Users;
-using Gym.Infrastructure.EventStores.Deserializers;
-using Gym.Infrastructure.EventStores.Serializers;
 using Gym.Infrastructure.HostedServices;
 using Gym.Infrastructure.Telegram;
 using Microsoft.Extensions.Configuration;
@@ -51,7 +52,8 @@ namespace Gym.Infrastructure
         public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
         {
             MongoDbOptions mongoDbOptions = configuration.GetSection("MongodDb").Get<MongoDbOptions>() ?? MongoDbOptions.Default;
-            
+            services.TryAddSingleton<MongoDbOptions>(_ => mongoDbOptions);
+
             services.AddMongoInfrastructure(mongoDbOptions ?? MongoDbOptions.Default);
             services.AddMessagePublisher();
             services.AddRepositories();
@@ -81,11 +83,13 @@ namespace Gym.Infrastructure
             services.AddMongoCollection<InstructorEntity>(mongoDbOptions.CollectionOptions.Instructors);
             services.AddMongoCollection<TrainingEntity>(mongoDbOptions.CollectionOptions.Trainings);
             services.AddMongoCollection<CalendarEventEntity>(mongoDbOptions.CollectionOptions.CalendarEvents);
+            services.AddMongoCollection<CalendarEventProjection>(mongoDbOptions.CollectionOptions.CalendarEventProjections);
             services.AddMongoCollection<UserEntity>(mongoDbOptions.CollectionOptions.Users);
             services.AddMongoCollection<ClientEntity>(mongoDbOptions.CollectionOptions.Clients);
             services.AddMongoCollection<EventEntity>(mongoDbOptions.CollectionOptions.Events);
             services.AddMongoCollection<MessageEntity>(mongoDbOptions.CollectionOptions.Messages);
             services.AddMongoCollection<EventProjection>(mongoDbOptions.CollectionOptions.EventProjections);
+            services.AddMongoCollection<CalendarEventProjection>(mongoDbOptions.CollectionOptions.EventProjections);
             services.AddMongoCollection<OutboxChangeStreamState>(mongoDbOptions.CollectionOptions.OutboxChangeStreams);
 
             return services;
@@ -116,7 +120,10 @@ namespace Gym.Infrastructure
         {
             services.TryAddScoped<IInstructorRepository, InstructorRepository>();
             services.TryAddScoped<ITrainingRepository, TrainingRepository>();
+
             services.TryAddScoped<ICalendarEventRepository, CalendarEventRepository>();
+            services.TryDecorate<ICalendarEventRepository, CalendarEventEventStoreAspect>();
+
             services.TryAddScoped<IUserRepository, UserRepository>();
 
             services.TryAddScoped<IClientRepository, ClientRepository>();
@@ -158,6 +165,9 @@ namespace Gym.Infrastructure
 
             services.TryAddScoped<EventProjectionStore>();
             services.TryAddScoped<IEventProjectionQueryService, EventProjectionQueryService>();
+
+            services.TryAddScoped<ICalendarEventProjectionQueryService, CalendarEventProjectionQueryService>();
+
             return services;
         }
 
@@ -165,9 +175,8 @@ namespace Gym.Infrastructure
         {
             services.TryAddScoped<IInstructorQueryService, InstructorRepository>();
             services.TryAddScoped<ITrainingQueryService, TrainingRepository>();
-            services.TryAddScoped<ICalendarEventQueryService, CalendarEventRepository>();
             services.TryAddScoped<IUserByTelegramIdFinder, UserRepository>();
-            services.TryAddScoped<IClientQueryService, ClientRepository>();
+            services.TryAddScoped<IClientByUserIdFinder, ClientRepository>();
             return services;
         }
 

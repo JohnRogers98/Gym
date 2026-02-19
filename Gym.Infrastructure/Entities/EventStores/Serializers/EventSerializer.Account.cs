@@ -1,20 +1,20 @@
 ﻿using Gym.Domain.AccountContext.Events;
 using Gym.Infrastructure.Entities.Repositories.Accounts.EventsDto;
 
-namespace Gym.Infrastructure.EventStores.Serializers
+namespace Gym.Infrastructure.Entities.EventStores.Serializers
 {
     internal partial class EventSerializer
     {
         private AccountCreatedDto ToDto(AccountCreatedDomainEvent domainEvent)
         {
-            return new AccountCreatedDto(domainEvent.Id.Value.ToString(), domainEvent.OccuredOn);
+            return new AccountCreatedDto(domainEvent.Id.Value.ToString(), domainEvent.OccurredOn);
         }
 
         private AccountChargedDto ToDto(AccountChargedDomainEvent domainEvent)
         {
             return new AccountChargedDto(
                 domainEvent.Id.Value.ToString(),
-                domainEvent.OccuredOn,
+                domainEvent.OccurredOn,
                 domainEvent.UserId.Value,
                 domainEvent.ByCount,
                 domainEvent.Reason);
@@ -24,7 +24,7 @@ namespace Gym.Infrastructure.EventStores.Serializers
         {
             return new TrainingBookedDto(
                 domainEvent.Id.Value.ToString(),
-                domainEvent.OccuredOn,
+                domainEvent.OccurredOn,
                 domainEvent.BookingId.Value,
                 domainEvent.UserId.Value,
                 domainEvent.CalendarEventId.Value);

@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using Gym.Application.Services.CalendarEventApi;
+using Gym.Abstractions.Query.CalendarEvents;
 using Gym.Application.Services.CalendarEventApi.GetAllCalendarEvents;
 using Gym.WebApi.Extensions;
 using Gym.WebDto.Responses;
@@ -18,8 +18,8 @@ namespace Gym.WebApi.Controllers.Api.CalendarEvents.AdminOnly
         [HttpGet]
         public async Task<ListResponse<AdminCalendarEventDto>> ListCalendarEvents()
         {
-            IEnumerable<CalendarEventDetails> calendarEventDetails = await _mediator.Send(new GetAllCalendarEvents());
-            return new (_mapper.Map<IEnumerable<AdminCalendarEventDto>>(calendarEventDetails));
+            IEnumerable<CalendarEventProjection> calendarEventProjections = await _mediator.Send(new GetAllCalendarEvents());
+            return new (_mapper.Map<IEnumerable<AdminCalendarEventDto>>(calendarEventProjections));
         }
     }
 }

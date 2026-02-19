@@ -13,9 +13,9 @@ namespace Gym.Application.Services.UserApi.TelegramAuthentication
         IUserRepository _userRepository,
         IUserByTelegramIdFinder _userByTelegramIdFinder,
         IClientRepository _clientRepository,
-        IAccountRepository _accountRepository) : IRequestHandler<AuthenticateUser, UserDetails>
+        IAccountRepository _accountRepository) : IRequestHandler<AuthenticateUser, AuthenticateUserDetails>
     {
-        public async Task<UserDetails> Handle(AuthenticateUser request, CancellationToken cancellationToken)
+        public async Task<AuthenticateUserDetails> Handle(AuthenticateUser request, CancellationToken cancellationToken)
         {
             Result<ValidatedTelegramUserInfo> verificationResult = _telegramSignatureVerifier.Verify(request.EscapedInitData);
             if (!verificationResult.Success)
@@ -28,7 +28,7 @@ namespace Gym.Application.Services.UserApi.TelegramAuthentication
                 user = await this.RegisterUser(verificationResult.Data.Id, cancellationToken);
             }
 
-            return user!.ToDetails();
+            return new AuthenticateUserDetails(user.Id.Value, user.Role.ToString(), user.TelegramId?.Value);
         }
 
         private async Task<User> RegisterUser(TelegramId telegramId, CancellationToken cancellationToken)

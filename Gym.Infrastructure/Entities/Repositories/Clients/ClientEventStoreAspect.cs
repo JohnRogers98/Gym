@@ -33,6 +33,8 @@ namespace Gym.Infrastructure.Entities.Repositories.Clients
                     );
             }
             await _decoratee.SaveAsync(client, cancellationToken);
+
+            client.ClearDomainEvents();
         }
 
         private EventEntity CreateEventEntity(ClientId clientId, DomainEvent domainEvent)
@@ -44,7 +46,7 @@ namespace Gym.Infrastructure.Entities.Repositories.Clients
                 AggregateType = nameof(Client),
                 Operation = domainEvent.GetType().Name,
                 Data = _eventSerializer.Serialize(domainEvent),
-                OccurredAt = domainEvent.OccuredOn
+                OccurredAt = domainEvent.OccurredOn
             };
         }
 

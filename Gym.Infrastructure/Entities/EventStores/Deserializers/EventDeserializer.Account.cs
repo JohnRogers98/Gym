@@ -4,7 +4,7 @@ using Gym.Domain.AccountContext;
 using Gym.Domain.AccountContext.Events;
 using Gym.Infrastructure.Entities.Repositories.Accounts.EventsDto;
 
-namespace Gym.Infrastructure.EventStores.Deserializers
+namespace Gym.Infrastructure.Entities.EventStores.Deserializers
 {
     internal partial class EventDeserializer
     {
@@ -12,7 +12,7 @@ namespace Gym.Infrastructure.EventStores.Deserializers
         {
             return AccountChargedDomainEvent.Restore(
                 DomainEventId.From(Guid.Parse(dto.Id)),
-                dto.OccuredOn,
+                dto.occurredOn,
                 UserId.From(dto.UserId),
                 dto.ByCount,
                 dto.Reason
@@ -23,7 +23,7 @@ namespace Gym.Infrastructure.EventStores.Deserializers
         {
             return AccountCreatedDomainEvent.Restore(
                 DomainEventId.From(Guid.Parse(dto.Id)),
-                dto.OccuredOn
+                dto.occurredOn
                 );
         }
 
@@ -31,7 +31,7 @@ namespace Gym.Infrastructure.EventStores.Deserializers
         {
             return TrainingBookedDomainEvent.Restore(
                 DomainEventId.From(Guid.Parse(dto.Id)),
-                dto.OccuredOn,
+                dto.occurredOn,
                 BookingId.From(dto.BookingId),
                 UserId.From(dto.UserId),
                 CalendarEventId.From(dto.CalendarEventId)

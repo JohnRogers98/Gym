@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Gym.Application.Services.UserApi;
 using Gym.Application.Services.UserApi.TelegramAuthentication;
 using Gym.WebApi.Controllers.Api.Users.Jwt;
 using Gym.WebDto.Requests.Users;
@@ -18,13 +17,13 @@ namespace Gym.WebApi.Controllers.Api.Users
         [HttpPost]
         public async Task<ActionResult<WebAppAuthResponse>> WebAppAuth(WebAppAuthRequest request)
         {
-            UserDetails userDetails = await _mediator.Send(new AuthenticateUser(request.InitData));
+            AuthenticateUserDetails authenticateUserDetails = await _mediator.Send(new AuthenticateUser(request.InitData));
 
-            String accessToken = _accessTokenGenerator.Generate(userDetails);
+            String accessToken = _accessTokenGenerator.Generate(authenticateUserDetails);
 
             this.AppendCookiesWithAccessToken(accessToken);
 
-            return Ok(_mapper.Map<WebAppAuthResponse>(userDetails));
+            return Ok(_mapper.Map<WebAppAuthResponse>(authenticateUserDetails));
         }
 
         private void AppendCookiesWithAccessToken(String accessToken)

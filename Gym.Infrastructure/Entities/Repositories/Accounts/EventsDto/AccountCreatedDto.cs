@@ -2,6 +2,6 @@
 {
     internal record AccountCreatedDto(
         String Id,
-        DateTime OccuredOn
+        DateTime occurredOn
         );
 }

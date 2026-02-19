@@ -6,23 +6,18 @@ using MediatR;
 namespace Gym.Application.Services.AccountApi.GetAccountHistory
 {
     internal class GetAccountHistoryHandler( 
-        IClientQueryService _clientQueryService,
-        IEventProjectionQueryService _eventProjectionQueryService) : IRequestHandler<GetAccountHistory, IEnumerable<AccountEventDetails>>
+        IClientRepository _clientRepository,
+        IEventProjectionQueryService _eventProjectionQueryService) : IRequestHandler<GetAccountHistory, IEnumerable<EventProjection>>
 
     {
-        public async Task<IEnumerable<AccountEventDetails>> Handle(GetAccountHistory request, CancellationToken cancellationToken)
+        public async Task<IEnumerable<EventProjection>> Handle(GetAccountHistory request, CancellationToken cancellationToken)
         {
             ClientId clientId = ClientId.From(request.ClientId);
-            Client? client = await _clientQueryService.GetByIdAsync(clientId, cancellationToken);
-            if (client is null)
-            {
-                throw new ArgumentException($"Client id - {clientId} not exist");
-            }
+            Client? client = await _clientRepository.GetByIdAsync(clientId, cancellationToken)
+                ?? throw new ArgumentException($"Client id - {clientId} not exist"); ;
 
             AccountId accountId = AccountId.From(client.UserId);
-            IEnumerable<EventProjection> eventProjections = await _eventProjectionQueryService.GetByStreamId(accountId.Value, cancellationToken);
-
-            return eventProjections.ToDetails();
+            return await _eventProjectionQueryService.GetByStreamId(accountId.Value, cancellationToken);
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using Gym.Application.Services.BookingApi;
-using Gym.Application.Services.CalendarEventApi;
+using Gym.Abstractions.Query.CalendarEvents;
+using Gym.Application.Services.BookingApi.BookTrainingEvent;
 using Gym.Application.Services.CalendarEventApi.CreateCalendarEvent;
 using Gym.WebDto.Requests.CalendarEvent;
 using Gym.WebDto.Responses.Bookings;
@@ -13,17 +13,17 @@ namespace Gym.WebApi.Controllers.Api.CalendarEvents
         public _DtoMappings()
         {
             CreateMap<CreateCalendarEventRequest, CreateCalendarEvent>();
-            CreateMap<CalendarEventDetails, CreateCalendarEventResponse>();
+            CreateMap<CreateCalendarEventResult, CreateCalendarEventResponse>();
 
-            CreateMap<CalendarEventDetails, GetAdminCalendarEventResponse>();
-            CreateMap<CalendarEventDetails, AdminCalendarEventDto>();
+            CreateMap<CalendarEventProjection, GetAdminCalendarEventResponse>();
+            CreateMap<CalendarEventProjection, AdminCalendarEventDto>();
 
-            CreateMap<CalendarEventDetails, GetClientCalendarEventResponse>()
+            CreateMap<CalendarEventProjection, GetClientCalendarEventResponse>()
               .ForMember(dest => dest.IsAlreadyBooked,
                 opt => opt.MapFrom((src, dest, _, context) =>
                 {
                     var currentUserId = (String)context.Items["CurrentUserId"];
-                    return src.BookingUsers.Any(aUserId => aUserId == currentUserId);
+                    return src.BookingUsers?.Any(aUserInfo => aUserInfo.Id == currentUserId);
                 }))
               .ForMember(dest => dest.CurrentClientCount,
                 opt => opt.MapFrom((src, dest, _, context) =>
@@ -31,12 +31,12 @@ namespace Gym.WebApi.Controllers.Api.CalendarEvents
                     return src.BookingUsers?.Count();
                 }));
 
-            CreateMap<CalendarEventDetails, ClientCalendarEventDto>()
+            CreateMap<CalendarEventProjection, ClientCalendarEventDto>()
               .ForMember(dest => dest.IsAlreadyBooked,
                 opt => opt.MapFrom((src, dest, _, context) =>
                 {
                     var currentUserId = (String)context.Items["CurrentUserId"];
-                    return src.BookingUsers.Any(aUserId => aUserId == currentUserId);
+                    return src.BookingUsers?.Any(aUserInfo => aUserInfo.Id == currentUserId);
                 }))
               .ForMember(dest => dest.CurrentClientCount,
                 opt => opt.MapFrom((src, dest, _, context) =>
@@ -44,7 +44,11 @@ namespace Gym.WebApi.Controllers.Api.CalendarEvents
                     return src.BookingUsers?.Count();
                 }));
 
-            CreateMap<BookingDetails, BookTrainingEventResponse>();
+            CreateMap<BookTrainingEventResult, BookTrainingEventResponse>();
+
+            CreateMap<Abstractions.Query.CalendarEvents.TrainingInfo, WebDto.Responses.Training.TrainingInfo>();
+            CreateMap<Abstractions.Query.CalendarEvents.InstructorInfo, WebDto.Responses.Instructor.InstructorInfo>();
+            CreateMap<Abstractions.Query.CalendarEvents.BookingUserInfo, WebDto.Responses.Bookings.BookingUserInfo>();
         }
     }
 }

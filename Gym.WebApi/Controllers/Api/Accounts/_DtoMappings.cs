@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using Gym.Application.Services.AccountApi;
+using Gym.Abstractions.Query.EventStore;
 using Gym.Application.Services.AccountApi.ChargeAccount;
 using Gym.Application.Services.AccountApi.GetAccountHistory;
 using Gym.WebApi.Extensions;
@@ -18,7 +18,7 @@ namespace Gym.WebApi.Controllers.Api.Accounts
                      return new ChargeAccount(context.GetTypedItem<String>(nameof(ChargeAccount.ClientId)), src.ByCount);
                  });
 
-            CreateMap<AccountDetails, ChargeAccountResponse>();
+            CreateMap<ChargeAccountResult, ChargeAccountResponse>();
 
             CreateMap<GetAccountHistoryRequest, GetAccountHistory>()
                  .ConstructUsing((src, context) =>
@@ -26,7 +26,7 @@ namespace Gym.WebApi.Controllers.Api.Accounts
                      return new GetAccountHistory(context.GetTypedItem<String>(nameof(GetAccountHistory.ClientId)));
                  });
 
-            CreateMap<AccountEventDetails, AccountHistoryDto>();
+            CreateMap<EventProjection, AccountHistoryDto>();
         }
     }
 }

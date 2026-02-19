@@ -4,12 +4,12 @@ namespace Gym.Domain.AccountContext.Events
 {
     public class AccountCreatedDomainEvent : DomainEvent
     {
-        private AccountCreatedDomainEvent(DomainEventId id, DateTime occuredOn) { }
+        private AccountCreatedDomainEvent(DomainEventId id, DateTime occurredOn) { }
 
         public static AccountCreatedDomainEvent Create()
             => new(DomainEventId.Generate(), DateTime.Now);
 
-        public static AccountCreatedDomainEvent Restore(DomainEventId id, DateTime occuredOn)
-            => new(id, occuredOn);
+        public static AccountCreatedDomainEvent Restore(DomainEventId id, DateTime occurredOn)
+            => new(id, occurredOn);
     }
 }

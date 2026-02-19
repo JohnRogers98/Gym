@@ -1,7 +1,6 @@
 ﻿using Gym.Domain._Exceptions;
 using Gym.Domain._Shared;
 using Gym.Domain.CalendarEventContext;
-using Gym.Domain.TrainingContext;
 
 namespace Gym.Domain.Tests
 {

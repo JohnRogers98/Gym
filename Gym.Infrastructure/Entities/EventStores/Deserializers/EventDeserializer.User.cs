@@ -3,7 +3,7 @@ using Gym.Domain._Shared;
 using Gym.Domain.UserContext.Events;
 using Gym.Infrastructure.Entities.Repositories.Users.EventsDto;
 
-namespace Gym.Infrastructure.EventStores.Deserializers
+namespace Gym.Infrastructure.Entities.EventStores.Deserializers
 {
     internal partial class EventDeserializer
     {
@@ -11,7 +11,7 @@ namespace Gym.Infrastructure.EventStores.Deserializers
         {
             return UserCreatedDomainEvent.Restore(
                 DomainEventId.From(Guid.Parse(dto.Id)),
-                dto.OccuredOn,
+                dto.occurredOn,
                 UserId.From(dto.UserId));
         }
     }

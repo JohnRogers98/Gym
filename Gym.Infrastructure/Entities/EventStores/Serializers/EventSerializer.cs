@@ -1,9 +1,8 @@
 ﻿using Gym.Domain._Common;
-using Gym.Infrastructure.Entities.EventStores.Serializers;
 using Microsoft.CSharp.RuntimeBinder;
 using System.Text.Json;
 
-namespace Gym.Infrastructure.EventStores.Serializers
+namespace Gym.Infrastructure.Entities.EventStores.Serializers
 {
     internal partial class EventSerializer : IEventSerializer
     {
