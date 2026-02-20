@@ -1,6 +1,4 @@
-﻿using Gym.Infrastructure.Entities.EventStores;
-
-namespace Gym.Infrastructure.Entities.EventStores.Extensions
+﻿namespace Gym.Infrastructure.Entities.EventStores.Extensions
 {
     internal static class EventExtensions
     {

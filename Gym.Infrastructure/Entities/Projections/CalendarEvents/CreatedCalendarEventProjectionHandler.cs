@@ -2,8 +2,9 @@
 using Gym.Domain.CalendarEventContext;
 using Gym.Domain.CalendarEventContext.Events;
 using Gym.Infrastructure.Entities.EventStores;
-using Gym.Infrastructure.Entities.EventStores.Deserializers;
+using Gym.Infrastructure.Entities.EventStores.DtoDeserializers;
 using Gym.Infrastructure.Entities.Extensions;
+using Gym.Infrastructure.Entities.Repositories.CalendarEvents.EventsDto;
 using Gym.Infrastructure.Entities.Repositories.Instructors;
 using Gym.Infrastructure.Entities.Repositories.Trainings;
 using MongoConsoleApp.Repositories.CalendarEvents;
@@ -11,13 +12,13 @@ using MongoDB.Driver;
 
 namespace Gym.Infrastructure.Entities.Projections.CalendarEvents
 {
-    internal class CalendarEventProjectionHandler(
+    internal class CreatedCalendarEventProjectionHandler(
         IMongoCollection<CalendarEventEntity> _calendarEventCollection,
         IMongoCollection<TrainingEntity> _trainingColletion,
         IMongoCollection<InstructorEntity> _instructorColletion,
         IMongoCollection<CalendarEventProjection> _projectionCollection,
         MongoUnitOfWork _mongoUnitOfWork,
-        IEventDeserializer _eventDeserializer) : IProjectionHandler
+        IEventDtoDeserializer _eventDtoDeserializer) : IProjectionHandler
     {
         public Boolean CanHandle(String aggregateType, String operation)
         {
@@ -26,10 +27,10 @@ namespace Gym.Infrastructure.Entities.Projections.CalendarEvents
 
         public async Task HandleAsync(EventEntity eventEntity, CancellationToken cancellationToken)
         {
-            var calendarEventCreatedDomainEvent = _eventDeserializer.Deserialize<CalendarEventCreatedDomainEvent>(eventEntity);
+            var calendarEventCreatedDto = _eventDtoDeserializer.Deserialize<CalendarEventCreatedDto>(eventEntity);
 
             var calendarEvent = await _calendarEventCollection
-                .Find(calendarEvent => calendarEvent.Id == calendarEventCreatedDomainEvent.CalendarEventId.Value.ToObjectId())
+                .Find(calendarEvent => calendarEvent.Id == calendarEventCreatedDto.CalendarEventId.ToObjectId())
                 .FirstAsync(cancellationToken);
 
             TrainingInfo training = await _trainingColletion
@@ -64,39 +65,6 @@ namespace Gym.Infrastructure.Entities.Projections.CalendarEvents
                     .ToList(),
                 Instructors: instructors
             );
-
-            /* CalendarEventProjection projection = _calendarEventCollection.AsQueryable()
-                 .Where(calendarEvent => calendarEvent.Id == calendarEventCreatedDomainEvent.CalendarEventId.Value.ToObjectId())
-                 .Select(calendarEvent => 
-                     new CalendarEventProjection(
-                         Id: calendarEvent.Id.ToString(),
-                         Start: calendarEvent.Start,
-                         End: calendarEvent.End,
-
-                         Training: _trainingColletion.AsQueryable()
-                             .Where(training => training.Id == calendarEvent.TrainingId)
-                             .Select(training => new TrainingInfo(
-                                 training.Id.ToString(),
-                                 training.Name,
-                                 training.Description)
-                             ).First(),
-
-                         MaxClientCount: calendarEvent.MaxClientCount,
-
-                         BookingUsers: calendarEvent.Bookings != null 
-                             ? calendarEvent.Bookings.ToList().Select(userId => new BookingUserInfo(userId.ToString())) 
-                             : null,
-
-                         Instructors: calendarEvent.Instructors != null 
-                             ? _instructorColletion.AsQueryable()
-                                 .Where(instructor => calendarEvent.Instructors.ToList().Contains(instructor.Id))
-                                 .Select(instructor => new InstructorInfo(
-                                     instructor.Id.ToString(),
-                                     $"{instructor.FirstName} {instructor.LastName}")
-                                 ).ToList()
-                             : null
-                     ))
-                 .First();*/
 
             await _projectionCollection.InsertOneAsync(_mongoUnitOfWork.Session, projection, cancellationToken: cancellationToken);
         }

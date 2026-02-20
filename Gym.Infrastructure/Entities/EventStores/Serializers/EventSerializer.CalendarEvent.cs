@@ -12,5 +12,14 @@ namespace Gym.Infrastructure.Entities.EventStores.Serializers
                 domainEvent.OccurredOn,
                 domainEvent.CalendarEventId.Value);
         }
+
+        private CalendarEventBookedDto ToDto(CalendarEventBookedDomainEvent domainEvent)
+        {
+            return new CalendarEventBookedDto(
+                domainEvent.Id.Value.ToString(),
+                domainEvent.OccurredOn,
+                domainEvent.CalendarEventId.Value,
+                domainEvent.UserId.Value);
+        }
     }
 }

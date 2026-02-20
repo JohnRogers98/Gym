@@ -60,6 +60,8 @@ namespace Gym.Domain.CalendarEventContext
             var wasAdded = _bookings.Add(userId);
             if (wasAdded is not true) 
                 throw new DomainException(UserAlreadyBookedError.Create(Id, userId));
+
+            base.AddDomainEvent(CalendarEventBookedDomainEvent.Create(Id, userId));
         }
         
         public Boolean HasFreeSpace() => MaxClientCount is null || MaxClientCount > _bookings.Count;

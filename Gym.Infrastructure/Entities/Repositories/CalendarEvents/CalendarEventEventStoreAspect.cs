@@ -32,7 +32,7 @@ namespace Gym.Infrastructure.Entities.Repositories.CalendarEvents
             {
                 await _eventStore.SaveAutoversionedAsync(
                     this.CreateStreamId(calendarEvent.Id),
-                    calendarEvent.DomainEvents.Select(domainEvent => this.CreateEventEntity(calendarEvent.Id, domainEvent)),
+                    calendarEvent.DomainEvents.Select(domainEvent => this.CreateEventEntity(calendarEvent.Id, domainEvent)).ToList(),
                     cancellationToken
                     );
             }

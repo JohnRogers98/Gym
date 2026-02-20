@@ -26,14 +26,15 @@ namespace Gym.Infrastructure.Entities.EventStores
             if (!eventEntities.Any())
                 return;
 
-            Int32 lastVersion = await this.GetLastVersionAsync(streamId, cancellationToken) ?? default;
+            Int32 lastKnownVersion = await this.GetLastVersionAsync(streamId, cancellationToken) ?? default;
 
+            Int32 newVersion = lastKnownVersion;
             foreach (var anEventEntity in eventEntities)
             {
-                anEventEntity.Version = lastVersion += 1;
+                newVersion++;
+                anEventEntity.Version = newVersion;
             }
-
-            await _events.InsertManyAsync(_mongoUnitOfWork.Session, eventEntities, cancellationToken: cancellationToken);
+            await this.SaveVersionedAsync(streamId, eventEntities, lastKnownVersion, cancellationToken);
         }
 
         public async Task SaveVersionedAsync(StreamId streamId, IEnumerable<EventEntity> eventEntities, Int32 lastKnownVersion, CancellationToken cancellationToken)
@@ -58,7 +59,7 @@ namespace Gym.Infrastructure.Entities.EventStores
                 Sort = sort
             };
 
-            EventEntity lastEventEntity =  await _events.Find(_mongoUnitOfWork.Session, @event => @event.StreamId == streamId.Value)
+            EventEntity? lastEventEntity =  await _events.Find(_mongoUnitOfWork.Session, @event => @event.StreamId == streamId.Value)
                 .Sort(sort)
                 .FirstOrDefaultAsync(cancellationToken);
 

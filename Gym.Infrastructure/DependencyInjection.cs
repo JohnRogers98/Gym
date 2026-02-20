@@ -12,6 +12,7 @@ using Gym.Infrastructure.Caching;
 using Gym.Infrastructure.Configurations;
 using Gym.Infrastructure.Entities.EventStores;
 using Gym.Infrastructure.Entities.EventStores.Deserializers;
+using Gym.Infrastructure.Entities.EventStores.DtoDeserializers;
 using Gym.Infrastructure.Entities.EventStores.Readers;
 using Gym.Infrastructure.Entities.EventStores.Serializers;
 using Gym.Infrastructure.Entities.Outbox;
@@ -187,6 +188,7 @@ namespace Gym.Infrastructure
 
             services.TryAddScoped<IEventSerializer, EventSerializer>();
             services.TryAddScoped<IEventDeserializer, EventDeserializer>();
+            services.TryAddScoped<IEventDtoDeserializer, EventDtoDeserializer>();
 
             return services;
         }

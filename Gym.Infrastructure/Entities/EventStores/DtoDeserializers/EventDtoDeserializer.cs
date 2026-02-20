@@ -1,5 +1,4 @@
-﻿using Gym.Domain._Common;
-using Gym.Domain.AccountContext.Events;
+﻿using Gym.Domain.AccountContext.Events;
 using Gym.Domain.CalendarEventContext.Events;
 using Gym.Domain.ClientContext.Events;
 using Gym.Domain.UserContext.Events;
@@ -9,9 +8,9 @@ using Gym.Infrastructure.Entities.Repositories.Clients.EventsDto;
 using Gym.Infrastructure.Entities.Repositories.Users.EventsDto;
 using System.Text.Json;
 
-namespace Gym.Infrastructure.Entities.EventStores.Deserializers
+namespace Gym.Infrastructure.Entities.EventStores.DtoDeserializers
 {
-    internal partial class EventDeserializer : IEventDeserializer
+    internal class EventDtoDeserializer : IEventDtoDeserializer
     {
         private readonly Dictionary<String, Type> _operationToDtoType = new()
         {
@@ -24,7 +23,7 @@ namespace Gym.Infrastructure.Entities.EventStores.Deserializers
             [nameof(CalendarEventBookedDomainEvent)] = typeof(CalendarEventBookedDto)
         };
 
-        public DomainEvent Deserialize(EventEntity eventEntity)
+        public Object Deserialize(EventEntity eventEntity)
         {
             _operationToDtoType.TryGetValue(eventEntity.Operation, out Type? dtoType);
             if (dtoType is null)
@@ -32,16 +31,14 @@ namespace Gym.Infrastructure.Entities.EventStores.Deserializers
                 throw new ArgumentException($"Operation is not declared as deserialized - {eventEntity.Operation}");
             }
 
-            Object? dto = JsonSerializer.Deserialize(eventEntity.Data, dtoType)
+            return JsonSerializer.Deserialize(eventEntity.Data, dtoType)
                 ?? throw new ArgumentException($"Data is not of declared event type - {eventEntity.Operation}");
-
-            return ToDomainEvent((dynamic)dto);
         }
 
-        public TDomainEvent Deserialize<TDomainEvent>(EventEntity eventEntity) where TDomainEvent : DomainEvent
+        public TDto Deserialize<TDto>(EventEntity eventEntity) where TDto : class
         {
-            return this.Deserialize(eventEntity) as TDomainEvent 
-                ?? throw new ArgumentException($"Cannot deserialize event - {eventEntity.Id} in {typeof(TDomainEvent)}");
+            return this.Deserialize(eventEntity) as TDto
+                ?? throw new ArgumentException($"Cannot deserialize event - {eventEntity.Id} in {typeof(TDto)}");
         }
     }
 }
