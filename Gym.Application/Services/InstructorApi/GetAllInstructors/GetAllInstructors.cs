@@ -1,6 +1,7 @@
-﻿using MediatR;
+﻿using Gym.Abstractions.Query.Instructors;
+using MediatR;
 
 namespace Gym.Application.Services.InstructorApi.GetAllInstructors
 {
-    public record GetAllInstructors : IRequest<IEnumerable<InstructorDetails>>;
+    public record GetAllInstructors : IRequest<IEnumerable<InstructorProjection>>;
 }

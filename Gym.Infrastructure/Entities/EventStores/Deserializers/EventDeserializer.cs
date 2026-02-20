@@ -2,10 +2,12 @@
 using Gym.Domain.AccountContext.Events;
 using Gym.Domain.CalendarEventContext.Events;
 using Gym.Domain.ClientContext.Events;
+using Gym.Domain.InstructorContext.Events;
 using Gym.Domain.UserContext.Events;
 using Gym.Infrastructure.Entities.Repositories.Accounts.EventsDto;
 using Gym.Infrastructure.Entities.Repositories.CalendarEvents.EventsDto;
 using Gym.Infrastructure.Entities.Repositories.Clients.EventsDto;
+using Gym.Infrastructure.Entities.Repositories.Instructors.EventsDto;
 using Gym.Infrastructure.Entities.Repositories.Users.EventsDto;
 using System.Text.Json;
 
@@ -21,7 +23,8 @@ namespace Gym.Infrastructure.Entities.EventStores.Deserializers
             [nameof(ClientCreatedDomainEvent)] = typeof(ClientCreatedDto),
             [nameof(UserCreatedDomainEvent)] = typeof(UserCreatedDto),
             [nameof(CalendarEventCreatedDomainEvent)] = typeof(CalendarEventCreatedDto),
-            [nameof(CalendarEventBookedDomainEvent)] = typeof(CalendarEventBookedDto)
+            [nameof(CalendarEventBookedDomainEvent)] = typeof(CalendarEventBookedDto),
+            [nameof(InstructorCreatedDomainEvent)] = typeof(InstructorCreatedDto)
         };
 
         public DomainEvent Deserialize(EventEntity eventEntity)

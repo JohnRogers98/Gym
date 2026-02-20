@@ -1,4 +1,5 @@
 ﻿using Gym.Domain._Common;
+using Gym.Domain.InstructorContext.Events;
 
 namespace Gym.Domain.InstructorContext
 {
@@ -15,8 +16,12 @@ namespace Gym.Domain.InstructorContext
             LastName = lastName;
         }
 
-        public static Instructor Create(InstructorId id, String firstName, String? lastName) 
-            => new Instructor(id, firstName, lastName);
+        public static Instructor Create(InstructorId id, String firstName, String? lastName)
+        {
+            Instructor instructor = new(id, firstName, lastName);
+            instructor.AddDomainEvent(InstructorCreatedDomainEvent.Create(instructor.Id));
+            return instructor;
+        } 
 
         public static Instructor Restore(InstructorId id, String firstName, String? lastName)
             => new Instructor(id, firstName, lastName);

@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using Gym.Application.Services.InstructorApi;
+using Gym.Abstractions.Query.Instructors;
 using Gym.Application.Services.InstructorApi.GetInstructorById;
 using Gym.WebApi.Extensions;
 using Gym.WebDto.Responses.Instructor;
@@ -7,7 +7,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Gym.WebApi.Controllers.Api.Instructors
+namespace Gym.WebApi.Controllers.Api.Instructors.AuthenticatedOnly
 {
     [Route("api/instructors/{id}")]
     [ApiController]
@@ -17,8 +17,8 @@ namespace Gym.WebApi.Controllers.Api.Instructors
         [HttpGet]
         public async Task<GetInstructorResponse> GetInstructor(String id)
         {
-            InstructorDetails instructorDetails = await _mediator.Send(new GetInstructorById(id));
-            return _mapper.Map<GetInstructorResponse>(instructorDetails);
+            InstructorProjection instructorProjection = await _mediator.Send(new GetInstructorById(id));
+            return _mapper.Map<GetInstructorResponse>(instructorProjection);
         }
     }
 }

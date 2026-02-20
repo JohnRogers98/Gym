@@ -7,6 +7,7 @@
 
     public sealed record CollectionOptions(
         String Instructors,
+        String InstructorProjections,
         String Trainings,
         String CalendarEvents,
         String CalendarEventProjections,
@@ -19,6 +20,7 @@
     {
         public static CollectionOptions Default => new CollectionOptions(
             "instructors",
+            "instructor-projections",
             "trainings",
             "calendar-events",
             "calendar-event-projections",

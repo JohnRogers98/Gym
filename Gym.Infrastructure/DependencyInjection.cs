@@ -1,5 +1,6 @@
 ﻿using Gym.Abstractions.Query.CalendarEvents;
 using Gym.Abstractions.Query.EventStore;
+using Gym.Abstractions.Query.Instructors;
 using Gym.Domain._Common;
 using Gym.Domain.AccountContext;
 using Gym.Domain.CalendarEventContext;
@@ -21,6 +22,7 @@ using Gym.Infrastructure.Entities.Outbox.Updaters;
 using Gym.Infrastructure.Entities.Projections;
 using Gym.Infrastructure.Entities.Projections.CalendarEvents;
 using Gym.Infrastructure.Entities.Projections.Events;
+using Gym.Infrastructure.Entities.Projections.Instructors;
 using Gym.Infrastructure.Entities.Repositories.Accounts;
 using Gym.Infrastructure.Entities.Repositories.CalendarEvents;
 using Gym.Infrastructure.Entities.Repositories.Clients;
@@ -82,15 +84,20 @@ namespace Gym.Infrastructure
             services.TryAddScoped<IUnitOfWork>(sp => sp.GetRequiredService<MongoUnitOfWork>());
 
             services.AddMongoCollection<InstructorEntity>(mongoDbOptions.CollectionOptions.Instructors);
+            services.AddMongoCollection<InstructorProjection>(mongoDbOptions.CollectionOptions.InstructorProjections);
+
             services.AddMongoCollection<TrainingEntity>(mongoDbOptions.CollectionOptions.Trainings);
+
             services.AddMongoCollection<CalendarEventEntity>(mongoDbOptions.CollectionOptions.CalendarEvents);
             services.AddMongoCollection<CalendarEventProjection>(mongoDbOptions.CollectionOptions.CalendarEventProjections);
+
             services.AddMongoCollection<UserEntity>(mongoDbOptions.CollectionOptions.Users);
             services.AddMongoCollection<ClientEntity>(mongoDbOptions.CollectionOptions.Clients);
+
             services.AddMongoCollection<EventEntity>(mongoDbOptions.CollectionOptions.Events);
-            services.AddMongoCollection<MessageEntity>(mongoDbOptions.CollectionOptions.Messages);
             services.AddMongoCollection<EventProjection>(mongoDbOptions.CollectionOptions.EventProjections);
-            services.AddMongoCollection<CalendarEventProjection>(mongoDbOptions.CollectionOptions.EventProjections);
+            services.AddMongoCollection<MessageEntity>(mongoDbOptions.CollectionOptions.Messages);
+
             services.AddMongoCollection<OutboxChangeStreamState>(mongoDbOptions.CollectionOptions.OutboxChangeStreams);
 
             return services;
@@ -120,6 +127,8 @@ namespace Gym.Infrastructure
         private static IServiceCollection AddRepositories(this IServiceCollection services)
         {
             services.TryAddScoped<IInstructorRepository, InstructorRepository>();
+            services.TryDecorate<IInstructorRepository, InstructorEventStoreAspect>();
+
             services.TryAddScoped<ITrainingRepository, TrainingRepository>();
 
             services.TryAddScoped<ICalendarEventRepository, CalendarEventRepository>();
@@ -168,13 +177,13 @@ namespace Gym.Infrastructure
             services.TryAddScoped<IEventProjectionQueryService, EventProjectionQueryService>();
 
             services.TryAddScoped<ICalendarEventProjectionQueryService, CalendarEventProjectionQueryService>();
+            services.TryAddScoped<IInstructorProjectionQueryService, InstructorProjectionQueryService>();
 
             return services;
         }
 
         private static IServiceCollection AddQueryServices(this IServiceCollection services)
         {
-            services.TryAddScoped<IInstructorQueryService, InstructorRepository>();
             services.TryAddScoped<ITrainingQueryService, TrainingRepository>();
             services.TryAddScoped<IUserByTelegramIdFinder, UserRepository>();
             services.TryAddScoped<IClientByUserIdFinder, ClientRepository>();
