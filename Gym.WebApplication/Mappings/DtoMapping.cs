@@ -11,8 +11,10 @@ namespace Gym.WebApplication.Mappings
         public DtoMapping()
         {
             base.CreateMap<TrainingDto, TrainingViewModel>();
+            base.CreateMap<TrainingInfo, TrainingViewModel>();
 
             base.CreateMap<InstructorDto, InstructorViewModel>();
+            base.CreateMap<InstructorInfo, InstructorViewModel>();
 
             base.CreateMap<ClientCalendarEventDto, CalendarItemViewModel>();
         }

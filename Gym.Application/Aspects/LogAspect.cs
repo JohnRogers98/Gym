@@ -11,7 +11,7 @@ namespace Gym.Application.Aspects
         public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
         {
             Guid logId = Guid.NewGuid();
-            _logger.LogInformation($"LogId - {logId}: {typeof(TRequest).Name} is executed. {request.ToString()}");
+            _logger.LogInformation($"LogId - {logId}: {typeof(TRequest).Name} is being executed. {request.ToString()}");
 
             var result = await next();
 
