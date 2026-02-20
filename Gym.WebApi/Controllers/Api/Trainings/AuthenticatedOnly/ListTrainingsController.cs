@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using Gym.Application.Services.TrainingApi;
+using Gym.Abstractions.Query.Trainings;
 using Gym.Application.Services.TrainingApi.GetAllTrainings;
 using Gym.WebApi.Extensions;
 using Gym.WebDto.Responses;
@@ -8,7 +8,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Gym.WebApi.Controllers.Api.Trainings
+namespace Gym.WebApi.Controllers.Api.Trainings.AuthenticatedOnly
 {
     [Route("api/trainings")]
     [ApiController]
@@ -18,8 +18,8 @@ namespace Gym.WebApi.Controllers.Api.Trainings
         [HttpGet]
         public async Task<ListResponse<TrainingDto>> ListTrainings()
         {
-            IEnumerable<TrainingDetails> trainingDetails = await _mediator.Send(new GetAllTrainings());
-            return new (_mapper.Map<IEnumerable<TrainingDto>>(trainingDetails));
+            IEnumerable<TrainingProjection> trainingProjections = await _mediator.Send(new GetAllTrainings());
+            return new (_mapper.Map<IEnumerable<TrainingDto>>(trainingProjections));
         }
     }
 }

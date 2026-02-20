@@ -1,4 +1,5 @@
 ﻿using Gym.Domain._Common;
+using Gym.Domain.TrainingContext.Events;
 
 namespace Gym.Domain.TrainingContext
 {
@@ -16,7 +17,11 @@ namespace Gym.Domain.TrainingContext
         }
 
         public static Training Create(TrainingId id, String name, String? description)
-            => new Training(id, name, description);
+        {
+            Training training = new (id, name, description);
+            training.AddDomainEvent(TrainingCreatedDomainEvent.Create(training.Id));
+            return training;
+        }
 
         public static Training Restore(TrainingId id, String name, String? description)
             => new Training(id, name, description);

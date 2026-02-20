@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using Gym.Application.Services.TrainingApi;
 using Gym.Application.Services.TrainingApi.CreateTraining;
+using Gym.WebApi.Controllers.Api.Trainings.AuthenticatedOnly;
 using Gym.WebApi.Extensions;
 using Gym.WebDto.Requests.Training;
 using Gym.WebDto.Responses.Training;
@@ -8,7 +8,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Gym.WebApi.Controllers.Api.Trainings
+namespace Gym.WebApi.Controllers.Api.Trainings.AdminOnly
 {
     [Route("api/trainings")]
     [ApiController]
@@ -18,13 +18,13 @@ namespace Gym.WebApi.Controllers.Api.Trainings
         [HttpPost]
         public async Task<ActionResult<CreateTrainingResponse>> CreateTraining(CreateTrainingRequest request)
         {
-            TrainingDetails trainingDetails = await _mediator.Send(_mapper.Map<CreateTraining>(request));
+            CreateTrainingResult createTrainingResult = await _mediator.Send(_mapper.Map<CreateTraining>(request));
             
-            return base.CreatedAtAction(
+            return base.AcceptedAtAction(
                 nameof(GetTrainingController.GetTraining),
                 "GetTraining",
-                new { trainingDetails.Id },
-                _mapper.Map<CreateTrainingResponse>(trainingDetails));
+                new { id = createTrainingResult.TrainingId },
+                _mapper.Map<CreateTrainingResponse>(createTrainingResult));
         }
     }
 }

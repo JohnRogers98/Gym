@@ -1,17 +1,14 @@
-﻿using Gym.Domain.TrainingContext;
+﻿using Gym.Abstractions.Query.Trainings;
 using MediatR;
 
 namespace Gym.Application.Services.TrainingApi.GetTrainingById
 {
-    internal class GetTrainingByIdHandler(ITrainingRepository _trainingRepository) : IRequestHandler<GetTrainingById, TrainingDetails>
+    internal class GetTrainingByIdHandler(ITrainingProjectionQueryService _trainingProjectionQueryService) : IRequestHandler<GetTrainingById, TrainingProjection>
     {
-        public async Task<TrainingDetails> Handle(GetTrainingById request, CancellationToken cancellationToken)
+        public async Task<TrainingProjection> Handle(GetTrainingById request, CancellationToken cancellationToken)
         {
-            Training? training = await _trainingRepository.GetByIdAsync(TrainingId.From(request.Id), cancellationToken);
-
-            if (training is null) throw new ArgumentException();
-
-            return training.ToDetails();
+            return await _trainingProjectionQueryService.GetByIdAsync(request.Id, cancellationToken)
+                ?? throw new ArgumentException();
         }
     }
 }

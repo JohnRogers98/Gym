@@ -1,6 +1,7 @@
 ﻿using Gym.Abstractions.Query.CalendarEvents;
 using Gym.Abstractions.Query.EventStore;
 using Gym.Abstractions.Query.Instructors;
+using Gym.Abstractions.Query.Trainings;
 using Gym.Domain._Common;
 using Gym.Domain.AccountContext;
 using Gym.Domain.CalendarEventContext;
@@ -23,6 +24,7 @@ using Gym.Infrastructure.Entities.Projections;
 using Gym.Infrastructure.Entities.Projections.CalendarEvents;
 using Gym.Infrastructure.Entities.Projections.Events;
 using Gym.Infrastructure.Entities.Projections.Instructors;
+using Gym.Infrastructure.Entities.Projections.Trainings;
 using Gym.Infrastructure.Entities.Repositories.Accounts;
 using Gym.Infrastructure.Entities.Repositories.CalendarEvents;
 using Gym.Infrastructure.Entities.Repositories.Clients;
@@ -87,6 +89,7 @@ namespace Gym.Infrastructure
             services.AddMongoCollection<InstructorProjection>(mongoDbOptions.CollectionOptions.InstructorProjections);
 
             services.AddMongoCollection<TrainingEntity>(mongoDbOptions.CollectionOptions.Trainings);
+            services.AddMongoCollection<TrainingProjection>(mongoDbOptions.CollectionOptions.TrainingProjections);
 
             services.AddMongoCollection<CalendarEventEntity>(mongoDbOptions.CollectionOptions.CalendarEvents);
             services.AddMongoCollection<CalendarEventProjection>(mongoDbOptions.CollectionOptions.CalendarEventProjections);
@@ -130,6 +133,7 @@ namespace Gym.Infrastructure
             services.TryDecorate<IInstructorRepository, InstructorEventStoreAspect>();
 
             services.TryAddScoped<ITrainingRepository, TrainingRepository>();
+            services.TryDecorate<ITrainingRepository, TrainingEventStoreAspect>();
 
             services.TryAddScoped<ICalendarEventRepository, CalendarEventRepository>();
             services.TryDecorate<ICalendarEventRepository, CalendarEventEventStoreAspect>();
@@ -178,13 +182,13 @@ namespace Gym.Infrastructure
 
             services.TryAddScoped<ICalendarEventProjectionQueryService, CalendarEventProjectionQueryService>();
             services.TryAddScoped<IInstructorProjectionQueryService, InstructorProjectionQueryService>();
+            services.TryAddScoped<ITrainingProjectionQueryService, TrainingProjectionQueryService>();
 
             return services;
         }
 
         private static IServiceCollection AddQueryServices(this IServiceCollection services)
         {
-            services.TryAddScoped<ITrainingQueryService, TrainingRepository>();
             services.TryAddScoped<IUserByTelegramIdFinder, UserRepository>();
             services.TryAddScoped<IClientByUserIdFinder, ClientRepository>();
             return services;
