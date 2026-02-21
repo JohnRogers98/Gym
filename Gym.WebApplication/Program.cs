@@ -1,5 +1,6 @@
 using Gym.WebApplication;
 using Gym.WebApplication.Extensions;
+using Gym.WebApplication.Features.Account.Services;
 using Gym.WebApplication.Features.Calendar.Services;
 using Gym.WebApplication.Features.Login.Services;
 using Gym.WebApplication.JSAdapters;
@@ -26,6 +27,9 @@ builder.Services.AddHttpClient(builder.Configuration);
 builder.Services.AddScoped<ICalendarService, CalendarService>();
 builder.Services.AddScoped<IWebAppAuthService, WebAppAuthService>();
 builder.Services.AddScoped<AuthenticationStateProvider, WebAppAuthStateProvider>();
+
+builder.Services.AddScoped<IAccountService, AccountService>();
+builder.Services.AddScoped<AccountHistoryViewModelMapper>();
 
 builder.Services.AddScoped<LocalStorageAdapter>();
 
