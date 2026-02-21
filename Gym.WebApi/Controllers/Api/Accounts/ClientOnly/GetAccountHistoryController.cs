@@ -11,17 +11,17 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Gym.WebApi.Controllers.Api.Accounts.AuthenticatedOnly
 {
-    [Route("api/clients/{clientId}/account/actions/get-history")]
+    [Route("api/account/actions/get-history")]
     [ApiController]
-    [Authorize(Policy = nameof(SecurityPolicy.AuthenticatedOnly))]
+    [Authorize(Policy = nameof(SecurityPolicy.ClientOnly))]
     public class GetAccountHistoryController(IMediator _mediator, IMapper _mapper) : ControllerBase
     {
         [HttpPost]
-        public async Task<ActionResult<ListResponse<AccountHistoryDto>>> GetAccountHistory(String clientId, GetAccountHistoryRequest request)
+        public async Task<ActionResult<ListResponse<AccountHistoryDto>>> GetAccountHistory(GetAccountHistoryRequest request)
         {
             var getAccountHistory = _mapper.Map<GetAccountHistory>(request, opts =>
             {
-                opts.Items[nameof(Application.Services.AccountApi.GetAccountHistory.GetAccountHistory.ClientId)] = clientId;
+                opts.Items[nameof(Application.Services.AccountApi.GetAccountHistory.GetAccountHistory.ClientId)] = User.GetRequiredClientId();
             });
 
             IEnumerable<EventProjection> eventProjections = await _mediator.Send(getAccountHistory);
