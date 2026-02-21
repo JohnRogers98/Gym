@@ -8,7 +8,7 @@ namespace Gym.WebApi.Controllers.Api.Users
     {
         public _DtoMappings() 
         {
-            CreateMap<AuthenticateUserDetails, WebAppAuthResponse>();
+            CreateMap<AuthenticatedUserDetails, WebAppAuthResponse>();
         }
     }
 }

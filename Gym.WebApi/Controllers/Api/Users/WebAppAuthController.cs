@@ -17,13 +17,13 @@ namespace Gym.WebApi.Controllers.Api.Users
         [HttpPost]
         public async Task<ActionResult<WebAppAuthResponse>> WebAppAuth(WebAppAuthRequest request)
         {
-            AuthenticateUserDetails authenticateUserDetails = await _mediator.Send(new AuthenticateUser(request.InitData));
+            AuthenticatedUserDetails authenticatedUserDetails = await _mediator.Send(new AuthenticateUser(request.InitData));
 
-            String accessToken = _accessTokenGenerator.Generate(authenticateUserDetails);
+            String accessToken = _accessTokenGenerator.Generate(authenticatedUserDetails);
 
             this.AppendCookiesWithAccessToken(accessToken);
 
-            return Ok(_mapper.Map<WebAppAuthResponse>(authenticateUserDetails));
+            return Ok(_mapper.Map<WebAppAuthResponse>(authenticatedUserDetails));
         }
 
         private void AppendCookiesWithAccessToken(String accessToken)

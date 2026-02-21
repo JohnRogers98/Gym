@@ -58,7 +58,7 @@ namespace Gym.WebApplication.Features.Login.Services
             WebAppAuthResponse webAuthResponse = await response.Content.ReadFromJsonAsync<WebAppAuthResponse>() 
                 ?? throw new IOException($"{nameof(WebAppAuthService)} response has no body");
 
-            StoredAuthClaims storedAuthClaims = new() { Id = webAuthResponse.Id, Role = webAuthResponse.Role };
+            StoredAuthClaims storedAuthClaims = new() { UserId = webAuthResponse.UserId, Role = webAuthResponse.Role };
 
             await _localStorage.SetItemAsync("auth-claims", storedAuthClaims);
 
