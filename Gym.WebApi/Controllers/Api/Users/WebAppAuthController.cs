@@ -17,7 +17,7 @@ namespace Gym.WebApi.Controllers.Api.Users
         [HttpPost]
         public async Task<ActionResult<WebAppAuthResponse>> WebAppAuth(WebAppAuthRequest request)
         {
-            UserDetails userDetails = await _mediator.Send(new AuthenticateUserCommand(request.InitData));
+            AuthenticatedUserDetails authenticatedUserDetails = await _mediator.Send(new AuthenticateUser(request.InitData));
 
             String accessToken = _accessTokenGenerator.Generate(authenticatedUserDetails);
 
