@@ -361,4 +361,6 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
-/Gym.WebApi/Gym.WebApi.http
+
+#JWT
+.env    

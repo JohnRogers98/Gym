@@ -1,0 +1,28 @@
+[{
+  "_id": {
+    "$oid": "693ec754633885c0552c22a0"
+  },
+  "firstName": "Andrey",
+  "lastName": "Zhuzhma"
+},
+{
+  "_id": {
+    "$oid": "693ec754633885c0552c22a1"
+  },
+  "firstName": "Pauline",
+  "lastName": null
+},
+{
+  "_id": {
+    "$oid": "693ec754633885c0552c22a2"
+  },
+  "firstName": "Natalya",
+  "lastName": null
+},
+{
+  "_id": {
+    "$oid": "6941c40f2069e8a0a412f10d"
+  },
+  "firstName": "Bob",
+  "lastName": "Minion"
+}]
