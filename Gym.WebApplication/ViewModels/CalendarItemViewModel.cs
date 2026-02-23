@@ -1,10 +1,16 @@
 ﻿namespace Gym.WebApplication.ViewModels
 {
-    public record CalendarItemViewModel(
-        String id,
-        DateTime start,
-        DateTime? end,
-        TrainingViewModel training,
-        Int32? maxClientCount,
-        IEnumerable<InstructorViewModel>? instructors);
+    public record CalendarItemViewModel
+    {
+        public required String Id { get; init; }
+        public DateTime Start { get; init; }
+        public DateTime? End { get; init; }
+        public required TrainingViewModel Training { get; init; }
+        public Int32? MaxClientCount { get; init; }
+        public Int32 CurrentClientCount { get; init; }
+        public IEnumerable<InstructorViewModel>? Instructors { get; init; }
+        public Boolean IsAlreadyBooked { get; init; }
+
+        public Boolean IsFull() => MaxClientCount.HasValue && MaxClientCount.Value == CurrentClientCount;
+    }
 }

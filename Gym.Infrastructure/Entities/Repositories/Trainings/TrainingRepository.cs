@@ -1,4 +1,4 @@
-﻿using Gym.Domain.TrainingAggregate;
+﻿using Gym.Domain.TrainingContext;
 using Gym.Infrastructure.Entities.Extensions;
 using Gym.Infrastructure.Entities.Extensions.Mappings;
 using MongoDB.Bson;
@@ -6,7 +6,7 @@ using MongoDB.Driver;
 
 namespace Gym.Infrastructure.Entities.Repositories.Trainings 
 {
-    internal class TrainingRepository(IMongoCollection<TrainingEntity> _trainingCollection, MongoUnitOfWork _mongoUnitOfWork) : ITrainingRepository, ITrainingQueryService
+    internal class TrainingRepository(IMongoCollection<TrainingEntity> _trainingCollection, MongoUnitOfWork _mongoUnitOfWork) : ITrainingRepository
     {
         public TrainingId NextIdentity() => TrainingId.From(ObjectId.GenerateNewId().ToString());
 
@@ -28,16 +28,6 @@ namespace Gym.Infrastructure.Entities.Repositories.Trainings
                 .FirstOrDefaultAsync(cancellationToken);
 
             return foundedEntity?.ToDomain();
-        }
-
-        public async Task<IEnumerable<Training>> GetAllAsync(CancellationToken cancellationToken)
-        {
-            List<Training> allTrainigs = new();
-
-            await _trainingCollection.Find(_mongoUnitOfWork.Session, Builders<TrainingEntity>.Filter.Empty)
-                .ForEachAsync(eTraining => allTrainigs.Add(eTraining.ToDomain()));
-
-            return allTrainigs;
         }
 
         public async Task<Boolean> ExistsAsync(TrainingId id, CancellationToken cancellationToken) 

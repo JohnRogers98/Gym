@@ -1,6 +1,6 @@
 ﻿using Gym.Domain._Shared;
-using Gym.Domain.CalendarEventAggregate;
-using Gym.Infrastructure.Entities;
+using Gym.Domain.CalendarEventContext;
+using Gym.Infrastructure;
 using Gym.Infrastructure.Entities.Extensions;
 using Gym.Infrastructure.Entities.Extensions.Mappings;
 using MongoDB.Bson;
@@ -8,7 +8,7 @@ using MongoDB.Driver;
 
 namespace MongoConsoleApp.Repositories.CalendarEvents
 {
-    internal class CalendarEventRepository(IMongoCollection<CalendarEventEntity> _calendarEventCollection, MongoUnitOfWork _mongoUnitOfWork) : ICalendarEventRepository, ICalendarEventQueryService
+    internal class CalendarEventRepository(IMongoCollection<CalendarEventEntity> _calendarEventCollection, MongoUnitOfWork _mongoUnitOfWork) : ICalendarEventRepository
     {
         public CalendarEventId NextIdentity() => CalendarEventId.From(ObjectId.GenerateNewId().ToString());
 
@@ -30,16 +30,6 @@ namespace MongoConsoleApp.Repositories.CalendarEvents
                 .FirstOrDefaultAsync(cancellationToken);
 
             return foundedEntity?.ToDomain(); 
-        }
-
-        public async Task<IEnumerable<CalendarEvent>> GetAllAsync(CancellationToken cancellationToken)
-        {
-            List<CalendarEvent> allCalendarEvents = new();
-
-            await _calendarEventCollection.Find(_mongoUnitOfWork.Session, Builders<CalendarEventEntity>.Filter.Empty)
-                .ForEachAsync(eCalendarEvent => allCalendarEvents.Add(eCalendarEvent.ToDomain()));
-
-            return allCalendarEvents;
         }
 
         public async Task<Boolean> ExistsAsync(CalendarEventId id, CancellationToken cancellationToken) 

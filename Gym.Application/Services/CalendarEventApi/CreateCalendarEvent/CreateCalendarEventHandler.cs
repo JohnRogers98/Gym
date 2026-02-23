@@ -1,26 +1,28 @@
-﻿using Gym.Application.Extensions;
-using Gym.Domain._Shared;
-using Gym.Domain.CalendarEventAggregate;
+﻿using Gym.Domain._Shared;
+using Gym.Domain.CalendarEventContext;
+using Gym.Domain.InstructorContext;
+using Gym.Domain.TrainingContext;
 using MediatR;
 
 namespace Gym.Application.Services.CalendarEventApi.CreateCalendarEvent
 {
-    internal class CreateCalendarEventHandler(ICalendarEventRepository _calendarEventRepository) : IRequestHandler<CreateCalendarEventCommand, CalendarEventDetails>
+    internal class CreateCalendarEventHandler(ICalendarEventRepository _calendarEventRepository) 
+        : IRequestHandler<CreateCalendarEvent, CreateCalendarEventResult>
     {
-        public async Task<CalendarEventDetails> Handle(CreateCalendarEventCommand request, CancellationToken cancellationToken)
+        public async Task<CreateCalendarEventResult> Handle(CreateCalendarEvent request, CancellationToken cancellationToken)
         {
             CalendarEvent calendarEvent = CalendarEvent.Create(
                 _calendarEventRepository.NextIdentity(),
-                request.start,
-                request.end,
-                request.training.ToInfo(),
+                request.Start,
+                request.End,
+                TrainingId.From(request.TrainingId),
                 new HashSet<UserId>(),
-                request.maxClientCount,
-                request.instructors.ToInfos());
+                request.MaxClientCount,
+                request.Instructors.Select(InstructorId.From));
 
             await _calendarEventRepository.SaveAsync(calendarEvent, cancellationToken);
 
-            return calendarEvent.ToDetails();
+            return new CreateCalendarEventResult(calendarEvent.Id.Value);
         }
     }
 }

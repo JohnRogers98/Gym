@@ -1,6 +1,6 @@
 ﻿namespace Gym.Domain._Shared
 {
-    public class UserId
+    public record UserId
     {
         public String Value { get; }
 

@@ -1,4 +1,8 @@
 ﻿namespace Gym.WebDto.Requests.Training
 {
-    public record CreateTrainingRequest(String name, String description);
+    public record CreateTrainingRequest 
+    {
+        public required String Name { get; init; }
+        public String? Description { get; init; }
+    }
 }

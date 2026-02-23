@@ -1,50 +1,20 @@
-﻿using Gym.Domain._Common;
-using Gym.Domain.BookingAggregate;
-using Gym.Domain.CalendarEventAggregate;
-using Gym.Domain.CalendarEventAggregate.Errors;
-using Gym.Domain.ClientAggregate;
+﻿using Gym.Domain.AccountContext;
+using Gym.Domain.CalendarEventContext;
 
 namespace Gym.Domain._Shared.Services
 {
     public interface ITrainingBookingService
     {
-        Result<Booking> MakeEventBooking(CalendarEvent calendarEvent, Client client);
+        Booking MakeEventBooking(Account account, CalendarEvent calendarEvent);
     }
 
-    public class TrainingBookingService(IBookingRepository _bookingRepository) : ITrainingBookingService
+    public class TrainingBookingService : ITrainingBookingService
     {
-        public Result<Booking> MakeEventBooking(CalendarEvent calendarEvent, Client client)
+        public Booking MakeEventBooking(Account account, CalendarEvent calendarEvent)
         {
-            Result possibilityValidationResult = this.ValidateBookingPossibility(calendarEvent, client);
-            if (possibilityValidationResult.Success is false)
-            {
-                return Result<Booking>.Fail(possibilityValidationResult.Error!);
-            }
-
-            Booking booking = Booking.Create(_bookingRepository.NextIdentity(), client.UserId, calendarEvent.Id);
+            calendarEvent.AddBooking(account.UserId);
             
-            if(calendarEvent.HasExpired(booking.ChangedAt) is true)
-            {
-                return Result<Booking>.Fail(EventTimeHasExpired.Create(calendarEvent.Id));
-            }
-
-            calendarEvent.AddBooking(booking.UserId);
-
-            return Result<Booking>.Ok(booking);
-        }
-
-        private Result ValidateBookingPossibility(CalendarEvent calendarEvent, Client client)
-        {
-            if (calendarEvent.HasBookingFor(client.UserId))
-            {
-                return Result.Fail(UserAlreadyBookedError.Create(calendarEvent.Id, client.UserId));
-            }
-            if (calendarEvent.HasFreeSpace() is false)
-            {
-                return Result.Fail(EventHasNotFreeSpaceError.Create(calendarEvent.Id));
-            }
-
-            return Result.Ok();
+            return account.MakeBooking(calendarEvent.Id);
         }
     }
 }

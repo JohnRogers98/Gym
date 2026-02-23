@@ -1,17 +1,16 @@
-﻿using Gym.Application.Extensions;
-using Gym.Domain.InstructorAggregate;
+﻿using Gym.Domain.InstructorContext;
 using MediatR;
 
 namespace Gym.Application.Services.InstructorApi.CreateInstructor
 {
-    internal class CreateInstructorHandler(IInstructorRepository _instructorRepository) : IRequestHandler<CreateInstructorCommand, InstructorDetails>
+    internal class CreateInstructorHandler(IInstructorRepository _instructorRepository) : IRequestHandler<CreateInstructor, CreateInstructorResult>
     {
-        public async Task<InstructorDetails> Handle(CreateInstructorCommand request, CancellationToken cancellationToken)
+        public async Task<CreateInstructorResult> Handle(CreateInstructor request, CancellationToken cancellationToken)
         {
-            Instructor instructor = Instructor.Create(_instructorRepository.NextIdentity(), request.firstName, request.lastName); 
+            Instructor instructor = Instructor.Create(_instructorRepository.NextIdentity(), request.FirstName, request.LastName); 
             await _instructorRepository.SaveAsync(instructor, cancellationToken);
 
-            return instructor.ToDetails();
+            return new CreateInstructorResult(instructor.Id.Value);
         }
     }
 }

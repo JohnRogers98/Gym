@@ -5,8 +5,32 @@
         public static MongoDbOptions Default => new MongoDbOptions(String.Empty, "test", CollectionOptions.Default);
     }
 
-    public sealed record CollectionOptions(String Instructors, String Trainings, String CalendarEvents, String Users, String Clients, String Bookings)
+    public sealed record CollectionOptions(
+        String Instructors,
+        String InstructorProjections,
+        String Trainings,
+        String TrainingProjections,
+        String CalendarEvents,
+        String CalendarEventProjections,
+        String Users,
+        String Clients,
+        String Events,
+        String EventProjections,
+        String Messages,
+        String OutboxChangeStreams)
     {
-        public static CollectionOptions Default => new CollectionOptions("instructors", "trainings", "calendar-events", "users", "clients", "bookings");
+        public static CollectionOptions Default => new CollectionOptions(
+            "instructors",
+            "instructor-projections",
+            "trainings",
+            "training-projections",
+            "calendar-events",
+            "calendar-event-projections",
+            "users",
+            "clients",
+            "events",
+            "event-projections",
+            "messages",
+            "outbox-changes-streams");
     }
 }

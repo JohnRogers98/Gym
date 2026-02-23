@@ -1,15 +1,14 @@
-﻿using Gym.Application.Extensions;
-using Gym.Domain.CalendarEventAggregate;
+﻿using Gym.Abstractions.Query.CalendarEvents;
 using MediatR;
 
 namespace Gym.Application.Services.CalendarEventApi.GetAllCalendarEvents
 {
-    internal class GetAllCalendarEventsHandler(ICalendarEventQueryService _calendarEventQueryService) : IRequestHandler<GetAllCalendarEventsQuery, IEnumerable<CalendarEventDetails>>
+    internal class GetAllCalendarEventsHandler(ICalendarEventProjectionQueryService _calendarEventProjectionQueryService) 
+        : IRequestHandler<GetAllCalendarEvents, IEnumerable<CalendarEventProjection>>
     {
-        public async Task<IEnumerable<CalendarEventDetails>> Handle(GetAllCalendarEventsQuery request, CancellationToken cancellationToken)
+        public async Task<IEnumerable<CalendarEventProjection>> Handle(GetAllCalendarEvents request, CancellationToken cancellationToken)
         {
-            var calendarEvents = await _calendarEventQueryService.GetAllAsync(cancellationToken);
-            return calendarEvents.Select(aCalendarEvent => aCalendarEvent.ToDetails());
+            return await _calendarEventProjectionQueryService.GetAllAsync(cancellationToken);
         }
     }
 }

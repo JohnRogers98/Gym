@@ -1,12 +1,23 @@
-﻿using Gym.WebDto.Requests.Users;
+﻿using Gym.WebApplication.JSAdapters;
+using Gym.WebDto.Requests.Users;
 using Gym.WebDto.Responses.Users;
 using System.Net.Http.Json;
 using System.Security.Claims;
 
 namespace Gym.WebApplication.Features.Login.Services
 {
-    public class WebAppAuthService(HttpClient _httpClient) : IWebAppAuthService
+    public interface IWebAppAuthService
     {
+        event Action<ClaimsPrincipal>? UserChanged;
+        ClaimsPrincipal CurrentUser { get; set; }
+        Task Authenticate(String initData);
+    }
+
+    public class WebAppAuthService : IWebAppAuthService
+    {
+        private readonly HttpClient _httpClient;
+        private readonly LocalStorageAdapter _localStorage;
+
         public event Action<ClaimsPrincipal>? UserChanged;
 
         public ClaimsPrincipal CurrentUser
@@ -23,9 +34,23 @@ namespace Gym.WebApplication.Features.Login.Services
             }
         }
 
+        public WebAppAuthService(HttpClient httpClient, LocalStorageAdapter localStorage)
+        {
+            (_httpClient, _localStorage) = (httpClient, localStorage);
+
+            Task.Run(async () =>
+            {
+                StoredAuthClaims? storedAuthClaims = await _localStorage.GetItemAsync<StoredAuthClaims>("auth-claims");
+                if(storedAuthClaims is not null)
+                {
+                    CurrentUser = storedAuthClaims.ToClaimsPrincipal();
+                }
+            });
+        }
+
         public async Task Authenticate(String initData)
         {
-            var response = await _httpClient.PostAsJsonAsync("api/users/web-app-auth", new WebAppAuthRequest(initData));
+            var response = await _httpClient.PostAsJsonAsync("api/users/actions/web-app-auth", new WebAppAuthRequest { InitData = initData });
 
             if (!response.IsSuccessStatusCode)
                 throw new IOException($"{nameof(WebAppAuthService)} returned {response.StatusCode}");
@@ -33,12 +58,12 @@ namespace Gym.WebApplication.Features.Login.Services
             WebAppAuthResponse webAuthResponse = await response.Content.ReadFromJsonAsync<WebAppAuthResponse>() 
                 ?? throw new IOException($"{nameof(WebAppAuthService)} response has no body");
 
-            var identity = new ClaimsIdentity(
-            [
-                new Claim(ClaimTypes.Role, webAuthResponse.role),
-            ], "WebApp Authentication");
+            StoredAuthClaims storedAuthClaims = new() { UserId = webAuthResponse.UserId, Role = webAuthResponse.Role };
 
-            CurrentUser = new ClaimsPrincipal(identity);
+            await _localStorage.SetItemAsync("auth-claims", storedAuthClaims);
+
+            CurrentUser = storedAuthClaims.ToClaimsPrincipal();
         }
+
     }
 }

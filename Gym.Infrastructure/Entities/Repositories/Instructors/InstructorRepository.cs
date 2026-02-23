@@ -1,4 +1,4 @@
-﻿using Gym.Domain.InstructorAggregate;
+﻿using Gym.Domain.InstructorContext;
 using Gym.Infrastructure.Entities.Extensions;
 using Gym.Infrastructure.Entities.Extensions.Mappings;
 using MongoDB.Bson;
@@ -6,7 +6,7 @@ using MongoDB.Driver;
 
 namespace Gym.Infrastructure.Entities.Repositories.Instructors
 {
-    internal class InstructorRepository(IMongoCollection<InstructorEntity> _instructorCollection, MongoUnitOfWork _mongoUnitOfWork) : IInstructorRepository, IInstructorQueryService
+    internal class InstructorRepository(IMongoCollection<InstructorEntity> _instructorCollection, MongoUnitOfWork _mongoUnitOfWork) : IInstructorRepository
     {
         public InstructorId NextIdentity() => InstructorId.From(ObjectId.GenerateNewId().ToString());
 
@@ -28,16 +28,6 @@ namespace Gym.Infrastructure.Entities.Repositories.Instructors
                 .FirstOrDefaultAsync(cancellationToken);
 
             return foundedEntity?.ToDomain();
-        }
-
-        public async Task<IEnumerable<Instructor>> GetAllAsync(CancellationToken cancellationToken)
-        {
-            List<Instructor> allInstructors = new();
-
-            await _instructorCollection.Find(_mongoUnitOfWork.Session, Builders<InstructorEntity>.Filter.Empty)
-                .ForEachAsync(eInstructor => allInstructors.Add(eInstructor.ToDomain()));
-
-            return allInstructors;
         }
 
         public async Task<Boolean> ExistsAsync(InstructorId id, CancellationToken cancellationToken) 

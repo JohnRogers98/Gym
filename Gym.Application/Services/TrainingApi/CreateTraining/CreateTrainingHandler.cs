@@ -1,17 +1,16 @@
-﻿using Gym.Application.Extensions;
-using Gym.Domain.TrainingAggregate;
+﻿using Gym.Domain.TrainingContext;
 using MediatR;
 
 namespace Gym.Application.Services.TrainingApi.CreateTraining
 {
-    internal class CreateTrainingHandler(ITrainingRepository _trainingRepository) : IRequestHandler<CreateTrainingCommand, TrainingDetails>
+    internal class CreateTrainingHandler(ITrainingRepository _trainingRepository) : IRequestHandler<CreateTraining, CreateTrainingResult>
     {
-        public async Task<TrainingDetails> Handle(CreateTrainingCommand request, CancellationToken cancellationToken)
+        public async Task<CreateTrainingResult> Handle(CreateTraining request, CancellationToken cancellationToken)
         {
-            Training training = Training.Create(_trainingRepository.NextIdentity(), request.name, request.description);
+            Training training = Training.Create(_trainingRepository.NextIdentity(), request.Name, request.Description);
             await _trainingRepository.SaveAsync(training, cancellationToken);
 
-            return training.ToDetails();
+            return new CreateTrainingResult(training.Id.Value);
         }
     }
 }

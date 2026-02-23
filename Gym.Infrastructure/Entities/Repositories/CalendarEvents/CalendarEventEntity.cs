@@ -1,6 +1,4 @@
-﻿using Gym.Infrastructure.Entities.Repositories.Instructors;
-using Gym.Infrastructure.Entities.Repositories.Trainings;
-using MongoDB.Bson;
+﻿using MongoDB.Bson;
 
 namespace MongoConsoleApp.Repositories.CalendarEvents
 {
@@ -15,8 +13,8 @@ namespace MongoConsoleApp.Repositories.CalendarEvents
         
         public Int32? MaxClientCount { get; set; }
 
-        public required TrainingEntity Training { get; set; }
+        public required ObjectId TrainingId { get; set; }
 
-        public IEnumerable<InstructorEntity>? Instructors { get; set; }
+        public IEnumerable<ObjectId>? Instructors { get; set; }
     }
 }

@@ -1,4 +1,7 @@
 ﻿namespace Gym.WebDto.Responses.Instructor
 {
-    public record CreateInstructorResponse(String id, String firstName, String? lastName);
+    public record CreateInstructorResponse
+    {
+        public required String InstructorId { get; init; }
+    }
 }

@@ -2,11 +2,20 @@
 {
     public abstract class DomainEvent
     {
-        public DateTime OccuredOn { get; protected set; }
+        public DomainEventId Id { get; } 
+
+        public DateTime OccurredOn { get; protected set; }
 
         protected DomainEvent()
         {
-            OccuredOn = DateTime.UtcNow;
+            Id = DomainEventId.Generate();
+            OccurredOn = DateTime.UtcNow;
+        }
+
+        protected DomainEvent(DomainEventId id, DateTime occurredOn)
+        {
+            Id = id;
+            OccurredOn = occurredOn;
         }
     }
 }

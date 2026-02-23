@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using Gym.WebApplication.ViewModels;
-using Gym.WebDto.Dto;
+using Gym.WebDto.Responses.CalendarEvent;
+using Gym.WebDto.Responses.Instructor;
+using Gym.WebDto.Responses.Training;
 
 namespace Gym.WebApplication.Mappings
 {
@@ -9,11 +11,12 @@ namespace Gym.WebApplication.Mappings
         public DtoMapping()
         {
             base.CreateMap<TrainingDto, TrainingViewModel>();
+            base.CreateMap<TrainingInfo, TrainingViewModel>();
 
-            base.CreateMap<InstructorDto, InstructorViewModel>()
-                .ConstructUsing(src => new InstructorViewModel(src.id, $"{src.firstName} {src.lastName ?? String.Empty}"));
+            base.CreateMap<InstructorDto, InstructorViewModel>();
+            base.CreateMap<InstructorInfo, InstructorViewModel>();
 
-            base.CreateMap<CalendarEventDto, CalendarItemViewModel>();
+            base.CreateMap<ClientCalendarEventDto, CalendarItemViewModel>();
         }
     }
 }

@@ -1,16 +1,17 @@
 ﻿using Gym.Domain._Exceptions;
 using Gym.Domain._Shared;
-using Gym.Domain.CalendarEventAggregate;
-using Gym.Domain.TrainingAggregate;
+using Gym.Domain.CalendarEventContext;
 
 namespace Gym.Domain.Tests
 {
     public class CalendarEventTests
     {
+        private readonly FakeDataFixture _fakeDataFixture = new ();
+
         [Fact]
         public void Check_New_Booking()
         {
-            CalendarEvent calendarEvent = this.CreateCalendarEvent();
+            CalendarEvent calendarEvent = _fakeDataFixture.CreateCalendarEvent();
             UserId userId = UserId.From(Guid.NewGuid().ToString());
 
             calendarEvent.AddBooking(userId);
@@ -22,7 +23,7 @@ namespace Gym.Domain.Tests
         [Fact]
         public void Booking_Throws_When_Going_To_Make_Already_Existing_Booking_Again()
         {
-            CalendarEvent calendarEvent = this.CreateCalendarEvent();
+            CalendarEvent calendarEvent = _fakeDataFixture.CreateCalendarEvent();
             UserId userId = UserId.From(Guid.NewGuid().ToString());
 
             calendarEvent.AddBooking(userId);
@@ -32,7 +33,7 @@ namespace Gym.Domain.Tests
         [Fact]
         public void Check_If_Can_Book_When_Free_Space_Exists()
         {
-            CalendarEvent calendarEvent = this.CreateCalendarEvent(maxClientCount: 2);
+            CalendarEvent calendarEvent = _fakeDataFixture.CreateCalendarEvent(maxClientCount: 2);
 
             calendarEvent.AddBooking(UserId.From(Guid.NewGuid().ToString()));
 
@@ -42,7 +43,7 @@ namespace Gym.Domain.Tests
         [Fact]
         public void Check_If_Can_Not_Book_When_Event_Booking_Is_Full()
         {
-            CalendarEvent calendarEvent = this.CreateCalendarEvent(maxClientCount: 2);
+            CalendarEvent calendarEvent = _fakeDataFixture.CreateCalendarEvent(maxClientCount: 2);
 
             calendarEvent.AddBooking(UserId.From(Guid.NewGuid().ToString()));
             calendarEvent.AddBooking(UserId.From(Guid.NewGuid().ToString()));
@@ -53,7 +54,7 @@ namespace Gym.Domain.Tests
         [Fact]
         public void Check_If_Has_Already_Booking_For_User()
         {
-            CalendarEvent calendarEvent = this.CreateCalendarEvent(maxClientCount: 2);
+            CalendarEvent calendarEvent = _fakeDataFixture.CreateCalendarEvent(maxClientCount: 2);
             UserId userId = UserId.From(Guid.NewGuid().ToString());
 
             Assert.False(calendarEvent.HasBookingFor(userId));
@@ -64,7 +65,7 @@ namespace Gym.Domain.Tests
         [Fact]
         public void Check_Whether_Future_Event_Is_Not_Expired()
         {
-            CalendarEvent calendarEvent = this.CreateCalendarEvent(isExpired: false);
+            CalendarEvent calendarEvent = _fakeDataFixture.CreateCalendarEvent(isExpired: false);
 
             Assert.False(calendarEvent.HasExpired(DateTime.Now));
         }
@@ -72,21 +73,9 @@ namespace Gym.Domain.Tests
         [Fact]
         public void Check_Whether_Past_Event_Is_Expired()
         {
-            CalendarEvent calendarEvent = this.CreateCalendarEvent(isExpired: true);
+            CalendarEvent calendarEvent = _fakeDataFixture.CreateCalendarEvent(isExpired: true);
 
             Assert.True(calendarEvent.HasExpired(DateTime.Now));
-        }
-
-
-        private CalendarEvent CreateCalendarEvent(Boolean isExpired = false, Int32? maxClientCount = null)
-        {
-            return CalendarEvent.Create(
-                CalendarEventId.From(Guid.NewGuid().ToString()),
-                isExpired ? DateTime.MinValue : DateTime.MaxValue,
-                null,
-                TrainingInfo.Create(TrainingId.From(Guid.NewGuid().ToString()), "kangoo", null),
-                maxClientCount: maxClientCount
-                );
         }
     }
 }

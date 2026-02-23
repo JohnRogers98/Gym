@@ -1,6 +1,5 @@
-﻿using Gym.Domain._Common;
-using Gym.Domain._Shared;
-using Gym.Domain.UserAggregate;
+﻿using Gym.Domain._Shared;
+using Gym.Domain.UserContext;
 using Gym.Infrastructure.Entities.Extensions;
 using Gym.Infrastructure.Entities.Extensions.Mappings;
 using MongoDB.Bson;
@@ -8,7 +7,7 @@ using MongoDB.Driver;
 
 namespace Gym.Infrastructure.Entities.Repositories.Users
 {
-    internal class UserRepository(IMongoCollection<UserEntity> _userCollection, MongoUnitOfWork _mongoUnitOfWork) : IUserRepository, IUserQueryService
+    internal class UserRepository(IMongoCollection<UserEntity> _userCollection, MongoUnitOfWork _mongoUnitOfWork) : IUserRepository, IUserByTelegramIdFinder
     {
         public UserId NextIdentity() => UserId.From(ObjectId.GenerateNewId().ToString());
 

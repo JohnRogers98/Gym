@@ -50,7 +50,7 @@ namespace Gym.WebApi.Extensions
         public static IServiceCollection AddAuthorizationPolicies(this IServiceCollection services)
         {
             services.AddAuthorizationBuilder()
-                .AddPolicy(nameof(SecurityPolicy.RequireAuthenticated), policy => policy.RequireAuthenticatedUser())
+                .AddPolicy(nameof(SecurityPolicy.AuthenticatedOnly), policy => policy.RequireAuthenticatedUser())
                 .AddPolicy(nameof(SecurityPolicy.AdminOnly), policy => policy.RequireRole("Admin"))
                 .AddPolicy(nameof(SecurityPolicy.ClientOnly), policy => policy.RequireRole("Client"));
 

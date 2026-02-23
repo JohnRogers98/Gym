@@ -1,0 +1,77 @@
+﻿@page "/account"
+@using Gym.WebApplication.Features.Account.Services
+@using Gym.WebApplication.Features.Account.ViewModels
+@using Gym.WebDto.Responses.Account
+
+@inject IAccountService AccountService
+
+@if (_historyItems is null)
+{
+    <MudSkeleton />
+}
+else
+{
+    <MudContainer>
+    <MudGrid Spacing="3">
+            <MudTimeline TimelinePosition="TimelinePosition.Start">
+
+                @foreach (var aHistoryItem in _historyItems)
+                {
+                    if (aHistoryItem is AccountCreatedViewModel accountCreatedViewModel)
+                    {
+                        <MudTimelineItem Variant="Variant.Filled" Color="Color.Primary" Size="Size.Large">
+                            <ItemContent>
+                                <MudCard Outlined="true" Elevation="25">
+                                    <MudCardContent>
+                                        <MudText Typo="Typo.body2">@aHistoryItem.GetMessage()</MudText>
+                                        <MudText Typo="Typo.body2">@aHistoryItem.OccurredAt.ToDateOnly()</MudText>
+                                    </MudCardContent>
+                                </MudCard>
+                            </ItemContent>
+
+                        </MudTimelineItem>
+                    }
+                    else if (aHistoryItem is AccountChargedViewModel accountChargedViewModel)
+                    {
+                        <MudTimelineItem Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium">
+                            <ItemContent>
+                                <MudCard Outlined="true" Elevation="25">
+                                    <MudCardContent>
+                                        <MudText Typo="Typo.body2">@aHistoryItem.GetMessage()</MudText>
+                                        <MudText Typo="Typo.body2">@aHistoryItem.OccurredAt.ToDateOnly()</MudText>
+                                    </MudCardContent>
+                                </MudCard>
+                            </ItemContent>
+                        </MudTimelineItem>
+                    }
+                    else if (aHistoryItem is TrainingBookedViewModel trainingBookedViewModel)
+                    {
+                        <MudTimelineItem Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small">
+                            <ItemContent>
+                                <MudCard Outlined="true" Elevation="25">
+                                    <MudCardContent>
+                                        <MudText Typo="Typo.body2">@aHistoryItem.GetMessage()</MudText>
+                                        <MudText Typo="Typo.body2">@aHistoryItem.OccurredAt.ToDateOnly()</MudText>
+                                    </MudCardContent>
+                                </MudCard>
+                            </ItemContent>
+                        </MudTimelineItem>
+                    }
+                }
+            </MudTimeline>
+
+    </MudGrid>
+</MudContainer>
+   
+}
+
+@code {
+
+    public List<AccountHistoryItemViewModel> _historyItems = default!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var loadedHistoryItems = await AccountService.GetAllAccountHistoryItemsAsync();
+        _historyItems = new List<AccountHistoryItemViewModel>(loadedHistoryItems);
+    }
+}

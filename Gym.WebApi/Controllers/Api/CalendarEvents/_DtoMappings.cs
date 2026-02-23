@@ -1,0 +1,54 @@
+﻿using AutoMapper;
+using Gym.Abstractions.Query.CalendarEvents;
+using Gym.Application.Services.BookingApi.BookTrainingEvent;
+using Gym.Application.Services.CalendarEventApi.CreateCalendarEvent;
+using Gym.WebDto.Requests.CalendarEvent;
+using Gym.WebDto.Responses.Bookings;
+using Gym.WebDto.Responses.CalendarEvent;
+
+namespace Gym.WebApi.Controllers.Api.CalendarEvents
+{
+    public class _DtoMappings : Profile
+    {
+        public _DtoMappings()
+        {
+            CreateMap<CreateCalendarEventRequest, CreateCalendarEvent>();
+            CreateMap<CreateCalendarEventResult, CreateCalendarEventResponse>();
+
+            CreateMap<CalendarEventProjection, GetAdminCalendarEventResponse>();
+            CreateMap<CalendarEventProjection, AdminCalendarEventDto>();
+
+            CreateMap<CalendarEventProjection, GetClientCalendarEventResponse>()
+              .ForMember(dest => dest.IsAlreadyBooked,
+                opt => opt.MapFrom((src, dest, _, context) =>
+                {
+                    var currentUserId = (String)context.Items["CurrentUserId"];
+                    return src.BookingUsers?.Any(aUserInfo => aUserInfo.Id == currentUserId);
+                }))
+              .ForMember(dest => dest.CurrentClientCount,
+                opt => opt.MapFrom((src, dest, _, context) =>
+                {
+                    return src.BookingUsers?.Count();
+                }));
+
+            CreateMap<CalendarEventProjection, ClientCalendarEventDto>()
+              .ForMember(dest => dest.IsAlreadyBooked,
+                opt => opt.MapFrom((src, dest, _, context) =>
+                {
+                    var currentUserId = (String)context.Items["CurrentUserId"];
+                    return src.BookingUsers?.Any(aUserInfo => aUserInfo.Id == currentUserId);
+                }))
+              .ForMember(dest => dest.CurrentClientCount,
+                opt => opt.MapFrom((src, dest, _, context) =>
+                {
+                    return src.BookingUsers?.Count();
+                }));
+
+            CreateMap<BookTrainingEventResult, BookTrainingEventResponse>();
+
+            CreateMap<Abstractions.Query.CalendarEvents.TrainingInfo, WebDto.Responses.Training.TrainingInfo>();
+            CreateMap<Abstractions.Query.CalendarEvents.InstructorInfo, WebDto.Responses.Instructor.InstructorInfo>();
+            CreateMap<Abstractions.Query.CalendarEvents.BookingUserInfo, WebDto.Responses.Bookings.BookingUserInfo>();
+        }
+    }
+}

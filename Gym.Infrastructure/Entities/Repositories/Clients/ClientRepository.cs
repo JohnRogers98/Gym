@@ -1,5 +1,5 @@
 ﻿using Gym.Domain._Shared;
-using Gym.Domain.ClientAggregate;
+using Gym.Domain.ClientContext;
 using Gym.Infrastructure.Entities.Extensions;
 using Gym.Infrastructure.Entities.Extensions.Mappings;
 using MongoDB.Bson;
@@ -7,7 +7,7 @@ using MongoDB.Driver;
 
 namespace Gym.Infrastructure.Entities.Repositories.Clients
 {
-    internal class ClientRepository(IMongoCollection<ClientEntity> _clientCollection, MongoUnitOfWork _mongoUnitOfWork) : IClientRepository, IClientQueryService
+    internal class ClientRepository(IMongoCollection<ClientEntity> _clientCollection, MongoUnitOfWork _mongoUnitOfWork) : IClientRepository, IClientByUserIdFinder
     {
         public ClientId NextIdentity() => ClientId.From(ObjectId.GenerateNewId().ToString());
 
