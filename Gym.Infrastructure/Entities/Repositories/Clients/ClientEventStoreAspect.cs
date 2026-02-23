@@ -28,7 +28,7 @@ namespace Gym.Infrastructure.Entities.Repositories.Clients
             {
                 await _eventStore.SaveAutoversionedAsync(
                     this.CreateStreamId(client.Id),
-                    client.DomainEvents.Select(domainEvent => this.CreateEventEntity(client.Id, domainEvent)),
+                    client.DomainEvents.Select(domainEvent => this.CreateEventEntity(client.Id, domainEvent)).ToList(),
                     cancellationToken
                     );
             }
