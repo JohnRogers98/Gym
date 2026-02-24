@@ -16,18 +16,8 @@ namespace Gym.WebApplication.Features.Account.Services
         public async Task<IEnumerable<AccountHistoryItemViewModel>> GetAllAccountHistoryItemsAsync()
         {
             var response = await _httpClient.PostAsJsonAsync("api/account/actions/get-history", new GetAccountHistoryRequest());
-            Console.WriteLine("2");
             var listResponse = await response.Content.ReadFromJsonAsync<ListResponse<AccountHistoryDto>>();
             IEnumerable<AccountHistoryDto> dtos = listResponse!.Data;
-            Console.WriteLine("1");
-            foreach(var a in dtos)
-            {
-                foreach (var item in a.Payload)
-                {
-                    Console.WriteLine(item.Key +  "         "  +  item.Value.GetType());
-                }
-                Console.WriteLine(a.ToString()); 
-            }
             return dtos.Select(_accountHistoryViewModelMapper.ToViewModel).ToList();
         }
     }

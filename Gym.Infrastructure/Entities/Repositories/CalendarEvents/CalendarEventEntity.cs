@@ -1,6 +1,6 @@
 ﻿using MongoDB.Bson;
 
-namespace MongoConsoleApp.Repositories.CalendarEvents
+namespace Gym.Infrastructure.Entities.Repositories.CalendarEvents
 {
     internal class CalendarEventEntity
     {
@@ -8,6 +8,8 @@ namespace MongoConsoleApp.Repositories.CalendarEvents
 
         public required DateTime Start {  get; set; }
         public DateTime? End { get; set; }
+
+        public required String Status {  get; set; }
 
         public IEnumerable<ObjectId>? Bookings { get; set; }
         

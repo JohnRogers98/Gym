@@ -2,7 +2,7 @@
 {
     internal record TrainingBookedDto(
         String Id,
-        DateTime occurredOn,
+        DateTime OccurredOn,
         String BookingId,
         String UserId,
         String CalendarEventId

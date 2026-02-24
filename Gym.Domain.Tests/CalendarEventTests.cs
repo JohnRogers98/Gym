@@ -77,5 +77,74 @@ namespace Gym.Domain.Tests
 
             Assert.True(calendarEvent.HasExpired(DateTime.Now));
         }
+
+        [Fact]
+        public void Check_Whether_Status_Upcoming_When_Created()
+        {
+            CalendarEvent calendarEvent = _fakeDataFixture.CreateCalendarEvent(isExpired: false);
+
+            Assert.Equal(CalendarEventStatus.Upcoming, calendarEvent.Status);
+        }
+
+
+        [Fact]
+        public void Check_Whether_Status_Completed_When_Complete()
+        {
+            CalendarEvent calendarEvent = _fakeDataFixture.CreateCalendarEvent(isExpired: true);
+
+            calendarEvent.Complete();
+
+            Assert.Equal(CalendarEventStatus.Completed, calendarEvent.Status);
+        }
+
+        [Fact]
+        public void Check_Whether_Status_Cancelled_When_Cancel()
+        {
+            CalendarEvent calendarEvent = _fakeDataFixture.CreateCalendarEvent(isExpired: true);
+
+            calendarEvent.Cancel();
+
+            Assert.Equal(CalendarEventStatus.Cancelled, calendarEvent.Status);
+        }
+
+        [Fact]
+        public void Check_Whether_Cancelling_Throws_When_Cancelled_Already()
+        {
+            CalendarEvent calendarEvent = _fakeDataFixture.CreateCalendarEvent(isExpired: false);
+
+            calendarEvent.Cancel();
+
+            Assert.Throws<DomainException>(calendarEvent.Cancel);
+        }
+
+        [Fact]
+        public void Check_Whether_Cancelling_Throws_When_Completed_Already()
+        {
+            CalendarEvent calendarEvent = _fakeDataFixture.CreateCalendarEvent(isExpired: false);
+
+            calendarEvent.Complete();
+
+            Assert.Throws<DomainException>(calendarEvent.Cancel);
+        }
+
+        [Fact]
+        public void Check_Whether_Completing_Throws_When_Cancelled_Already()
+        {
+            CalendarEvent calendarEvent = _fakeDataFixture.CreateCalendarEvent(isExpired: false);
+
+            calendarEvent.Cancel();
+
+            Assert.Throws<DomainException>(calendarEvent.Complete);
+        }
+
+        [Fact]
+        public void Check_Whether_Completing_Throws_When_Completing_Already()
+        {
+            CalendarEvent calendarEvent = _fakeDataFixture.CreateCalendarEvent(isExpired: false);
+
+            calendarEvent.Complete();
+
+            Assert.Throws<DomainException>(calendarEvent.Complete);
+        }
     }
 }

@@ -1,14 +1,14 @@
 ﻿using Gym.Domain._Shared;
 using Gym.Domain.CalendarEventContext;
-using Gym.Infrastructure;
 using Gym.Infrastructure.Entities.Extensions;
 using Gym.Infrastructure.Entities.Extensions.Mappings;
 using MongoDB.Bson;
 using MongoDB.Driver;
 
-namespace MongoConsoleApp.Repositories.CalendarEvents
+namespace Gym.Infrastructure.Entities.Repositories.CalendarEvents
 {
-    internal class CalendarEventRepository(IMongoCollection<CalendarEventEntity> _calendarEventCollection, MongoUnitOfWork _mongoUnitOfWork) : ICalendarEventRepository
+    internal class CalendarEventRepository(IMongoCollection<CalendarEventEntity> _calendarEventCollection, MongoUnitOfWork _mongoUnitOfWork) 
+        : ICalendarEventRepository, IPastCalendarEventsFinder
     {
         public CalendarEventId NextIdentity() => CalendarEventId.From(ObjectId.GenerateNewId().ToString());
 
@@ -35,5 +35,14 @@ namespace MongoConsoleApp.Repositories.CalendarEvents
         public async Task<Boolean> ExistsAsync(CalendarEventId id, CancellationToken cancellationToken) 
             => await _calendarEventCollection.Find(_mongoUnitOfWork.Session, eCalendarEvent => eCalendarEvent.Id == id.Value.ToObjectId()).AnyAsync(cancellationToken);
 
+        public async Task<IEnumerable<CalendarEvent>> GetPastCalendarEventsAsync(DateTime currentDateTime, CancellationToken cancellationToken)
+        {
+            var foundedEntities = await _calendarEventCollection.Find(
+                    _mongoUnitOfWork.Session,
+                    eCalendarEvent => eCalendarEvent.Start < currentDateTime && eCalendarEvent.Status == CalendarEventStatus.Upcoming.ToString())
+              .ToListAsync(cancellationToken);
+
+            return foundedEntities.Select(aFoundedEntity => aFoundedEntity.ToDomain()).ToList();
+        }
     }
 }

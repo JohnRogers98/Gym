@@ -19,6 +19,8 @@ namespace Gym.Application
 
             services.AddScoped<ITrainingBookingService, TrainingBookingService>();
             services.AddScoped<IChargeAccountService, ChargeAccountService>();
+            services.AddScoped<ICompleteCalendarEventService, CompleteCalendarEventService>();
+            services.AddScoped<ICancelCalendarEventService, CancelCalendarEventService>();
 
             return services;
         }

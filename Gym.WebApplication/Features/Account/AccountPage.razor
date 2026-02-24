@@ -57,6 +57,19 @@ else
                             </ItemContent>
                         </MudTimelineItem>
                     }
+                    else if (aHistoryItem is TrainingCompletedViewModel trainingCompletedViewModel)
+                    {
+                        <MudTimelineItem Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small">
+                            <ItemContent>
+                                <MudCard Outlined="true" Elevation="25">
+                                    <MudCardContent>
+                                        <MudText Typo="Typo.body2">@aHistoryItem.GetMessage()</MudText>
+                                        <MudText Typo="Typo.body2">@aHistoryItem.OccurredAt.ToDateOnly()</MudText>
+                                    </MudCardContent>
+                                </MudCard>
+                            </ItemContent>
+                        </MudTimelineItem>
+                    }
                 }
             </MudTimeline>
 

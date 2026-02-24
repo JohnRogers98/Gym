@@ -36,7 +36,6 @@ using Gym.Infrastructure.Telegram;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using MongoConsoleApp.Repositories.CalendarEvents;
 using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
 using System.Runtime.CompilerServices;
@@ -63,7 +62,7 @@ namespace Gym.Infrastructure
             services.AddMessagePublisher();
             services.AddRepositories();
             services.AddProjections();
-            services.AddQueryServices();
+            services.AddFinderServices();
             services.AddEventStore();
             services.AddCaching();
 
@@ -187,10 +186,12 @@ namespace Gym.Infrastructure
             return services;
         }
 
-        private static IServiceCollection AddQueryServices(this IServiceCollection services)
+        private static IServiceCollection AddFinderServices(this IServiceCollection services)
         {
             services.TryAddScoped<IUserByTelegramIdFinder, UserRepository>();
             services.TryAddScoped<IClientByUserIdFinder, ClientRepository>();
+            services.TryAddScoped<IClientByUserIdFinder, ClientRepository>();
+            services.TryAddScoped<IPastCalendarEventsFinder, CalendarEventRepository>();
             return services;
         }
 
@@ -226,6 +227,12 @@ namespace Gym.Infrastructure
         private static IServiceCollection AddBackgroundWorkers(this IServiceCollection services)
         {
             services.AddHostedService<OutboxReaderHostedService>();
+
+            services.TryAddKeyedSingleton<PeriodicTimer>(
+                nameof(CalendarEventCompletionChecker),
+                (_, _) => new PeriodicTimer(TimeSpan.FromMinutes(5), TimeProvider.System)
+            );
+            services.AddHostedService<CalendarEventCompletionChecker>();
             return services;
         }
     }

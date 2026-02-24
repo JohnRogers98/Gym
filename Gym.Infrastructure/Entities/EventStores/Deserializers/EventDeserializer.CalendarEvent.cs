@@ -23,5 +23,23 @@ namespace Gym.Infrastructure.Entities.EventStores.Deserializers
                 CalendarEventId.From(dto.CalendarEventId),
                 UserId.From(dto.UserId));
         }
+
+        private DomainEvent ToDomainEvent(CalendarEventCompletedDto dto)
+        {
+            return CalendarEventCompletedDomainEvent.Restore(
+                DomainEventId.From(Guid.Parse(dto.Id)),
+                dto.occurredOn,
+                CalendarEventId.From(dto.CalendarEventId),
+                dto.BookingUsers.Select(UserId.From).ToList().AsReadOnly());
+        }
+
+        private DomainEvent ToDomainEvent(CalendarEventCancelledDto dto)
+        {
+            return CalendarEventCancelledDomainEvent.Restore(
+                DomainEventId.From(Guid.Parse(dto.Id)),
+                dto.occurredOn,
+                CalendarEventId.From(dto.CalendarEventId),
+                dto.BookingUsers.Select(UserId.From).ToList().AsReadOnly());
+        }
     }
 }

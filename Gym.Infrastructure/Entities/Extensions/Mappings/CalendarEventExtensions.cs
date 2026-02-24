@@ -2,7 +2,7 @@
 using Gym.Domain.CalendarEventContext;
 using Gym.Domain.InstructorContext;
 using Gym.Domain.TrainingContext;
-using MongoConsoleApp.Repositories.CalendarEvents;
+using Gym.Infrastructure.Entities.Repositories.CalendarEvents;
 
 namespace Gym.Infrastructure.Entities.Extensions.Mappings
 {
@@ -14,6 +14,7 @@ namespace Gym.Infrastructure.Entities.Extensions.Mappings
                 CalendarEventId.From(entity.Id.ToString()),
                 entity.Start,
                 entity.End,
+                Enum.Parse<CalendarEventStatus>(entity.Status),
                 TrainingId.From(entity.TrainingId.ToString()),
                 entity.Bookings?.Select(x => UserId.From(x.ToString())) ?? new HashSet<UserId>(),
                 entity.MaxClientCount,
@@ -27,6 +28,7 @@ namespace Gym.Infrastructure.Entities.Extensions.Mappings
                 Id = calendarEvent.Id.Value.ToObjectId(),
                 Start = calendarEvent.Start,
                 End = calendarEvent.End,
+                Status = calendarEvent.Status.ToString(),
                 TrainingId = calendarEvent.TrainingId.Value.ToObjectId(),
                 Bookings = calendarEvent.Bookings.Select(anUserId => anUserId.Value.ToObjectId()),
                 MaxClientCount = calendarEvent.MaxClientCount,

@@ -21,12 +21,15 @@ namespace Gym.Infrastructure.Entities.EventStores.DtoDeserializers
             [nameof(AccountChargedDomainEvent)] = typeof(AccountChargedDto),
             [nameof(AccountCreatedDomainEvent)] = typeof(AccountCreatedDto),
             [nameof(TrainingBookedDomainEvent)] = typeof(TrainingBookedDto),
+            [nameof(TrainingCompletedDomainEvent)] = typeof(TrainingCompletedDto),
             [nameof(ClientCreatedDomainEvent)] = typeof(ClientCreatedDto),
             [nameof(UserCreatedDomainEvent)] = typeof(UserCreatedDto),
             [nameof(CalendarEventCreatedDomainEvent)] = typeof(CalendarEventCreatedDto),
             [nameof(CalendarEventBookedDomainEvent)] = typeof(CalendarEventBookedDto),
             [nameof(InstructorCreatedDomainEvent)] = typeof(InstructorCreatedDto),
-            [nameof(TrainingCreatedDomainEvent)] = typeof(TrainingCreatedDto)
+            [nameof(TrainingCreatedDomainEvent)] = typeof(TrainingCreatedDto),
+            [nameof(CalendarEventCompletedDomainEvent)] = typeof(CalendarEventCompletedDto),
+            [nameof(CalendarEventCancelledDomainEvent)] = typeof(CalendarEventCancelledDto)
         };
 
         public Object Deserialize(EventEntity eventEntity)

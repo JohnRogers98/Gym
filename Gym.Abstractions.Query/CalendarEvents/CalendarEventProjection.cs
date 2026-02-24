@@ -4,6 +4,7 @@
         String Id,
         DateTime Start,
         DateTime? End,
+        String Status,
         TrainingInfo Training,
         Int32? MaxClientCount,
         IEnumerable<BookingUserInfo>? BookingUsers,

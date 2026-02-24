@@ -19,9 +19,9 @@ namespace Gym.Abstractions.MessageBus.Notifiers.Bookings
             if (bookedCalendarEvent is not null)
             {
                 await _notificationService.SendMessageAsync(
-               notification.DomainEvent.UserId,
-               $"You booked event - {bookedCalendarEvent.Training.Name}.",
-               cancellationToken);
+                    notification.DomainEvent.UserId,
+                    $"You booked event - {bookedCalendarEvent.Training.Name}.",
+                    cancellationToken);
             }
         }
     }

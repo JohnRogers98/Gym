@@ -25,6 +25,12 @@ namespace Gym.WebApplication.Features.Account.Services
                     TrainingName = dto.Payload.GetRequiredValue<String>(nameof(TrainingBookedViewModel.TrainingName))
                 },
 
+                "TrainingCompletedDomainEvent" => new TrainingCompletedViewModel
+                {
+                    OccurredAt = dto.OccurredAt,
+                    TrainingName = dto.Payload.GetRequiredValue<String>(nameof(TrainingBookedViewModel.TrainingName))
+                },
+
                 _ => throw new NotImplementedException()
             };
         }

@@ -4,10 +4,10 @@ using Gym.Domain.CalendarEventContext.Events;
 using Gym.Infrastructure.Entities.EventStores;
 using Gym.Infrastructure.Entities.EventStores.DtoDeserializers;
 using Gym.Infrastructure.Entities.Extensions;
+using Gym.Infrastructure.Entities.Repositories.CalendarEvents;
 using Gym.Infrastructure.Entities.Repositories.CalendarEvents.EventsDto;
 using Gym.Infrastructure.Entities.Repositories.Instructors;
 using Gym.Infrastructure.Entities.Repositories.Trainings;
-using MongoConsoleApp.Repositories.CalendarEvents;
 using MongoDB.Driver;
 
 namespace Gym.Infrastructure.Entities.Projections.CalendarEvents
@@ -58,6 +58,7 @@ namespace Gym.Infrastructure.Entities.Projections.CalendarEvents
                 Id: calendarEvent.Id.ToString(),
                 Start: calendarEvent.Start,
                 End: calendarEvent.End,
+                Status: calendarEvent.Status,
                 Training: training,
                 MaxClientCount: calendarEvent.MaxClientCount,
                 BookingUsers: calendarEvent.Bookings?

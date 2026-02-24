@@ -2,7 +2,7 @@
 {
     internal record AccountChargedDto(
         String Id,
-        DateTime occurredOn,
+        DateTime OccurredOn,
         String UserId,
         Int32 ByCount,
         String? Reason

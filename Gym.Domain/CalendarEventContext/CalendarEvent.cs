@@ -15,6 +15,8 @@ namespace Gym.Domain.CalendarEventContext
         public DateTime Start { get; private set; }
         public DateTime? End { get; private set; }
 
+        public CalendarEventStatus Status { get; private set; }
+
         public Int32? MaxClientCount { get; private set; }
 
         public TrainingId TrainingId { get; private set; }
@@ -25,12 +27,13 @@ namespace Gym.Domain.CalendarEventContext
         private HashSet<UserId> _bookings = new();
         public IReadOnlyCollection<UserId> Bookings => _bookings.AsReadOnly();
 
-        private CalendarEvent(CalendarEventId id, DateTime start, DateTime? end, TrainingId trainingId,
+        private CalendarEvent(CalendarEventId id, DateTime start, DateTime? end, CalendarEventStatus status, TrainingId trainingId,
             IEnumerable<UserId> bookings, Int32? maxClientCount = default, IEnumerable<InstructorId>? instructors = default)
         {
             Id = id;
             Start = start;
             End = end;
+            Status = status;
             TrainingId = trainingId;
             MaxClientCount = maxClientCount;
             _instructors = instructors?.ToList();
@@ -41,15 +44,15 @@ namespace Gym.Domain.CalendarEventContext
             CalendarEventId id, DateTime start, DateTime? end, TrainingId trainingId, IEnumerable<UserId>? bookings = default, Int32? maxClientCount = default,
             IEnumerable<InstructorId>? instructors = default)
         {
-            CalendarEvent calendarEvent = new (id, start, end, trainingId, bookings ?? new HashSet<UserId>(), maxClientCount, instructors);
+            CalendarEvent calendarEvent = new (id, start, end, CalendarEventStatus.Upcoming, trainingId, bookings ?? new HashSet<UserId>(), maxClientCount, instructors);
             calendarEvent.AddDomainEvent(CalendarEventCreatedDomainEvent.Create(calendarEvent.Id));
             return calendarEvent;
         }
 
-        public static CalendarEvent Restore(CalendarEventId id, DateTime start, DateTime? end, TrainingId trainingId,
+        public static CalendarEvent Restore(CalendarEventId id, DateTime start, DateTime? end, CalendarEventStatus status, TrainingId trainingId,
             IEnumerable<UserId> bookings, Int32? maxClientCount = default, IEnumerable<InstructorId>? instructors = default)
         {
-            return new (id, start, end, trainingId, bookings, maxClientCount, instructors);
+            return new (id, start, end, status, trainingId, bookings, maxClientCount, instructors);
         }
 
         public void AddBooking(UserId userId)
@@ -70,7 +73,29 @@ namespace Gym.Domain.CalendarEventContext
 
         public Int32 BookingCount() => _bookings.Count;
 
-        public Boolean HasBookingFor(UserId userId) => _bookings.Where(anUserId => anUserId == userId).Any();
+        public Boolean HasBookingFor(UserId userId) => _bookings.Any(anUserId => anUserId == userId);
+
+        internal void Complete()
+        {
+            if(Status is not CalendarEventStatus.Upcoming)
+            {
+                throw new DomainException(EventStatusIncorrectForOperationError.Create(Id));
+            }
+
+            Status = CalendarEventStatus.Completed;
+            base.AddDomainEvent(CalendarEventCompletedDomainEvent.Create(Id, Bookings));
+        }
+
+        internal void Cancel()
+        {
+            if (Status is not CalendarEventStatus.Upcoming)
+            {
+                throw new DomainException(EventStatusIncorrectForOperationError.Create(Id));
+            }
+
+            Status = CalendarEventStatus.Cancelled;
+            base.AddDomainEvent(CalendarEventCancelledDomainEvent.Create(Id, Bookings));
+        }
 
         public override String ToString()
             => $"{nameof(Id)}: {Id} \t {nameof(Start)}: {Start} \t {nameof(End)}: {End?.ToString() ?? "_"} \t {nameof(TrainingId)}: {TrainingId}";
