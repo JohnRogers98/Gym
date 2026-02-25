@@ -29,7 +29,7 @@ namespace Gym.Domain.Tests.AccountContext
         [InlineData(2, 2)]
         public void Apply_Training_Booking_Cancelled_Add_Available_Training_Count(Int32 availableCount, Int32 expectedCountAfterApplying)
         {
-            var trainingBookingCancelledDomainEvent = TrainingBookingCancelledDomainEvent.Create(_fakeDataFixture.BookingId, _fakeDataFixture.UserId, _fakeDataFixture.CalendarEventId);
+            var trainingBookingCancelledDomainEvent = TrainingCancelledDomainEvent.Create(_fakeDataFixture.BookingId, _fakeDataFixture.UserId, _fakeDataFixture.CalendarEventId);
             Account sut = _fakeDataFixture.CreateAccount(availableTrainingsCount: availableCount);
             sut.MakeBooking(_fakeDataFixture.CalendarEventId);
 

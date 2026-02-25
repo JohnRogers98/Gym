@@ -17,59 +17,17 @@ else
 
                 @foreach (var aHistoryItem in _historyItems)
                 {
-                    if (aHistoryItem is AccountCreatedViewModel accountCreatedViewModel)
-                    {
-                        <MudTimelineItem Variant="Variant.Filled" Color="Color.Primary" Size="Size.Large">
-                            <ItemContent>
-                                <MudCard Outlined="true" Elevation="25">
-                                    <MudCardContent>
-                                        <MudText Typo="Typo.body2">@aHistoryItem.GetMessage()</MudText>
-                                        <MudText Typo="Typo.body2">@aHistoryItem.OccurredAt.ToDateOnly()</MudText>
-                                    </MudCardContent>
-                                </MudCard>
-                            </ItemContent>
+                    <MudTimelineItem Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small">
+                        <ItemContent>
+                            <MudCard Outlined="true" Elevation="25">
+                                <MudCardContent>
+                                    <MudText Typo="Typo.body2">@aHistoryItem.GetMessage()</MudText>
+                                    <MudText Typo="Typo.body2">@aHistoryItem.OccurredAt.ToDateOnly()</MudText>
+                                </MudCardContent>
+                            </MudCard>
+                        </ItemContent>
 
-                        </MudTimelineItem>
-                    }
-                    else if (aHistoryItem is AccountChargedViewModel accountChargedViewModel)
-                    {
-                        <MudTimelineItem Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium">
-                            <ItemContent>
-                                <MudCard Outlined="true" Elevation="25">
-                                    <MudCardContent>
-                                        <MudText Typo="Typo.body2">@aHistoryItem.GetMessage()</MudText>
-                                        <MudText Typo="Typo.body2">@aHistoryItem.OccurredAt.ToDateOnly()</MudText>
-                                    </MudCardContent>
-                                </MudCard>
-                            </ItemContent>
-                        </MudTimelineItem>
-                    }
-                    else if (aHistoryItem is TrainingBookedViewModel trainingBookedViewModel)
-                    {
-                        <MudTimelineItem Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small">
-                            <ItemContent>
-                                <MudCard Outlined="true" Elevation="25">
-                                    <MudCardContent>
-                                        <MudText Typo="Typo.body2">@aHistoryItem.GetMessage()</MudText>
-                                        <MudText Typo="Typo.body2">@aHistoryItem.OccurredAt.ToDateOnly()</MudText>
-                                    </MudCardContent>
-                                </MudCard>
-                            </ItemContent>
-                        </MudTimelineItem>
-                    }
-                    else if (aHistoryItem is TrainingCompletedViewModel trainingCompletedViewModel)
-                    {
-                        <MudTimelineItem Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small">
-                            <ItemContent>
-                                <MudCard Outlined="true" Elevation="25">
-                                    <MudCardContent>
-                                        <MudText Typo="Typo.body2">@aHistoryItem.GetMessage()</MudText>
-                                        <MudText Typo="Typo.body2">@aHistoryItem.OccurredAt.ToDateOnly()</MudText>
-                                    </MudCardContent>
-                                </MudCard>
-                            </ItemContent>
-                        </MudTimelineItem>
-                    }
+                    </MudTimelineItem>
                 }
             </MudTimeline>
 

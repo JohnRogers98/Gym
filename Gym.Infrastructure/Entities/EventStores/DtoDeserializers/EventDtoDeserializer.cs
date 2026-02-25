@@ -22,6 +22,7 @@ namespace Gym.Infrastructure.Entities.EventStores.DtoDeserializers
             [nameof(AccountCreatedDomainEvent)] = typeof(AccountCreatedDto),
             [nameof(TrainingBookedDomainEvent)] = typeof(TrainingBookedDto),
             [nameof(TrainingCompletedDomainEvent)] = typeof(TrainingCompletedDto),
+            [nameof(TrainingCancelledDomainEvent)] = typeof(TrainingCancelledDto),
             [nameof(ClientCreatedDomainEvent)] = typeof(ClientCreatedDto),
             [nameof(UserCreatedDomainEvent)] = typeof(UserCreatedDto),
             [nameof(CalendarEventCreatedDomainEvent)] = typeof(CalendarEventCreatedDto),

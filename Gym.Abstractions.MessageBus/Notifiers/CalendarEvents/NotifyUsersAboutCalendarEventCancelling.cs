@@ -7,7 +7,7 @@ using MediatR;
 
 namespace Gym.Abstractions.MessageBus.Notifiers.CalendarEvents
 {
-    internal class NotifyUserAboutCalendarEventCancelling(INotificationService _notificationService, ICalendarEventProjectionQueryService _calendarEventProjectionQueryService) 
+    internal class NotifyUsersAboutCalendarEventCancelling(INotificationService _notificationService, ICalendarEventProjectionQueryService _calendarEventProjectionQueryService) 
         : INotificationHandler<DomainEventNotification<CalendarEventCancelledDomainEvent>>
     {
         public async Task Handle(DomainEventNotification<CalendarEventCancelledDomainEvent> notification, CancellationToken cancellationToken)

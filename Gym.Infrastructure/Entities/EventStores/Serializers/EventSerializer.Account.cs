@@ -39,5 +39,15 @@ namespace Gym.Infrastructure.Entities.EventStores.Serializers
                 domainEvent.UserId.Value,
                 domainEvent.CalendarEventId.Value);
         }
+
+        private TrainingCancelledDto ToDto(TrainingCancelledDomainEvent domainEvent)
+        {
+            return new TrainingCancelledDto(
+                domainEvent.Id.Value.ToString(),
+                domainEvent.OccurredOn,
+                domainEvent.BookingId.Value,
+                domainEvent.UserId.Value,
+                domainEvent.CalendarEventId.Value);
+        }
     }
 }
