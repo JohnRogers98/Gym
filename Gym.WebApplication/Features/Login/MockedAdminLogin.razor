@@ -1,0 +1,14 @@
+﻿@using Gym.WebApplication.Features.Login.Services
+
+@inject IWebAppAuthService WevAppAuthService
+
+<MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Login" Color="Color.Primary" OnClick="Authenticate">Admin Login</MudButton>
+
+@code {
+
+    private async void Authenticate()
+    {
+        await WevAppAuthService.MockAuthenticateAdminAsync();
+    }
+
+}

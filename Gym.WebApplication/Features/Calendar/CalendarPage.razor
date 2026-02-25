@@ -3,7 +3,7 @@
 @using System.Collections.ObjectModel
 @using System.Collections.Specialized
 
-@attribute [Authorize]
+@attribute [Authorize(Roles = "Client")]
 
 @inject ICalendarService CalendarService
 @inject AuthenticationStateProvider AuthenticationStateProvider

@@ -3,6 +3,8 @@
 @using Gym.WebApplication.Features.Account.ViewModels
 @using Gym.WebDto.Responses.Account
 
+@attribute [Authorize(Roles = "Client")]
+
 @inject IAccountService AccountService
 
 @if (_historyItems is null)
