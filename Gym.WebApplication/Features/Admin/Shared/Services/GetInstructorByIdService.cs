@@ -18,9 +18,9 @@ namespace Gym.WebApplication.Features.Admin.Shared.Services
     {
         public async Task<InstructorViewModel?> ExecuteAsync(InstructorId instructorId, CancellationToken cancellationToken = default)
         {
-            return await _pipelineProvider.InstructorEventualConsistency.ExecuteAsync(async token =>
+            return await _pipelineProvider.InstructorEventualConsistency.ExecuteAsync(async innerToken =>
             {
-                return await _decoratee.ExecuteAsync(instructorId, token);
+                return await _decoratee.ExecuteAsync(instructorId, innerToken);
             }, cancellationToken);
         }
     }
