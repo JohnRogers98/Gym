@@ -12,9 +12,7 @@ namespace Gym.WebApplication.Features.Admin.Shared.Services
         Task<InstructorViewModel?> ExecuteAsync(InstructorId instructorId, CancellationToken cancellationToken = default);
     }
 
-    public class RetryableGetInstructorByIdService(
-        IGetInstructorByIdService _decoratee,
-        IPipelineProvider _pipelineProvider) : IGetInstructorByIdService
+    public class RetryableGetInstructorByIdService(IGetInstructorByIdService _decoratee, IPipelineProvider _pipelineProvider) : IGetInstructorByIdService
     {
         public async Task<InstructorViewModel?> ExecuteAsync(InstructorId instructorId, CancellationToken cancellationToken = default)
         {

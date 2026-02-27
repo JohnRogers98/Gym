@@ -1,5 +1,6 @@
 ﻿@page "/admin"
 @using Gym.WebApplication.Features.Admin.Instructors
+@using Gym.WebApplication.Features.Admin.Trainings
 
 @attribute [Authorize(Roles = "Admin")]
 
@@ -7,6 +8,7 @@
 
     <MudExpansionPanels MultiExpansion="true" Elevation="5">
         <InstructorPanels></InstructorPanels>
+        <TrainingPanels></TrainingPanels>
     </MudExpansionPanels>
 
 </MudContainer>

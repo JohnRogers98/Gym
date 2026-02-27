@@ -4,6 +4,8 @@ using Gym.WebApplication.Features.Account.Services;
 using Gym.WebApplication.Features.Admin.Instructors.Registration.Services;
 using Gym.WebApplication.Features.Admin.Instructors.States;
 using Gym.WebApplication.Features.Admin.Shared.Services;
+using Gym.WebApplication.Features.Admin.Trainings.Creation.Services;
+using Gym.WebApplication.Features.Admin.Trainings.States;
 using Gym.WebApplication.Features.Calendar.Services;
 using Gym.WebApplication.Features.Login.Services;
 using Gym.WebApplication.JSAdapters;
@@ -60,5 +62,13 @@ builder.Services.Decorate<IGetInstructorByIdService, RetryableGetInstructorByIdS
 
 builder.Services.AddScoped<ICreateInstructorService, CreateInstructorService>();
 builder.Services.AddScoped<IInstructorRegisteredSharedState, InstructorRegistrationSharedState>();
+
+builder.Services.AddScoped<ICreateTrainingService, CreateTrainingService>();
+builder.Services.AddScoped<ITrainingCreationSharedState, TrainingCreationSharedState>();
+
+builder.Services.AddScoped<IGetAllTrainingsService, GetAllTrainingsService>();
+
+builder.Services.AddScoped<IGetTrainingByIdService, GetTrainingByIdService>();
+builder.Services.Decorate<IGetTrainingByIdService, RetryableGetTrainingByIdService>();
 
 await builder.Build().RunAsync();

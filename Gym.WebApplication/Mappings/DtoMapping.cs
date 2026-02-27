@@ -1,8 +1,11 @@
 ﻿using AutoMapper;
 using Gym.WebApplication.Features.Admin.Instructors.Registration.Models.Forms;
 using Gym.WebApplication.Features.Admin.Instructors.Registration.Models.Results;
+using Gym.WebApplication.Features.Admin.Trainings.Creation.Models.Forms;
+using Gym.WebApplication.Features.Admin.Trainings.Creation.Models.Results;
 using Gym.WebApplication.ViewModels;
 using Gym.WebDto.Requests.Instructor;
+using Gym.WebDto.Requests.Training;
 using Gym.WebDto.Responses.CalendarEvent;
 using Gym.WebDto.Responses.Instructor;
 using Gym.WebDto.Responses.Training;
@@ -15,6 +18,11 @@ namespace Gym.WebApplication.Mappings
         {
             base.CreateMap<TrainingDto, TrainingViewModel>();
             base.CreateMap<TrainingInfo, TrainingViewModel>();
+
+            base.CreateMap<CreateTrainingFormModel, CreateTrainingRequest>();
+            base.CreateMap<CreateTrainingResponse, CreateTrainingResult>();
+
+            base.CreateMap<GetTrainingResponse, TrainingViewModel>();
 
             base.CreateMap<InstructorDto, InstructorViewModel>();
             base.CreateMap<InstructorInfo, InstructorViewModel>();

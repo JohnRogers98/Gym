@@ -50,6 +50,23 @@ namespace Gym.WebApplication.Extensions
                     });
             });
 
+            services.AddResiliencePipeline<String, TrainingViewModel?>(nameof(GetTrainingByIdService), builder =>
+            {
+                builder
+                    .AddFallback(new FallbackStrategyOptions<TrainingViewModel?>
+                    {
+                        FallbackAction = args => Outcome.FromResultAsValueTask((TrainingViewModel?)null)
+                    })
+                    .AddTimeout(TimeSpan.FromSeconds(5))
+                    .AddRetry(new()
+                    {
+                        MaxRetryAttempts = 3,
+                        ShouldHandle = new PredicateBuilder<TrainingViewModel?>()
+                            .Handle<HttpRequestException>()
+                            .HandleResult(response => response is null)
+                    });
+            });
+
             services.AddScoped<IPipelineProvider, PipelineProvider>();
 
             return services;

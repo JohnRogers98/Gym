@@ -6,16 +6,16 @@ namespace Gym.WebApplication.Features.Admin.Instructors.States
     {
         event Action<CreateInstructorResult>? InstructorCreated;
 
-        void Notify(CreateInstructorResult createdInstructorViewModel);
+        void Notify(CreateInstructorResult createdInstructorResult);
     }
 
     public class InstructorRegistrationSharedState : IInstructorRegisteredSharedState
     {
         public event Action<CreateInstructorResult>? InstructorCreated;
 
-        public void Notify(CreateInstructorResult createdInstructorViewModel)
+        public void Notify(CreateInstructorResult createdInstructorResult)
         {
-            InstructorCreated?.Invoke(createdInstructorViewModel);
+            InstructorCreated?.Invoke(createdInstructorResult);
         }
     }
 }
