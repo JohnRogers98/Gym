@@ -15,10 +15,13 @@ namespace Gym.WebApi.Controllers.Api.CalendarEvents.AdminOnly
     public class GetCalendarEventController(IMediator _mediator, IMapper _mapper) : ControllerBase
     {
         [HttpGet]
-        public async Task<GetAdminCalendarEventResponse> GetCalendarEvent(String id)
+        public async Task<ActionResult<GetAdminCalendarEventResponse>> GetCalendarEvent(String id)
         {
             CalendarEventProjection calendarEventProjection = await _mediator.Send(new GetCalendarEventById(id));
-            return _mapper.Map<GetAdminCalendarEventResponse>(calendarEventProjection);
+
+            return base.Ok(
+                _mapper.Map<GetAdminCalendarEventResponse>(calendarEventProjection)
+            );
         }
     }
 }

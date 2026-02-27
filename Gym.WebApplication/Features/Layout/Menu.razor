@@ -11,17 +11,33 @@
                          Label="Home"
                          OnClick="@ToggleDrawer"/>
 
-            <MudMenuItem Href="/calendar"
-                         Icon="@Icons.Material.Filled.DateRange"
-                         IconColor="Color.Primary"
-                         Label="Calendar"
-                         OnClick="@ToggleDrawer" />
 
-            <MudMenuItem Href="/account"
-                         Icon="@Icons.Material.Filled.AccountBalanceWallet"
-                         IconColor="Color.Primary"
-                         Label="Account"
-                         OnClick="@ToggleDrawer" />
+            <AuthorizeView Roles="Client">
+
+                <MudMenuItem Href="/calendar"
+                             Icon="@Icons.Material.Filled.DateRange"
+                             IconColor="Color.Primary"
+                             Label="Calendar"
+                             OnClick="@ToggleDrawer" />
+
+                <MudMenuItem Href="/account"
+                             Icon="@Icons.Material.Filled.AccountBalanceWallet"
+                             IconColor="Color.Primary"
+                             Label="Account"
+                             OnClick="@ToggleDrawer" />
+
+            </AuthorizeView>
+          
+            <AuthorizeView Roles="Admin">
+
+                <MudMenuItem Href="/admin"
+                             Icon="@Icons.Material.Filled.Edit"
+                             IconColor="Color.Primary"
+                             Label="Instructors"
+                             OnClick="@ToggleDrawer" />
+
+            </AuthorizeView>
+           
         </MudNavMenu>
       
     </MudDrawer>

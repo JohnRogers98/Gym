@@ -1,0 +1,44 @@
+﻿@using Gym.WebApplication.Features.Admin.Instructors.Registration.Models.Forms
+@using Gym.WebApplication.Features.Admin.Instructors.Registration.Models.Results
+@using Gym.WebApplication.Features.Admin.Instructors.Registration.Services
+@using Gym.WebApplication.Features.Admin.Instructors.States
+
+@inject ICreateInstructorService CreateInstructorService
+@inject IInstructorRegisteredSharedState InstructorRegisteredSharedState
+
+<EditForm Model="@_formModel" OnValidSubmit="@OnValidSubmit">
+    <DataAnnotationsValidator />
+    <MudGrid>
+        <MudItem xs="12" sm="12">
+            <MudCard Elevation="0">
+                <MudCardContent>
+                    <MudTextField HelperText="Enter first name" @bind-Value="@_formModel.FirstName" For="@(() => _formModel.FirstName)" />
+                    <MudTextField HelperText="Enter last name" Class="mt-3" @bind-Value="_formModel.LastName" For="@(() => _formModel.LastName)" />
+                </MudCardContent>
+                <MudCardActions>
+                    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Register</MudButton>
+                </MudCardActions>
+            </MudCard>
+        </MudItem>
+    </MudGrid>
+</EditForm>
+
+@code {
+    InstructorRegistrationFormModel _formModel = new InstructorRegistrationFormModel();
+
+    protected override async Task OnInitializedAsync() { }
+
+    private async void OnValidSubmit(EditContext context)
+    {
+        CreateInstructorResult createdInstructorViewModel = await CreateInstructorService.ExecuteAsync(_formModel);
+        InstructorRegisteredSharedState.Notify(createdInstructorViewModel);
+
+        this.ClearForm();
+    }
+
+    private void ClearForm()
+    {
+        _formModel = new InstructorRegistrationFormModel();
+        base.StateHasChanged();
+    }
+}

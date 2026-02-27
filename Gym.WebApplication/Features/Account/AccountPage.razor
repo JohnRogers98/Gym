@@ -5,7 +5,7 @@
 
 @attribute [Authorize(Roles = "Client")]
 
-@inject IAccountService AccountService
+@inject IGetAllAccountHistoryItemsService GetAllAccountHistoryItemsService
 
 @if (_historyItems is null)
 {
@@ -44,7 +44,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        var loadedHistoryItems = await AccountService.GetAllAccountHistoryItemsAsync();
+        var loadedHistoryItems = await GetAllAccountHistoryItemsService.ExecuteAsync();
         _historyItems = new List<AccountHistoryItemViewModel>(loadedHistoryItems);
     }
 }

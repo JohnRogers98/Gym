@@ -5,7 +5,8 @@
 
 @attribute [Authorize(Roles = "Client")]
 
-@inject ICalendarService CalendarService
+@inject IGetAllCalendarItemsService GetAllCalendarItemsService
+@inject IBookCalendarItemService BookCalendarItemService
 @inject AuthenticationStateProvider AuthenticationStateProvider
 
 @if (_calendarItems is null)
@@ -29,7 +30,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        var loadedCalendarEvents = await CalendarService.GetAllCalendarItemsAsync();
+        var loadedCalendarEvents = await GetAllCalendarItemsService.ExecuteAsync();
         _calendarItems = new List<CalendarItemViewModel>(loadedCalendarEvents);
 
         _pickedDate = DateTime.Now.ToDateOnly();
@@ -45,7 +46,7 @@ else
 
     private async void BookEvent(CalendarItemViewModel selectdCalendarEvent)
     {
-        Boolean bookingSuccessful = await CalendarService.BookCalendarItem(selectdCalendarEvent);
+        Boolean bookingSuccessful = await BookCalendarItemService.ExecuteAsync(selectdCalendarEvent);
         if (bookingSuccessful)
         {
             var indexOfEvent = _calendarItems.IndexOf(selectdCalendarEvent);

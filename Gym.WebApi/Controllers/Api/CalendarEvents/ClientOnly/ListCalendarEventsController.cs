@@ -16,13 +16,16 @@ namespace Gym.WebApi.Controllers.Api.CalendarEvents.ClientOnly
     public class ListCalendarEventsController(IMediator _mediator, IMapper _mapper) : ControllerBase
     {
         [HttpGet]
-        public async Task<ListResponse<ClientCalendarEventDto>> ListClientCalendarEvents()
+        public async Task<ActionResult<ListResponse<ClientCalendarEventDto>>> ListClientCalendarEvents()
         {
             IEnumerable<CalendarEventProjection> calendarEventProjections = await _mediator.Send(new GetAllCalendarEvents());
-            return new (_mapper.Map<IEnumerable<ClientCalendarEventDto>>(calendarEventProjections, opts =>
+            
+            var response = _mapper.Map<IEnumerable<ClientCalendarEventDto>>(calendarEventProjections, opts =>
             {
                 opts.Items["CurrentUserId"] = User.GetRequiredUserId();
-            }));
+            });
+
+            return base.Ok(new ListResponse<ClientCalendarEventDto>(response));
         }
     }
 }

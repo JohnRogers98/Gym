@@ -15,10 +15,19 @@ namespace Gym.WebApi.Controllers.Api.Instructors.AuthenticatedOnly
     public class GetInstructorController(IMediator _mediator, IMapper _mapper) : ControllerBase
     {
         [HttpGet]
-        public async Task<GetInstructorResponse> GetInstructor(String id)
+        public async Task<ActionResult<GetInstructorResponse>> GetInstructor(String id)
         {
-            InstructorProjection instructorProjection = await _mediator.Send(new GetInstructorById(id));
-            return _mapper.Map<GetInstructorResponse>(instructorProjection);
+            try
+            {
+                InstructorProjection instructorProjection = await _mediator.Send(new GetInstructorById(id));
+                return base.Ok(
+                    _mapper.Map<GetInstructorResponse>(instructorProjection)
+                );
+            }
+            catch (ArgumentException)
+            {
+                return base.NotFound();
+            }
         }
     }
 }
