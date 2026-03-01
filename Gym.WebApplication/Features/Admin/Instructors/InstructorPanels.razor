@@ -6,6 +6,8 @@
 @inject ISnackbar Snackbar
 @inject IInstructorRegisteredSharedState InstructorRegisteredSharedState
 
+@implements IDisposable
+
 <MudExpansionPanel Text="Instructor registration form">
     <InstructorRegistration></InstructorRegistration>
 </MudExpansionPanel>
@@ -25,4 +27,6 @@
     {
         Snackbar.Add($"Instructor - {createdInstructorViewModel.InstructorId} created", Severity.Success);
     }
+
+    public void Dispose() => InstructorRegisteredSharedState.InstructorCreated -= ShowRegisteredInstructorInSnackbar;
 }

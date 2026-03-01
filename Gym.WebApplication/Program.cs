@@ -56,6 +56,7 @@ builder.Services.AddScoped<AccountHistoryViewModelMapper>();
 builder.Services.AddScoped<IGetAllAccountHistoryItemsService, GetAllAccountHistoryItemsService>();
 
 builder.Services.AddScoped<IGetAllInstructorsService, GetAllInstructorsService>();
+builder.Services.Decorate<IGetAllInstructorsService, CachableGetAllInstructosSetvice>();
 
 builder.Services.AddScoped<IGetInstructorByIdService, GetInstructorByIdService>();
 builder.Services.Decorate<IGetInstructorByIdService, RetryableGetInstructorByIdService>();
@@ -67,6 +68,7 @@ builder.Services.AddScoped<ICreateTrainingService, CreateTrainingService>();
 builder.Services.AddScoped<ITrainingCreationSharedState, TrainingCreationSharedState>();
 
 builder.Services.AddScoped<IGetAllTrainingsService, GetAllTrainingsService>();
+builder.Services.Decorate<IGetAllTrainingsService, CachableGetAllTrainingsSetvice>();
 
 builder.Services.AddScoped<IGetTrainingByIdService, GetTrainingByIdService>();
 builder.Services.Decorate<IGetTrainingByIdService, RetryableGetTrainingByIdService>();

@@ -6,6 +6,8 @@
 @inject ISnackbar Snackbar
 @inject ITrainingCreationSharedState TrainingCreationSharedState
 
+@implements IDisposable
+
 <MudExpansionPanel Text="Create training form">
     <CreateTrainingForm></CreateTrainingForm>
 </MudExpansionPanel>
@@ -18,12 +20,13 @@
 
     protected override async Task OnInitializedAsync()
     {
-        TrainingCreationSharedState.TrainingCreated += ShowRegisteredInstructorInSnackbar;
+        TrainingCreationSharedState.TrainingCreated += ShowRegisteredTrainingInSnackbar;
     }
 
-    private void ShowRegisteredInstructorInSnackbar(CreateTrainingResult createTrainingResult)
+    private void ShowRegisteredTrainingInSnackbar(CreateTrainingResult createTrainingResult)
     {
         Snackbar.Add($"Training - {createTrainingResult.TrainingId} created", Severity.Success);
     }
 
+    public void Dispose() => TrainingCreationSharedState.TrainingCreated -= ShowRegisteredTrainingInSnackbar;
 }
