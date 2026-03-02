@@ -5,8 +5,8 @@ namespace Gym.Application.Services.CalendarEventApi.CreateCalendarEvent
 {
     public record CreateCalendarEvent(
         DateTime Start,
-        DateTime End,
-        Int32 MaxClientCount,
+        DateTime? End,
+        Int32? MaxClientCount,
         String TrainingId,
-        IEnumerable<String> Instructors) : IRequest<CreateCalendarEventResult>, ITransactionalRequest;
+        IEnumerable<String>? Instructors) : IRequest<CreateCalendarEventResult>, ITransactionalRequest;
 }

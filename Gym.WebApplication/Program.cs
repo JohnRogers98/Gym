@@ -1,6 +1,8 @@
 using Gym.WebApplication;
 using Gym.WebApplication.Extensions;
 using Gym.WebApplication.Features.Account.Services;
+using Gym.WebApplication.Features.Admin.CalendarEvents.Creation.Services;
+using Gym.WebApplication.Features.Admin.CalendarEvents.States;
 using Gym.WebApplication.Features.Admin.Instructors.Registration.Services;
 using Gym.WebApplication.Features.Admin.Instructors.States;
 using Gym.WebApplication.Features.Admin.Shared.Services;
@@ -51,6 +53,9 @@ builder.Services.AddScoped<LocalStorageAdapter>();
 
 builder.Services.AddScoped<IGetAllCalendarItemsService, GetAllCalendarItemsService>();
 builder.Services.AddScoped<IBookCalendarItemService, BookCalendarItemService>();
+
+builder.Services.AddScoped<ICreateCalendarEventService, CreateCalendarEventService>();
+builder.Services.AddScoped<ICalendarEventCreationState, CalendarEventCreationState>();
 
 builder.Services.AddScoped<AccountHistoryViewModelMapper>();
 builder.Services.AddScoped<IGetAllAccountHistoryItemsService, GetAllAccountHistoryItemsService>();
