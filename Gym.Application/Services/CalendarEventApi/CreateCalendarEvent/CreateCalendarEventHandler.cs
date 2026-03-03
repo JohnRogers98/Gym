@@ -18,7 +18,7 @@ namespace Gym.Application.Services.CalendarEventApi.CreateCalendarEvent
                 TrainingId.From(request.TrainingId),
                 new HashSet<UserId>(),
                 request.MaxClientCount,
-                request.Instructors.Select(InstructorId.From));
+                request.Instructors?.Select(InstructorId.From));
 
             await _calendarEventRepository.SaveAsync(calendarEvent, cancellationToken);
 

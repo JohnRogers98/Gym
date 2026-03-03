@@ -51,7 +51,6 @@ namespace Gym.WebApi.Controllers.Api.CalendarEvents
             CreateMap<Abstractions.Query.CalendarEvents.InstructorInfo, WebDto.Responses.Instructor.InstructorInfo>();
             CreateMap<Abstractions.Query.CalendarEvents.BookingUserInfo, WebDto.Responses.Bookings.BookingUserInfo>();
 
-            CreateMap<CancelCalendarEventRequest, CancelCalendarEvent>();
             CreateMap<CancelCalendarEventResult, CancelCalendarEventResponse>();
         }
     }

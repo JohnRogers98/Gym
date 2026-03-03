@@ -40,11 +40,14 @@ namespace Gym.WebApplication.Mappings
             #endregion
 
             #region CalendarEvent
-            base.CreateMap<ClientCalendarEventDto, CalendarItemViewModel>();
+            base.CreateMap<ClientCalendarEventDto, ClientCalendarItemViewModel>();
+            base.CreateMap<AdminCalendarEventDto, AdminCalendarItemViewModel>();
 
             base.CreateMap<CreateCalendarEventFormModel, CreateCalendarEventRequest>();
             
-                base.CreateMap<CreateCalendarEventResponse, CreateCalendarEventResult>();
+            base.CreateMap<CreateCalendarEventResponse, CreateCalendarEventResult>();
+
+            base.CreateMap<GetAdminCalendarEventResponse, AdminCalendarItemViewModel>();
             #endregion
 
         }

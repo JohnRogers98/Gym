@@ -4,7 +4,7 @@ namespace Gym.WebApplication.Features.Admin.CalendarEvents.Creation.Models.Forms
 {
     public class CreateCalendarEventFormModel
     {
-        [Required, Future]
+        [Required, FromToday]
         public DateTime? StartDateTime { get; set; }
 
         [Required]

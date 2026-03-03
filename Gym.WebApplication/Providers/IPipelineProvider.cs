@@ -9,6 +9,7 @@ namespace Gym.WebApplication.Providers
     {
         ResiliencePipeline<InstructorViewModel?> InstructorEventualConsistency { get; }
         ResiliencePipeline<TrainingViewModel?> TrainingEventualConsistency { get; }
+        ResiliencePipeline<AdminCalendarItemViewModel?> CalendarEventEventualConsistency { get; }
     }
 
     public class PipelineProvider(ResiliencePipelineProvider<String> _resiliencePipelineProvider) : IPipelineProvider
@@ -18,5 +19,8 @@ namespace Gym.WebApplication.Providers
 
         public ResiliencePipeline<TrainingViewModel?> TrainingEventualConsistency 
             => _resiliencePipelineProvider.GetPipeline<TrainingViewModel?>(nameof(GetTrainingByIdService));
+
+        public ResiliencePipeline<AdminCalendarItemViewModel?> CalendarEventEventualConsistency 
+            => _resiliencePipelineProvider.GetPipeline<AdminCalendarItemViewModel?>(nameof(GetAdminCalendarEventByIdService));
     }
 }

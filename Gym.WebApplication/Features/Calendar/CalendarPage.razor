@@ -22,16 +22,16 @@ else
 
 
 @code {
-    private List<CalendarItemViewModel> _calendarItems = default!;
+    private List<ClientCalendarItemViewModel> _calendarItems = default!;
 
-    private List<CalendarItemViewModel> _selectedItems = default!;
+    private List<ClientCalendarItemViewModel> _selectedItems = default!;
 
     private DateOnly? _pickedDate = default; 
 
     protected override async Task OnInitializedAsync()
     {
         var loadedCalendarEvents = await GetAllCalendarItemsService.ExecuteAsync();
-        _calendarItems = new List<CalendarItemViewModel>(loadedCalendarEvents);
+        _calendarItems = new List<ClientCalendarItemViewModel>(loadedCalendarEvents);
 
         _pickedDate = DateTime.Now.ToDateOnly();
         this.RefreshSelectedItems();
@@ -44,7 +44,7 @@ else
         base.StateHasChanged();
     }
 
-    private async void BookEvent(CalendarItemViewModel selectdCalendarEvent)
+    private async void BookEvent(ClientCalendarItemViewModel selectdCalendarEvent)
     {
         Boolean bookingSuccessful = await BookCalendarItemService.ExecuteAsync(selectdCalendarEvent);
         if (bookingSuccessful)

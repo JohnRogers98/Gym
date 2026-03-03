@@ -3,6 +3,7 @@ using Gym.WebApplication.Extensions;
 using Gym.WebApplication.Features.Account.Services;
 using Gym.WebApplication.Features.Admin.CalendarEvents.Creation.Services;
 using Gym.WebApplication.Features.Admin.CalendarEvents.States;
+using Gym.WebApplication.Features.Admin.CalendarEvents.TableView.Services;
 using Gym.WebApplication.Features.Admin.Instructors.Registration.Services;
 using Gym.WebApplication.Features.Admin.Instructors.States;
 using Gym.WebApplication.Features.Admin.Shared.Services;
@@ -54,8 +55,17 @@ builder.Services.AddScoped<LocalStorageAdapter>();
 builder.Services.AddScoped<IGetAllCalendarItemsService, GetAllCalendarItemsService>();
 builder.Services.AddScoped<IBookCalendarItemService, BookCalendarItemService>();
 
+builder.Services.AddScoped<IGetAllAdminCalendarEventsService, GetAllAdminCalendarEventsService>();
+builder.Services.Decorate<IGetAllAdminCalendarEventsService, CachableGetAllAdminCalendarEventsSetvice>();
+
+builder.Services.AddScoped<IGetAdminCalendarEventByIdService, GetAdminCalendarEventByIdService>();
+builder.Services.Decorate<IGetAdminCalendarEventByIdService, RetryableGetAdminCalendarEventByIdService>();
+
 builder.Services.AddScoped<ICreateCalendarEventService, CreateCalendarEventService>();
 builder.Services.AddScoped<ICalendarEventCreationState, CalendarEventCreationState>();
+
+builder.Services.AddScoped<ICancelCalendarEventService, CancelCalendarEventService>();
+builder.Services.AddScoped<ICalendarEventCancellationState, CalendarEventCancellationState>();
 
 builder.Services.AddScoped<AccountHistoryViewModelMapper>();
 builder.Services.AddScoped<IGetAllAccountHistoryItemsService, GetAllAccountHistoryItemsService>();

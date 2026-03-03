@@ -2,7 +2,7 @@
 
 namespace Gym.WebApplication.Features.Admin.CalendarEvents.Creation.Models.Forms
 {
-    public class FutureAttribute : ValidationAttribute
+    public class FromTodayAttribute : ValidationAttribute
     {
         protected override ValidationResult? IsValid(Object? value, ValidationContext validationContext)
         {
@@ -11,7 +11,7 @@ namespace Gym.WebApplication.Features.Admin.CalendarEvents.Creation.Models.Forms
                 return ValidationResult.Success;
             }
 
-            if (value is DateTime dateTime && dateTime > DateTime.UtcNow)
+            if (value is DateTime dateTime && dateTime >= DateTime.Today)
             {
                 return ValidationResult.Success;
             }

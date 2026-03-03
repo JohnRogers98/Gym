@@ -4,7 +4,6 @@ using Gym.WebApplication.ViewModels;
 using Microsoft.AspNetCore.Components.WebAssembly.Http;
 using Polly;
 using Polly.Fallback;
-using Polly.Registry;
 
 namespace Gym.WebApplication.Extensions
 {
@@ -62,6 +61,23 @@ namespace Gym.WebApplication.Extensions
                     {
                         MaxRetryAttempts = 3,
                         ShouldHandle = new PredicateBuilder<TrainingViewModel?>()
+                            .Handle<HttpRequestException>()
+                            .HandleResult(response => response is null)
+                    });
+            });
+
+            services.AddResiliencePipeline<String, AdminCalendarItemViewModel?>(nameof(GetAdminCalendarEventByIdService), builder =>
+            {
+                builder
+                    .AddFallback(new FallbackStrategyOptions<AdminCalendarItemViewModel?>
+                    {
+                        FallbackAction = args => Outcome.FromResultAsValueTask((AdminCalendarItemViewModel?)null)
+                    })
+                    .AddTimeout(TimeSpan.FromSeconds(5))
+                    .AddRetry(new()
+                    {
+                        MaxRetryAttempts = 3,
+                        ShouldHandle = new PredicateBuilder<AdminCalendarItemViewModel?>()
                             .Handle<HttpRequestException>()
                             .HandleResult(response => response is null)
                     });

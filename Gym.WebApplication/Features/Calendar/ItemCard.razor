@@ -22,7 +22,7 @@
                 </MudText>
                 <MudText Color="Color.Default" Typo="Typo.body2">
                     <MudIcon Icon="@Icons.Material.Filled.AccessTime" Color="Color.Primary" Size="Size.Small" />
-                    @CalendarItem.Start.ToString("HH:mm") - @CalendarItem.End?.ToString("HH:mm")
+                    @CalendarItem.LocalStart.ToString("HH:mm") - @CalendarItem.LocalEnd?.ToString("HH:mm")
                 </MudText>
             </MudStack>
         </CardHeaderContent>
@@ -87,9 +87,9 @@
     
 
 @code {
-    [Parameter, EditorRequired] public CalendarItemViewModel CalendarItem { get; set; } = default!;
+    [Parameter, EditorRequired] public ClientCalendarItemViewModel CalendarItem { get; set; } = default!;
     
-    [Parameter] public EventCallback<CalendarItemViewModel> OnSelected { get; set; }
+    [Parameter] public EventCallback<ClientCalendarItemViewModel> OnSelected { get; set; }
 
     private String GetMonthText() => CalendarItem.Start.ToString("MMM");
 }
