@@ -25,7 +25,7 @@ namespace Gym.Application.Services.UserApi.TelegramAuthentication
             User? user = await _userByTelegramIdFinder.GetByTelegramIdAsync(verificationResult.Data!.Id, cancellationToken);
             if (user is null)
             {
-                user = await this.RegisterUser(verificationResult.Data.Id, cancellationToken);
+                user = await this.RegisterUser(verificationResult.Data, cancellationToken);
             }
 
             Client client = await _clientByUserIdFinder.GetByUserIdAsync(user.Id, cancellationToken)
@@ -34,10 +34,18 @@ namespace Gym.Application.Services.UserApi.TelegramAuthentication
             return new AuthenticatedUserDetails(user.Id.Value, client.Id.Value, user.Role.ToString(), user.TelegramId?.Value);
         }
 
-        private async Task<User> RegisterUser(TelegramId telegramId, CancellationToken cancellationToken)
+        private async Task<User> RegisterUser(ValidatedTelegramUserInfo validatedTelegramUserInfo, CancellationToken cancellationToken)
         {
             UserId userId = _userRepository.NextIdentity();
-            User newUser = User.Create(userId, UserRole.Client, telegramId);
+            User newUser = User.Create(
+                userId,
+                UserRole.Client,
+                validatedTelegramUserInfo.Id,
+                validatedTelegramUserInfo.Username,
+                validatedTelegramUserInfo.FirstName,
+                validatedTelegramUserInfo.LastName
+            );
+
             await _userRepository.SaveAsync(newUser, cancellationToken);
 
             await this.CreateClientFromRegisteredUser(userId, cancellationToken);

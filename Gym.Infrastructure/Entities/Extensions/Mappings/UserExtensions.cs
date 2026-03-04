@@ -14,12 +14,27 @@ namespace Gym.Infrastructure.Entities.Extensions.Mappings
                 throw new ArgumentException($"Failed to parse role for user {entity.Id}");
             }
 
-            return User.Restore(UserId.From(entity.Id.ToString()), userRole, TelegramId.From(entity.TelegramId ?? default));
+            return User.Restore(
+                UserId.From(entity.Id.ToString()),
+                userRole, 
+                TelegramId.From(entity.TelegramId ?? default),
+                entity.TelegramUsername is not null ? TelegramUsername.From(entity.TelegramUsername) : null, 
+                entity.FirstName is not null ? FirstName.From(entity.FirstName) : null, 
+                entity.LastName is not null ? LastName.From(entity.LastName) : null
+            );
         }
 
         public static UserEntity ToEntity(this User user)
         {
-            return new() { Id = user.Id.Value.ToObjectId(), Role = user.Role.ToString(), TelegramId = user.TelegramId?.Value };
+            return new() 
+            { 
+                Id = user.Id.Value.ToObjectId(),
+                Role = user.Role.ToString(),
+                TelegramId = user.TelegramId?.Value,
+                TelegramUsername = user.TelegramUsername?.Value,
+                FirstName = user.FirstName?.Value,
+                LastName = user.LastName?.Value,
+            };
         }
     }
 }

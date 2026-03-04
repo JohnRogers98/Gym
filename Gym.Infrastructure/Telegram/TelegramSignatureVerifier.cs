@@ -1,4 +1,5 @@
 ﻿using Gym.Domain._Common;
+using Gym.Domain.UserContext;
 using Gym.Domain.UserContext.Authentication;
 using Gym.Domain.UserContext.Errors;
 using System.Collections.Specialized;
@@ -6,7 +7,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.Web;
-using Telegram.Bot.Types;
+using static Gym.Infrastructure.Telegram.WebAppInitData;
 
 namespace Gym.Infrastructure.Telegram
 {
@@ -22,8 +23,16 @@ namespace Gym.Infrastructure.Telegram
 
             if(computedHash == webAppInitData.GetHash())
             {
-                User tgUser = webAppInitData.GetUser();
-                return Result<ValidatedTelegramUserInfo>.Ok(ValidatedTelegramUserInfo.From(Domain.UserContext.TelegramId.From(tgUser.Id)));
+                TelegramUser tgUser = webAppInitData.GetUser();
+                
+                return Result<ValidatedTelegramUserInfo>.Ok(
+                    ValidatedTelegramUserInfo.From(
+                        TelegramId.From(tgUser.Id),
+                        tgUser.Username is not null ? TelegramUsername.From(tgUser.Username) : null,
+                        tgUser.FirstName is not null ? FirstName.From(tgUser.FirstName) : null,
+                        tgUser.LastName is not null ? LastName.From(tgUser.LastName) : null
+                    )
+                );
             }
             else
             {
@@ -69,17 +78,25 @@ namespace Gym.Infrastructure.Telegram
 
         public String GetHash() => _parsedTgWebAppData["hash"]!;
 
-        public User GetUser()
+        public class TelegramUser
+        {
+            public Int64 Id { get; set; }
+            public String? FirstName { get; set; }
+            public String? LastName { get; set; }
+            public String? Username { get; set; }
+        }
+
+        public TelegramUser GetUser()
         {
             String userJson = _parsedTgWebAppData["user"]!;
 
             using JsonDocument userJsonDoc = JsonDocument.Parse(userJson);
             var root = userJsonDoc.RootElement;
 
-            return new User
+            return new TelegramUser
             {
                 Id = root.GetProperty("id").GetInt64(),
-                FirstName = root.GetProperty("first_name").GetString() ?? "",
+                FirstName = root.GetProperty("first_name").GetString(),
                 LastName = root.GetProperty("last_name").GetString(),
                 Username = root.GetProperty("username").GetString(),
             };
