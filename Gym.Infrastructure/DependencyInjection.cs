@@ -1,4 +1,5 @@
 ﻿using Gym.Abstractions.Query.CalendarEvents;
+using Gym.Abstractions.Query.Clients;
 using Gym.Abstractions.Query.EventStore;
 using Gym.Abstractions.Query.Instructors;
 using Gym.Abstractions.Query.Trainings;
@@ -22,6 +23,7 @@ using Gym.Infrastructure.Entities.Outbox.Readers;
 using Gym.Infrastructure.Entities.Outbox.Updaters;
 using Gym.Infrastructure.Entities.Projections;
 using Gym.Infrastructure.Entities.Projections.CalendarEvents;
+using Gym.Infrastructure.Entities.Projections.Clients;
 using Gym.Infrastructure.Entities.Projections.Events;
 using Gym.Infrastructure.Entities.Projections.Instructors;
 using Gym.Infrastructure.Entities.Projections.Trainings;
@@ -95,6 +97,7 @@ namespace Gym.Infrastructure
 
             services.AddMongoCollection<UserEntity>(mongoDbOptions.CollectionOptions.Users);
             services.AddMongoCollection<ClientEntity>(mongoDbOptions.CollectionOptions.Clients);
+            services.AddMongoCollection<ClientProjection>(mongoDbOptions.CollectionOptions.ClientProjections);
 
             services.AddMongoCollection<EventEntity>(mongoDbOptions.CollectionOptions.Events);
             services.AddMongoCollection<EventProjection>(mongoDbOptions.CollectionOptions.EventProjections);
@@ -182,6 +185,7 @@ namespace Gym.Infrastructure
             services.TryAddScoped<ICalendarEventProjectionQueryService, CalendarEventProjectionQueryService>();
             services.TryAddScoped<IInstructorProjectionQueryService, InstructorProjectionQueryService>();
             services.TryAddScoped<ITrainingProjectionQueryService, TrainingProjectionQueryService>();
+            services.TryAddScoped<IClientProjectionQueryService, ClientProjectionQueryService>();
 
             return services;
         }
