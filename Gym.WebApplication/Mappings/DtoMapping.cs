@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Gym.WebApplication.Features.Admin.CalendarEvents.Creation.Models.Forms;
 using Gym.WebApplication.Features.Admin.CalendarEvents.Creation.Models.Results;
+using Gym.WebApplication.Features.Admin.Clients.TableView.Models.Results;
 using Gym.WebApplication.Features.Admin.Instructors.Registration.Models.Forms;
 using Gym.WebApplication.Features.Admin.Instructors.Registration.Models.Results;
 using Gym.WebApplication.Features.Admin.Trainings.Creation.Models.Forms;
@@ -9,7 +10,9 @@ using Gym.WebApplication.ViewModels;
 using Gym.WebDto.Requests.CalendarEvent;
 using Gym.WebDto.Requests.Instructor;
 using Gym.WebDto.Requests.Training;
+using Gym.WebDto.Responses.Account;
 using Gym.WebDto.Responses.CalendarEvent;
+using Gym.WebDto.Responses.Clients;
 using Gym.WebDto.Responses.Instructor;
 using Gym.WebDto.Responses.Training;
 
@@ -50,6 +53,10 @@ namespace Gym.WebApplication.Mappings
             base.CreateMap<GetAdminCalendarEventResponse, AdminCalendarItemViewModel>();
             #endregion
 
+            #region Client
+            base.CreateMap<ClientDto, ClientViewModel>();
+            base.CreateMap<ChargeAccountResponse, ChargeClientResult>();
+            #endregion
         }
     }
 }
