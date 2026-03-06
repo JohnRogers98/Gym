@@ -54,7 +54,16 @@
     </MudCardContent>
 
     <MudCardActions>
-        @if(CalendarItem.IsAlreadyBooked)
+        @if (CalendarItem.Status == "Cancelled")
+        {
+        <MudButton FullWidth="true"
+                   Variant="Variant.Filled"
+                   Color="Color.Error"
+                   Disabled="true">
+            Отменено
+        </MudButton>
+        }
+        else if(CalendarItem.IsAlreadyBooked)
         {
             <MudButton FullWidth="true"
                        Variant="Variant.Filled"
