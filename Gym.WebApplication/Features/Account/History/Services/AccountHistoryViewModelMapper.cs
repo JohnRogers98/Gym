@@ -1,8 +1,8 @@
 ﻿using Gym.WebApplication.Extensions;
-using Gym.WebApplication.Features.Account.ViewModels;
+using Gym.WebApplication.Features.Account.History.ViewModels;
 using Gym.WebDto.Responses.Account;
 
-namespace Gym.WebApplication.Features.Account.Services
+namespace Gym.WebApplication.Features.Account.History.Services
 {
     public class AccountHistoryViewModelMapper
     {

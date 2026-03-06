@@ -1,10 +1,10 @@
-﻿using Gym.WebApplication.Features.Account.ViewModels;
+﻿using Gym.WebApplication.Features.Account.History.ViewModels;
 using Gym.WebDto.Requests.Account;
 using Gym.WebDto.Responses;
 using Gym.WebDto.Responses.Account;
 using System.Net.Http.Json;
 
-namespace Gym.WebApplication.Features.Account.Services
+namespace Gym.WebApplication.Features.Account.History.Services
 {
     public interface IGetAllAccountHistoryItemsService
     {

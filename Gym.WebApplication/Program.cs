@@ -1,6 +1,7 @@
 using Gym.WebApplication;
 using Gym.WebApplication.Extensions;
-using Gym.WebApplication.Features.Account.Services;
+using Gym.WebApplication.Features.Account.Details.Servises;
+using Gym.WebApplication.Features.Account.History.Services;
 using Gym.WebApplication.Features.Admin.CalendarEvents.Creation.Services;
 using Gym.WebApplication.Features.Admin.CalendarEvents.States;
 using Gym.WebApplication.Features.Admin.CalendarEvents.TableView.Services;
@@ -90,6 +91,7 @@ builder.Services.AddScoped<IGetTrainingByIdService, GetTrainingByIdService>();
 builder.Services.Decorate<IGetTrainingByIdService, RetryableGetTrainingByIdService>();
 
 builder.Services.AddScoped<IGetAllClientsService, GetAllClientsService>();
+builder.Services.AddScoped<IGetClientDetailsService, GetClientDetailsService>();
 builder.Services.AddScoped<IChargeClientService, ChargeClientService>();
 
 await builder.Build().RunAsync();

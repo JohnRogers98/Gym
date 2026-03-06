@@ -1,4 +1,4 @@
-﻿namespace Gym.WebApplication.Features.Account.ViewModels
+﻿namespace Gym.WebApplication.Features.Account.History.ViewModels
 {
     public record TrainingCompletedViewModel : AccountHistoryItemViewModel
     {

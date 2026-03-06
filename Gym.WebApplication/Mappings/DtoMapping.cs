@@ -55,6 +55,7 @@ namespace Gym.WebApplication.Mappings
 
             #region Client
             base.CreateMap<ClientDto, ClientViewModel>();
+            base.CreateMap<GetClientResponse, ClientViewModel>();
             base.CreateMap<ChargeAccountResponse, ChargeClientResult>();
             #endregion
         }
