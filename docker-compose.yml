@@ -9,11 +9,23 @@ services:
       - "27017:27017"
     volumes:
       - mongodb_data:/data/db
-#    environment:
-#      MONGO_INITDB_ROOT_USERNAME: admin
-#      MONGO_INITDB_ROOT_PASSWORD: supersecret
+      - ./mongo-init.js:/mongo-init.js:ro
+    command: [--replSet, rs0, --bind_ip_all]
     networks:
       - gym-net
+  mongodb-init:
+    image: mongo:7-jammy
+    depends_on:
+      - mongodb
+    networks:
+      - gym-net
+    volumes:
+      - ./mongo-init.js:/mongo-init.js:ro
+    command: >
+      bash -c "
+        sleep 10 &&
+        mongosh mongodb://gym-mongodb:27017/admin /mongo-init.js
+      "
 
   backend:
     build:
@@ -33,7 +45,7 @@ services:
     #volumes:
     #- ~/.aspnet/https:/https:ro
     depends_on:
-      - mongodb
+      - mongodb-init
     networks:
       - gym-net
 
