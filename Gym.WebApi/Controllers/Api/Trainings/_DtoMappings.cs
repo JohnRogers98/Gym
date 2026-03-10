@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
-using Gym.Application.Services.TrainingApi;
+using Gym.Abstractions.Query.Trainings;
 using Gym.Application.Services.TrainingApi.CreateTraining;
-using Gym.WebDto.Dto;
 using Gym.WebDto.Requests.Training;
 using Gym.WebDto.Responses.Training;
 
@@ -12,10 +11,10 @@ namespace Gym.WebApi.Controllers.Api.Trainings
         public _DtoMappings()
         {
             CreateMap<CreateTrainingRequest, CreateTraining>();
-            CreateMap<TrainingDetails, CreateTrainingResponse>();
-            CreateMap<TrainingDetails, GetTrainingResponse>();
-            CreateMap<TrainingDetails, TrainingDto>();
-            CreateMap<TrainingDto, TrainingDetails>();
+            CreateMap<CreateTrainingResult, CreateTrainingResponse>();
+
+            CreateMap<TrainingProjection, GetTrainingResponse>();
+            CreateMap<TrainingProjection, TrainingDto>();
         }
     }
 }

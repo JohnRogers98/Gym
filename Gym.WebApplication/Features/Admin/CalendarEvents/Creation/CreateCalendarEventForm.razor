@@ -1,0 +1,91 @@
+﻿@using Gym.WebApplication.Features.Admin.CalendarEvents.Creation.Models.Forms
+@using Gym.WebApplication.Features.Admin.CalendarEvents.Creation.Models.Results
+@using Gym.WebApplication.Features.Admin.CalendarEvents.Creation.Services
+@using Gym.WebApplication.Features.Admin.CalendarEvents.States
+@using Gym.WebApplication.Features.Admin.Shared.Services
+
+@inject ICreateCalendarEventService CreateCalendarEventService
+@inject ICalendarEventCreationState CalendarEventCreationState
+@inject IGetAllTrainingsService GetAllTrainingsService
+@inject IGetAllInstructorsService GetAllInstructorsService
+
+<EditForm Model="@_formModel" OnValidSubmit="@OnValidSubmit">
+    <DataAnnotationsValidator />
+    <MudGrid>
+        <MudItem xs="12" sm="12">
+            <MudCard Elevation="0">
+                <MudCardContent>
+                    <MudDatePicker PickerVariant="PickerVariant.Dialog" HelperText="Choose day" AutoClose="true"    
+                                   MinDate="@DateTime.Today" @bind-Date="@_formModel.StartDateTime" For="@(() => _formModel.StartDateTime)"/>
+
+                    <MudTimePicker PickerVariant="PickerVariant.Dialog" HelperText="Choose time" AutoClose="true" 
+                                   @bind-Time="@_formModel.StartTimeSpan" For="@(() => _formModel.StartTimeSpan)" />
+                    
+                    <MudNumericField @bind-Value="@_formModel.DurationInMinutes" HelperText="Choose duration in minutes" Variant="Variant.Text"
+                                   Step="30" For="@(() => _formModel.DurationInMinutes)" />
+
+                    <MudSelect T="String" @bind-Value="@_formModel.TrainingId" Clearable="true" HelperText="Choose training" For="@(() => _formModel.TrainingId)">
+                        @foreach (var training in _trainings)
+                        {
+                            <MudSelectItem T="String" Value="@training.Id">
+                                @training.Name
+                            </MudSelectItem>    
+                        }
+                    </MudSelect>
+
+                    <MudNumericField @bind-Value="@_formModel.MaxClientCount" HelperText="Max client count" Variant="Variant.Text"
+                                     Step="1" Min="0" For="@(() => _formModel.MaxClientCount)" />
+
+                    <MudSelect MultiSelection="true" @bind-SelectedValues="@_formModel.Instructors" Clearable="true" HelperText="Choose instructors"
+                        MultiSelectionTextFunc="@(new Func<IReadOnlyList<String>, String>(GetMultiSelectionText))">
+                        @foreach (var instructor in _instructors)
+                        {
+                            <MudSelectItem T="String" Value="@instructor.Id">
+                                @instructor.FullName
+                            </MudSelectItem>
+                        }
+                    </MudSelect>
+
+                </MudCardContent>
+
+                <MudCardActions>
+                    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Create</MudButton>
+                </MudCardActions>
+            </MudCard>
+        </MudItem>
+    </MudGrid>
+</EditForm>
+
+@code {
+    private CreateCalendarEventFormModel _formModel = new CreateCalendarEventFormModel();
+
+    private IList<TrainingViewModel> _trainings = [];
+    private IList<InstructorViewModel> _instructors = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        _trainings = [.. await GetAllTrainingsService.ExecuteAsync()];
+        _instructors = [.. await GetAllInstructorsService.ExecuteAsync()];
+    }
+
+    private String GetMultiSelectionText(IReadOnlyList<String> selectedValues)
+    {
+        return String.Join(
+            ", ",
+           _instructors.Where(anInstructor => selectedValues.Contains(anInstructor.Id)).Select(anInstructor => anInstructor.FullName)
+        );
+    }
+
+    private async void OnValidSubmit(EditContext context)
+    {
+        CreateCalendarEventResult createCalendarEventResult = await CreateCalendarEventService.ExecuteAsync(_formModel);
+        CalendarEventCreationState.Notify(createCalendarEventResult);
+        this.ClearForm();
+    }
+
+    private void ClearForm()
+    {
+        _formModel = new CreateCalendarEventFormModel();
+        base.StateHasChanged();
+    }
+}

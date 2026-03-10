@@ -10,7 +10,8 @@ namespace Gym.WebApplication.Features.Login.Services
     {
         event Action<ClaimsPrincipal>? UserChanged;
         ClaimsPrincipal CurrentUser { get; set; }
-        Task Authenticate(String initData);
+        Task AuthenticateAsync(String initData);
+        Task MockAuthenticateAdminAsync();
     }
 
     public class WebAppAuthService : IWebAppAuthService
@@ -48,7 +49,7 @@ namespace Gym.WebApplication.Features.Login.Services
             });
         }
 
-        public async Task Authenticate(String initData)
+        public async Task AuthenticateAsync(String initData)
         {
             var response = await _httpClient.PostAsJsonAsync("api/users/actions/web-app-auth", new WebAppAuthRequest { InitData = initData });
 
@@ -58,12 +59,25 @@ namespace Gym.WebApplication.Features.Login.Services
             WebAppAuthResponse webAuthResponse = await response.Content.ReadFromJsonAsync<WebAppAuthResponse>() 
                 ?? throw new IOException($"{nameof(WebAppAuthService)} response has no body");
 
-            StoredAuthClaims storedAuthClaims = new() { Id = webAuthResponse.Id, Role = webAuthResponse.Role };
+            StoredAuthClaims storedAuthClaims = new() { UserId = webAuthResponse.UserId, Role = webAuthResponse.Role };
 
             await _localStorage.SetItemAsync("auth-claims", storedAuthClaims);
 
             CurrentUser = storedAuthClaims.ToClaimsPrincipal();
         }
 
+        public async Task MockAuthenticateAdminAsync()
+        {
+            var response = await _httpClient.PostAsJsonAsync("api/users/actions/admin-auth-mock", new Object());
+
+            if (!response.IsSuccessStatusCode)
+                throw new IOException($"{nameof(WebAppAuthService)} returned {response.StatusCode}");
+
+            StoredAuthClaims storedAuthClaims = new() { UserId = "Undefined", Role = "Admin" };
+
+            await _localStorage.SetItemAsync("auth-claims", storedAuthClaims);
+
+            CurrentUser = storedAuthClaims.ToClaimsPrincipal();
+        }
     }
 }

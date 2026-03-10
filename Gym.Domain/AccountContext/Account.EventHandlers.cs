@@ -11,7 +11,7 @@ namespace Gym.Domain.AccountContext
             AvailableTrainingsCount--;
         }
 
-        public void ApplyEvent(TrainingBookingCancelledDomainEvent @event)
+        public void ApplyEvent(TrainingCancelledDomainEvent @event)
         {
             Booking booking = this.FindBookingByCalendarEvent(@event.CalendarEventId)!;
             booking.Cancel();

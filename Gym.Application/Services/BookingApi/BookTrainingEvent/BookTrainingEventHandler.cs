@@ -1,51 +1,39 @@
-﻿using Gym.Application.Services.DomainEventPublisher;
-using Gym.Domain._Exceptions;
+﻿using Gym.Domain._Exceptions;
 using Gym.Domain._Shared;
 using Gym.Domain._Shared.Services;
 using Gym.Domain.AccountContext;
 using Gym.Domain.CalendarEventContext;
 using Gym.Domain.ClientContext;
+using Gym.Domain.UserContext;
 using MediatR;
 
 namespace Gym.Application.Services.BookingApi.BookTrainingEvent
 {
     internal class BookTrainingEventHandler(
         ITrainingBookingService _trainingBookingService,
-        ICalendarEventQueryService _calendarEventQueryService,
         ICalendarEventRepository _calendarEventRepository,
-        IClientQueryService _clientQueryService,
-        IAccountRepository _accountRepository,
-        IDomainEventPublisher _domainEventPublisher) : IRequestHandler<BookTrainingEvent, BookingDetails>
+        IClientByUserIdFinder _clientByUserIdFinder,
+        IAccountRepository _accountRepository) : IRequestHandler<BookTrainingEvent, BookTrainingEventResult>
     {
-        public async Task<BookingDetails> Handle(BookTrainingEvent request, CancellationToken cancellationToken)
+        public async Task<BookTrainingEventResult> Handle(BookTrainingEvent request, CancellationToken cancellationToken)
         {
-            if (!await _clientQueryService.ExistsByUserIdAsync(UserId.From(request.UserId), cancellationToken) 
-                || !await _calendarEventQueryService.ExistsAsync(CalendarEventId.From(request.CalendarEventId), cancellationToken))
-            {
-                throw new ArgumentException("Argument ids not exist.");
-            }
+            Client? client = await _clientByUserIdFinder.GetByUserIdAsync(UserId.From(request.UserId), cancellationToken)
+                ?? throw new ArgumentException($"{nameof(User)} - {request.UserId} is not client");
+
+            CalendarEvent? calendarEvent = await _calendarEventRepository.GetByIdAsync(CalendarEventId.From(request.CalendarEventId), cancellationToken)
+                ?? throw new ArgumentException($"{nameof(CalendarEvent)} - {request.CalendarEventId} is not exist");
+
+            AccountId accountId = AccountId.From(UserId.From(request.UserId));
+            Account account = await _accountRepository.GetByIdAsync(accountId, cancellationToken);
 
             try
             {
-                Client? client = await _clientQueryService.GetByUserIdAsync(UserId.From(request.UserId), cancellationToken);
-                if (client == null)
-                {
-                    throw new ArgumentException($"User - {request.UserId} is not client");
-                }
-
-                AccountId accountId = AccountId.From(UserId.From(request.UserId));
-                Account account = await _accountRepository.GetByIdAsync(accountId, cancellationToken);
-                CalendarEvent? calendarEvent = await _calendarEventQueryService.GetByIdAsync(CalendarEventId.From(request.CalendarEventId), cancellationToken);
-
-                Booking booking = _trainingBookingService.MakeEventBooking(account, calendarEvent!);
+                Booking booking = _trainingBookingService.MakeEventBooking(account, calendarEvent);
 
                 await _calendarEventRepository.SaveAsync(calendarEvent!, cancellationToken);
                 await _accountRepository.SaveAsync(account, cancellationToken);
 
-                await _domainEventPublisher.PublishAsync(account!.DomainEvents, cancellationToken);
-                await _domainEventPublisher.PublishAsync(calendarEvent!.DomainEvents, cancellationToken);
-
-                return booking.ToDetails();
+                return new BookTrainingEventResult(booking.Id.Value);
             }
             catch (DomainException domainException)
             {

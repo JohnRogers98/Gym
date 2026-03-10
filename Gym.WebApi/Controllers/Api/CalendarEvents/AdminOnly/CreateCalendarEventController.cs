@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Gym.Application.Services.CalendarEventApi;
 using Gym.Application.Services.CalendarEventApi.CreateCalendarEvent;
 using Gym.WebApi.Extensions;
 using Gym.WebDto.Requests.CalendarEvent;
@@ -18,14 +17,14 @@ namespace Gym.WebApi.Controllers.Api.CalendarEvents.AdminOnly
         [HttpPost]
         public async Task<ActionResult<CreateCalendarEventResponse>> CreateCalendarEvent(CreateCalendarEventRequest request)
         {
-            CalendarEventDetails calendarEventDetails = await _mediator.Send(_mapper.Map<CreateCalendarEvent>(request));
+            CreateCalendarEventResult createCalendarEventResult = await _mediator.Send(_mapper.Map<CreateCalendarEvent>(request));
 
-            return base.CreatedAtAction(
-                nameof(GetCalendarEventController.GetCalendarEvent),
-                "GetCalendarEvent",
-                new { calendarEventDetails.Id },
-                _mapper.Map<CreateCalendarEventResponse>(calendarEventDetails));
-            
+            return AcceptedAtAction(  
+                actionName: nameof(GetCalendarEventController.GetCalendarEvent),
+                controllerName: "GetCalendarEvent",
+                routeValues: new { id = createCalendarEventResult.CalendarEventId },
+                value: _mapper.Map<CreateCalendarEventResponse>(createCalendarEventResult)
+            );
         }
     }
 }

@@ -10,11 +10,15 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.1" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="10.0.1" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.1" />
     <PackageReference Include="MongoDB.Driver" Version="3.5.2" />
+    <PackageReference Include="Scrutor" Version="7.0.0" />
     <PackageReference Include="Telegram.Bot" Version="22.7.6" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Gym.Abstractions.MessageBus\Gym.MessageBus.csproj" />
+    <ProjectReference Include="..\Gym.Abstractions.Query\Gym.Abstractions.Query.csproj" />
     <ProjectReference Include="..\Gym.Domain\Gym.Domain.csproj" />
   </ItemGroup>
 

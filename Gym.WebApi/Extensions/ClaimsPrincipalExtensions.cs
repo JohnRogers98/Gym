@@ -13,5 +13,15 @@ namespace Gym.WebApi.Extensions
 
             return userId;
         }
+
+        public static String GetRequiredClientId(this ClaimsPrincipal principal)
+        {
+            var clientId = principal.FindFirst("ClientId")?.Value;
+
+            if (string.IsNullOrEmpty(clientId))
+                throw new UnauthorizedAccessException("ClientId not found in claims");
+
+            return clientId;
+        }
     }
 }

@@ -1,9 +1,9 @@
 ﻿using AutoMapper;
-using Gym.Application.Services.CalendarEventApi;
+using Gym.Abstractions.Query.CalendarEvents;
 using Gym.Application.Services.CalendarEventApi.GetAllCalendarEvents;
 using Gym.WebApi.Extensions;
-using Gym.WebDto.Dto;
 using Gym.WebDto.Responses;
+using Gym.WebDto.Responses.CalendarEvent;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -16,13 +16,16 @@ namespace Gym.WebApi.Controllers.Api.CalendarEvents.ClientOnly
     public class ListCalendarEventsController(IMediator _mediator, IMapper _mapper) : ControllerBase
     {
         [HttpGet]
-        public async Task<ListResponse<ClientCalendarEventDto>> ListClientCalendarEvents()
+        public async Task<ActionResult<ListResponse<ClientCalendarEventDto>>> ListClientCalendarEvents()
         {
-            IEnumerable<CalendarEventDetails> calendarEventDetails = await _mediator.Send(new GetAllCalendarEvents());
-            return new (_mapper.Map<IEnumerable<ClientCalendarEventDto>>(calendarEventDetails, opts =>
+            IEnumerable<CalendarEventProjection> calendarEventProjections = await _mediator.Send(new GetAllCalendarEvents());
+            
+            var response = _mapper.Map<IEnumerable<ClientCalendarEventDto>>(calendarEventProjections, opts =>
             {
                 opts.Items["CurrentUserId"] = User.GetRequiredUserId();
-            }));
+            });
+
+            return base.Ok(new ListResponse<ClientCalendarEventDto>(response));
         }
     }
 }

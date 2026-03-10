@@ -1,0 +1,38 @@
+﻿@using Gym.WebApplication.Features.Admin.Shared.Services
+@using Gym.WebApplication.Features.Admin.Shared.ValueObjects
+@using Gym.WebApplication.Features.Admin.Trainings.Creation.Models.Results
+@using Gym.WebApplication.Features.Admin.Trainings.States
+
+@inject ITrainingCreationSharedState TrainingCreationSharedState
+@inject IGetAllTrainingsService GetAllTrainingsService
+@inject IGetTrainingByIdService GetTrainingByIdService
+
+<MudDataGrid Items="@_trainings" Striped="true" Elevation="0">
+    <Columns>
+        <PropertyColumn Property="x => x.Id" Title="Id" />
+        <PropertyColumn Property="x => x.Name" Title="Name" />
+        <PropertyColumn Property="x => x.Description" Title="Description" />
+    </Columns>
+</MudDataGrid>
+
+@code {
+    private IList<TrainingViewModel> _trainings = new List<TrainingViewModel>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        TrainingCreationSharedState.TrainingCreated += AddCreatedTraining;
+        _trainings = [.. await GetAllTrainingsService.ExecuteAsync()];
+    }
+
+    private async void AddCreatedTraining(CreateTrainingResult createTrainingResult)
+    {
+        TrainingId trainingId = new TrainingId(createTrainingResult.TrainingId);
+        TrainingViewModel? trainingViewModel = await GetTrainingByIdService.ExecuteAsync(trainingId);
+
+        if (trainingViewModel is null)
+            return;
+
+        _trainings.Add(trainingViewModel);
+        base.StateHasChanged();
+    }
+}

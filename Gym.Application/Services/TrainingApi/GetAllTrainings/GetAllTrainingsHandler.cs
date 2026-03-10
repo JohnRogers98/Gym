@@ -1,14 +1,13 @@
-﻿using Gym.Domain.TrainingContext;
+﻿using Gym.Abstractions.Query.Trainings;
 using MediatR;
 
 namespace Gym.Application.Services.TrainingApi.GetAllTrainings
 {
-    internal class GetAllTrainingsHandler(ITrainingQueryService _trainingQueryService) : IRequestHandler<GetAllTrainings, IEnumerable<TrainingDetails>>
+    internal class GetAllTrainingsHandler(ITrainingProjectionQueryService _trainingProjectionQueryService) : IRequestHandler<GetAllTrainings, IEnumerable<TrainingProjection>>
     {
-        public async Task<IEnumerable<TrainingDetails>> Handle(GetAllTrainings request, CancellationToken cancellationToken)
+        public async Task<IEnumerable<TrainingProjection>> Handle(GetAllTrainings request, CancellationToken cancellationToken)
         {
-            var trainings = await _trainingQueryService.GetAllAsync(cancellationToken);
-            return trainings.Select(aTraining => aTraining.ToDetails());
+            return await _trainingProjectionQueryService.GetAllAsync(cancellationToken);
         }
     }
 }

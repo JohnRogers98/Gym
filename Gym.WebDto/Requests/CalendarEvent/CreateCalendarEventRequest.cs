@@ -1,13 +1,11 @@
-﻿using Gym.WebDto.Dto;
-
-namespace Gym.WebDto.Requests.CalendarEvent
+﻿namespace Gym.WebDto.Requests.CalendarEvent
 {
     public record CreateCalendarEventRequest
     {
-        public DateTime Start { get; init; }
+        public required DateTime Start { get; init; }
         public DateTime? End { get; init; }
-        public required TrainingDto Training { get; init; }
+        public required String TrainingId { get; init; }
         public Int32? MaxClientCount { get; init; }
-        public IEnumerable<InstructorDto>? Instructors { get; init; }
+        public IEnumerable<String>? Instructors { get; init; }
     }
 }

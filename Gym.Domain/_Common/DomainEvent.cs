@@ -4,18 +4,18 @@
     {
         public DomainEventId Id { get; } 
 
-        public DateTime OccuredOn { get; protected set; }
+        public DateTime OccurredOn { get; protected set; }
 
         protected DomainEvent()
         {
             Id = DomainEventId.Generate();
-            OccuredOn = DateTime.UtcNow;
+            OccurredOn = DateTime.UtcNow;
         }
 
-        protected DomainEvent(DomainEventId id, DateTime occuredOn)
+        protected DomainEvent(DomainEventId id, DateTime occurredOn)
         {
             Id = id;
-            OccuredOn = occuredOn;
+            OccurredOn = occurredOn;
         }
     }
 }

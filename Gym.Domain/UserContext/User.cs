@@ -1,5 +1,6 @@
 ﻿using Gym.Domain._Common;
 using Gym.Domain._Shared;
+using Gym.Domain.UserContext.Events;
 
 namespace Gym.Domain.UserContext
 {
@@ -7,23 +8,30 @@ namespace Gym.Domain.UserContext
     {
         public UserId Id { get; }
         public TelegramId? TelegramId { get; private set; }
+        public TelegramUsername? TelegramUsername { get; private set; }
+        public FirstName? FirstName { get; private set; }
+        public LastName? LastName { get; private set; }
         public UserRole Role { get; private set; }
 
-        private User(UserId id, UserRole role, TelegramId? telegramId)
+        private User(UserId id, UserRole role, TelegramId? telegramId, TelegramUsername? telegramUsername, FirstName? firstName, LastName? lastName)
         {
             Id = id;
             TelegramId = telegramId;
             Role = role;
+            TelegramUsername = telegramUsername;
+            FirstName = firstName;
+            LastName = lastName;
         }
 
-        public static User Create(UserId id, UserRole role, TelegramId? telegramId)
+        public static User Create(UserId id, UserRole role, TelegramId? telegramId, TelegramUsername? telegramUsername, FirstName? firstName, LastName? lastName)
         {
-            User user = new(id, role, telegramId);
+            User user = new(id, role, telegramId, telegramUsername, firstName, lastName);
+            user.AddDomainEvent(UserCreatedDomainEvent.Create(id));
             return user;
         }
 
-        public static User Restore(UserId id, UserRole role, TelegramId? telegramId)
-            => new(id, role, telegramId);
+        public static User Restore(UserId id, UserRole role, TelegramId? telegramId, TelegramUsername? telegramUsername, FirstName? firstName, LastName? lastName)
+            => new(id, role, telegramId, telegramUsername, firstName, lastName);
 
         public override String ToString()
             => $"{nameof(Id)}: {Id} \t {nameof(Role)}: {Role} \t {nameof(TelegramId)}: {TelegramId?.Value.ToString() ?? "_"}";

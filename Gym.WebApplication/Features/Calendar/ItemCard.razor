@@ -1,6 +1,7 @@
 ﻿@using System.Globalization
+@using Gym.WebDto.Responses.Instructor
 
-<MudCard Outlined="true">
+<MudCard Outlined="false" Elevation="3">
 
     <MudCardHeader>
         <CardHeaderAvatar>
@@ -21,7 +22,7 @@
                 </MudText>
                 <MudText Color="Color.Default" Typo="Typo.body2">
                     <MudIcon Icon="@Icons.Material.Filled.AccessTime" Color="Color.Primary" Size="Size.Small" />
-                    @CalendarItem.Start.ToString("HH:mm") - @CalendarItem.End?.ToString("HH:mm")
+                    @CalendarItem.LocalStart.ToString("HH:mm") - @CalendarItem.LocalEnd?.ToString("HH:mm")
                 </MudText>
             </MudStack>
         </CardHeaderContent>
@@ -53,7 +54,16 @@
     </MudCardContent>
 
     <MudCardActions>
-        @if(CalendarItem.IsAlreadyBooked)
+        @if (CalendarItem.Status == "Cancelled")
+        {
+        <MudButton FullWidth="true"
+                   Variant="Variant.Filled"
+                   Color="Color.Error"
+                   Disabled="true">
+            Отменено
+        </MudButton>
+        }
+        else if(CalendarItem.IsAlreadyBooked)
         {
             <MudButton FullWidth="true"
                        Variant="Variant.Filled"
@@ -86,9 +96,9 @@
     
 
 @code {
-    [Parameter, EditorRequired] public CalendarItemViewModel CalendarItem { get; set; } = default!;
+    [Parameter, EditorRequired] public ClientCalendarItemViewModel CalendarItem { get; set; } = default!;
     
-    [Parameter] public EventCallback<CalendarItemViewModel> OnSelected { get; set; }
+    [Parameter] public EventCallback<ClientCalendarItemViewModel> OnSelected { get; set; }
 
     private String GetMonthText() => CalendarItem.Start.ToString("MMM");
 }

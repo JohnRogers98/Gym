@@ -3,9 +3,10 @@
 @using System.Collections.ObjectModel
 @using System.Collections.Specialized
 
-@attribute [Authorize]
+@attribute [Authorize(Roles = "Client")]
 
-@inject ICalendarService CalendarService
+@inject IGetAllCalendarItemsService GetAllCalendarItemsService
+@inject IBookCalendarItemService BookCalendarItemService
 @inject AuthenticationStateProvider AuthenticationStateProvider
 
 @if (_calendarItems is null)
@@ -21,16 +22,16 @@ else
 
 
 @code {
-    private List<CalendarItemViewModel> _calendarItems = default!;
+    private List<ClientCalendarItemViewModel> _calendarItems = default!;
 
-    private List<CalendarItemViewModel> _selectedItems = default!;
+    private List<ClientCalendarItemViewModel> _selectedItems = default!;
 
     private DateOnly? _pickedDate = default; 
 
     protected override async Task OnInitializedAsync()
     {
-        var loadedCalendarEvents = await CalendarService.GetAllCalendarItemsAsync();
-        _calendarItems = new List<CalendarItemViewModel>(loadedCalendarEvents);
+        var loadedCalendarEvents = await GetAllCalendarItemsService.ExecuteAsync();
+        _calendarItems = new List<ClientCalendarItemViewModel>(loadedCalendarEvents);
 
         _pickedDate = DateTime.Now.ToDateOnly();
         this.RefreshSelectedItems();
@@ -43,9 +44,9 @@ else
         base.StateHasChanged();
     }
 
-    private async void BookEvent(CalendarItemViewModel selectdCalendarEvent)
+    private async void BookEvent(ClientCalendarItemViewModel selectdCalendarEvent)
     {
-        Boolean bookingSuccessful = await CalendarService.BookCalendarItem(selectdCalendarEvent);
+        Boolean bookingSuccessful = await BookCalendarItemService.ExecuteAsync(selectdCalendarEvent);
         if (bookingSuccessful)
         {
             var indexOfEvent = _calendarItems.IndexOf(selectdCalendarEvent);

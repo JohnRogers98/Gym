@@ -1,4 +1,6 @@
-﻿using Gym.WebDto.Dto;
+﻿using Gym.WebDto.Responses.Bookings;
+using Gym.WebDto.Responses.Instructor;
+using Gym.WebDto.Responses.Training;
 
 namespace Gym.WebDto.Responses.CalendarEvent
 {
@@ -7,9 +9,10 @@ namespace Gym.WebDto.Responses.CalendarEvent
         public required String Id { get; init; }
         public DateTime Start { get; init; }
         public DateTime? End { get; init; }
-        public required TrainingDto Training { get; init; }
+        public required String Status { get; init; }
+        public required TrainingInfo Training { get; init; }
         public Int32? MaxClientCount { get; init; }
-        public IEnumerable<InstructorDto>? Instructors { get; init; }
-        public IEnumerable<String>? BookingUsers { get; init; }
+        public IEnumerable<InstructorInfo>? Instructors { get; init; }
+        public IEnumerable<BookingUserInfo>? BookingUsers { get; init; }
     }
 }

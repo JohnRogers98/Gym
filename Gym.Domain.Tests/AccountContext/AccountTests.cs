@@ -30,7 +30,7 @@ namespace Gym.Domain.Tests.AccountContext
             sut.CancelBooking(_fakeDataFixture.CalendarEventId);
 
             Assert.Equal(1, sut.AvailableTrainingsCount);
-            Assert.NotEqual(default, sut.DomainEvents.OfType<TrainingBookingCancelledDomainEvent>().SingleOrDefault());
+            Assert.NotEqual(default, sut.DomainEvents.OfType<TrainingCancelledDomainEvent>().SingleOrDefault());
         }
 
         [Fact]

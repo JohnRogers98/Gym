@@ -1,4 +1,9 @@
-﻿using Microsoft.AspNetCore.Components.WebAssembly.Http;
+﻿using Gym.WebApplication.Features.Admin.Shared.Services;
+using Gym.WebApplication.Providers;
+using Gym.WebApplication.ViewModels;
+using Microsoft.AspNetCore.Components.WebAssembly.Http;
+using Polly;
+using Polly.Fallback;
 
 namespace Gym.WebApplication.Extensions
 {
@@ -21,6 +26,64 @@ namespace Gym.WebApplication.Extensions
                     BaseAddress = new Uri(configuration["WebApiBaseUrl"]!)
                 };
             });
+
+            return services;
+        }
+
+        public static IServiceCollection AddResiliencePipelines(this IServiceCollection services)
+        {
+            services.AddResiliencePipeline<String, InstructorViewModel?>(nameof(GetInstructorByIdService), builder =>
+            {
+                builder
+                    .AddFallback(new FallbackStrategyOptions<InstructorViewModel?>
+                    {
+                        FallbackAction = args => Outcome.FromResultAsValueTask((InstructorViewModel?)null)
+                    })
+                    .AddTimeout(TimeSpan.FromSeconds(5))
+                    .AddRetry(new()
+                    {
+                        MaxRetryAttempts = 3,
+                        ShouldHandle = new PredicateBuilder<InstructorViewModel?>()
+                            .Handle<HttpRequestException>()
+                            .HandleResult(response => response is null)
+                    });
+            });
+
+            services.AddResiliencePipeline<String, TrainingViewModel?>(nameof(GetTrainingByIdService), builder =>
+            {
+                builder
+                    .AddFallback(new FallbackStrategyOptions<TrainingViewModel?>
+                    {
+                        FallbackAction = args => Outcome.FromResultAsValueTask((TrainingViewModel?)null)
+                    })
+                    .AddTimeout(TimeSpan.FromSeconds(5))
+                    .AddRetry(new()
+                    {
+                        MaxRetryAttempts = 3,
+                        ShouldHandle = new PredicateBuilder<TrainingViewModel?>()
+                            .Handle<HttpRequestException>()
+                            .HandleResult(response => response is null)
+                    });
+            });
+
+            services.AddResiliencePipeline<String, AdminCalendarItemViewModel?>(nameof(GetAdminCalendarEventByIdService), builder =>
+            {
+                builder
+                    .AddFallback(new FallbackStrategyOptions<AdminCalendarItemViewModel?>
+                    {
+                        FallbackAction = args => Outcome.FromResultAsValueTask((AdminCalendarItemViewModel?)null)
+                    })
+                    .AddTimeout(TimeSpan.FromSeconds(5))
+                    .AddRetry(new()
+                    {
+                        MaxRetryAttempts = 3,
+                        ShouldHandle = new PredicateBuilder<AdminCalendarItemViewModel?>()
+                            .Handle<HttpRequestException>()
+                            .HandleResult(response => response is null)
+                    });
+            });
+
+            services.AddScoped<IPipelineProvider, PipelineProvider>();
 
             return services;
         }

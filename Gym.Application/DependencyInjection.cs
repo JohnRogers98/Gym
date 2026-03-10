@@ -1,5 +1,4 @@
 ﻿using Gym.Application.Aspects;
-using Gym.Application.Services.DomainEventPublisher;
 using Gym.Domain._Shared.Services;
 using MediatR;
 using Microsoft.Extensions.Configuration;
@@ -14,20 +13,14 @@ namespace Gym.Application
     {
         public static IServiceCollection AddApplication(this IServiceCollection services, IConfiguration configuration) 
         {
-            services.AddMediatR(cfg =>
-            {
-                cfg.LicenseKey = configuration["MEDIATR_LICENSE_KEY"];
-                cfg.Lifetime = ServiceLifetime.Scoped;
-                cfg.RegisterServicesFromAssembly(typeof(DependencyInjection).Assembly);
+            services.AddScoped(typeof(IPipelineBehavior<,>), typeof(LogAspect<,>));
+            services.AddScoped(typeof(IPipelineBehavior<,>), typeof(OperationLockAspect<,>));
+            services.AddScoped(typeof(IPipelineBehavior<,>), typeof(UnitOfWorkAspect<,>));
 
-                services.AddScoped(typeof(IPipelineBehavior<,>), typeof(LogAspect<,>));
-                services.AddScoped(typeof(IPipelineBehavior<,>), typeof(OperationLockAspect<,>));
-                services.AddScoped(typeof(IPipelineBehavior<,>), typeof(UnitOfWorkAspect<,>));
-            });
-
-            services.AddScoped<IDomainEventPublisher, DomainEventPublisher>();
             services.AddScoped<ITrainingBookingService, TrainingBookingService>();
             services.AddScoped<IChargeAccountService, ChargeAccountService>();
+            services.AddScoped<ICompleteCalendarEventService, CompleteCalendarEventService>();
+            services.AddScoped<ICancelCalendarEventService, CancelCalendarEventService>();
 
             return services;
         }

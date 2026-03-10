@@ -1,4 +1,4 @@
-﻿using Gym.Application.Services.UserApi;
+﻿using Gym.Application.Services.UserApi.TelegramAuthentication;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
@@ -8,20 +8,21 @@ namespace Gym.WebApi.Controllers.Api.Users.Jwt
 {
     public interface IAccessTokenGenerator
     {
-        String Generate(UserDetails userDetails);
+        String Generate(AuthenticatedUserDetails authenticatedUserDetails);
     }
 
     public class AccessTokenGenerator(IConfiguration _configuration) : IAccessTokenGenerator
     {
         private SymmetricSecurityKey Key => field ??= new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT_SECRET"]!));
 
-        public String Generate(UserDetails userDetails)
+        public String Generate(AuthenticatedUserDetails authenticatedUserDetails)
         {
             var claimsIdentity = new ClaimsIdentity([
-                new Claim(ClaimTypes.NameIdentifier, userDetails.Id),
-                new Claim(JwtRegisteredClaimNames.Sub, userDetails.Id),
-                new Claim(ClaimTypes.Role, userDetails.Role),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+                new Claim(ClaimTypes.NameIdentifier, authenticatedUserDetails.UserId),
+                new Claim(JwtRegisteredClaimNames.Sub, authenticatedUserDetails.UserId),
+                new Claim(ClaimTypes.Role, authenticatedUserDetails.Role),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                new Claim("ClientId", authenticatedUserDetails.ClientId)
                 ]);
 
             var tokenDescriptor = new SecurityTokenDescriptor

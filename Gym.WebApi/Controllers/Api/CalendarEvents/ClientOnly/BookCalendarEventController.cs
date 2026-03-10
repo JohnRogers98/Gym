@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Gym.Application.Services.BookingApi;
 using Gym.Application.Services.BookingApi.BookTrainingEvent;
 using Gym.WebApi.Extensions;
 using Gym.WebDto.Requests.CalendarEvent;
@@ -20,10 +19,10 @@ namespace Gym.WebApi.Controllers.Api.CalendarEvents.ClientOnly
         {
             try
             {
-                BookingDetails bookingDetails = await _mediator.Send(
+                BookTrainingEventResult bookTrainingEventResult = await _mediator.Send(
                     new BookTrainingEvent(User.GetRequiredUserId(), request.CalendarEventId));
 
-                return base.Ok(_mapper.Map<BookTrainingEventResponse>(bookingDetails));
+                return base.Ok(_mapper.Map<BookTrainingEventResponse>(bookTrainingEventResult));
             }
             catch (Exception ex)
             {
@@ -34,7 +33,7 @@ namespace Gym.WebApi.Controllers.Api.CalendarEvents.ClientOnly
                     Detail = ex.Message,
                     Instance = HttpContext.Request.Path
                 };
-                problemDetails.Extensions["code"] = "BOOKING_CONFLICT";
+                problemDetails.Extensions["Code"] = "BOOKING_CONFLICT";
 
                 return Conflict(problemDetails);
             }

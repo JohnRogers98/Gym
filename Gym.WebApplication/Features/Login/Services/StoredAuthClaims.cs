@@ -4,7 +4,7 @@ namespace Gym.WebApplication.Features.Login.Services
 {
     public record StoredAuthClaims
     {
-        public required String Id { get; init; }
+        public required String UserId { get; init; }
         public required String Role { get; init; }
 
         public ClaimsPrincipal ToClaimsPrincipal()

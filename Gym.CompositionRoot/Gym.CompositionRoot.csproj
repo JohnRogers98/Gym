@@ -7,11 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+	<PackageReference Include="MediatR" Version="14.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.1" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.1" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Gym.Abstractions.MessageBus\Gym.MessageBus.csproj" />
     <ProjectReference Include="..\Gym.Application\Gym.Application.csproj" />
     <ProjectReference Include="..\Gym.Domain\Gym.Domain.csproj" />
     <ProjectReference Include="..\Gym.Infrastructure\Gym.Infrastructure.csproj" />

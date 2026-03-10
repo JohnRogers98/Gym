@@ -86,7 +86,7 @@ namespace Gym.Domain.AccountContext
             booking.Cancel();
             AvailableTrainingsCount++;
 
-            base.AddDomainEvent(TrainingBookingCancelledDomainEvent.Create(booking.Id, UserId, calendarEventId));
+            base.AddDomainEvent(TrainingCancelledDomainEvent.Create(booking.Id, UserId, calendarEventId));
         }
 
         internal void Rebook(CalendarEventId calendarEventId)

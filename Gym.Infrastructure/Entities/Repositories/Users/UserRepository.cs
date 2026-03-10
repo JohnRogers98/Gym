@@ -7,7 +7,7 @@ using MongoDB.Driver;
 
 namespace Gym.Infrastructure.Entities.Repositories.Users
 {
-    internal class UserRepository(IMongoCollection<UserEntity> _userCollection, MongoUnitOfWork _mongoUnitOfWork) : IUserRepository, IUserQueryService
+    internal class UserRepository(IMongoCollection<UserEntity> _userCollection, MongoUnitOfWork _mongoUnitOfWork) : IUserRepository, IUserByTelegramIdFinder
     {
         public UserId NextIdentity() => UserId.From(ObjectId.GenerateNewId().ToString());
 

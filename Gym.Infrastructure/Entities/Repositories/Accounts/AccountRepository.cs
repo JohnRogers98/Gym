@@ -1,12 +1,14 @@
 ﻿using Gym.Domain._Common;
 using Gym.Domain._Shared;
 using Gym.Domain.AccountContext;
-using Gym.Infrastructure.EventStores;
+using Gym.Infrastructure.Entities.EventStores;
+using Gym.Infrastructure.Entities.EventStores.Deserializers;
+using Gym.Infrastructure.Entities.EventStores.Serializers;
 using System.Text.RegularExpressions;
 
 namespace Gym.Infrastructure.Entities.Repositories.Accounts
 {
-    internal class AccountRepository(IEventStore _eventStore, AccountEventMapper _accountEventMapper) : IAccountRepository
+    internal class AccountRepository(IEventStore _eventStore, IEventSerializer _eventSerializer, IEventDeserializer _eventDeserializer) : IAccountRepository
     {
 
         private readonly Dictionary<Account, Int32> _identityVersionMap = new(ReferenceEqualityComparer.Instance);
@@ -15,19 +17,17 @@ namespace Gym.Infrastructure.Entities.Repositories.Accounts
         {
             IEnumerable<EventEntity> entities = await _eventStore.LoadAsync(new StreamId(accountId.Value), cancellationToken);
             
-            UserId userId = UserId.From(
-                Regex.Replace(accountId.Value, "^account_", ""));
-            
             List<DomainEvent> domainEvents = new ();
             foreach (var entity in entities)
             {
-                domainEvents.Add(_accountEventMapper.Deserialize(entity));
+                domainEvents.Add(_eventDeserializer.Deserialize(entity));
             }
 
+            UserId userId = UserId.From(Regex.Replace(accountId.Value, "^account_", ""));
             Account account = Account.Restore(accountId, userId, domainEvents);
 
             Int32 lastFetchedVersion = domainEvents.Any() ? entities.Max(x => x.Version) : 0;
-            this.UpsertLastKnownVersion(account, lastFetchedVersion);
+            this.UpsertLastFetchedVersion(account, lastFetchedVersion);
 
             return account;
         }
@@ -36,21 +36,24 @@ namespace Gym.Infrastructure.Entities.Repositories.Accounts
         {
             List<EventEntity> entities = new();
 
-            Int32 lastVersion = this.GetLastKnownVersion(account);
+            Int32 newVersion = this.GetLastFetchedVersion(account);
             foreach (var aDomainEvent in account.DomainEvents)
             {
-                EventEntity entity = this.CreateEventEntity(account.Id, aDomainEvent, ++lastVersion);
+                newVersion++;
+                EventEntity entity = this.CreateEventEntity(account.Id, aDomainEvent, newVersion);
                 entities.Add(entity);
             }
 
-            await _eventStore.SaveAsync(new StreamId(account.Id.Value), entities, cancellationToken);
+            await _eventStore.SaveVersionedAsync(new StreamId(account.Id.Value), entities, this.GetLastFetchedVersion(account), cancellationToken);
 
-            this.UpsertLastKnownVersion(account, lastVersion);
+            this.UpsertLastFetchedVersion(account, newVersion);
+
+            account.ClearDomainEvents();
         }
 
-        private Int32 GetLastKnownVersion(Account account) => _identityVersionMap.GetValueOrDefault(account);
+        private Int32 GetLastFetchedVersion(Account account) => _identityVersionMap.GetValueOrDefault(account);
 
-        private void UpsertLastKnownVersion(Account account, Int32 newVersion) => _identityVersionMap[account] = newVersion;
+        private void UpsertLastFetchedVersion(Account account, Int32 newVersion) => _identityVersionMap[account] = newVersion;
 
         private EventEntity CreateEventEntity(AccountId accountId, DomainEvent domainEvent, Int32 version)
         {
@@ -59,9 +62,10 @@ namespace Gym.Infrastructure.Entities.Repositories.Accounts
                 Id = domainEvent.Id.Value.ToString(),
                 StreamId = accountId.Value,
                 Version = version,
+                AggregateType = nameof(Account),
                 Operation = domainEvent.GetType().Name,
-                Data = _accountEventMapper.Serialize(domainEvent),
-                OccurredAt = domainEvent.OccuredOn
+                Data = _eventSerializer.Serialize(domainEvent),
+                OccurredAt = domainEvent.OccurredOn
             };
         }
     }

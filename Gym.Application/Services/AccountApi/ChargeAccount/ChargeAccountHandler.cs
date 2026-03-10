@@ -7,17 +7,14 @@ namespace Gym.Application.Services.AccountApi.ChargeAccount
 {
     internal class ChargeAccountHandler(
         IAccountRepository _accountRepository,
-        IClientQueryService _clientQueryService,
-        IChargeAccountService _chargeAccountService) : IRequestHandler<ChargeAccount, AccountDetails>
+        IClientRepository _clientRepository,
+        IChargeAccountService _chargeAccountService) : IRequestHandler<ChargeAccount, ChargeAccountResult>
     {
-        public async Task<AccountDetails> Handle(ChargeAccount request, CancellationToken cancellationToken)
+        public async Task<ChargeAccountResult> Handle(ChargeAccount request, CancellationToken cancellationToken)
         {
             ClientId clientId = ClientId.From(request.ClientId);
-            Client? client = await _clientQueryService.GetByIdAsync(clientId, cancellationToken);
-            if(client is null)
-            {
-                throw new ArgumentException($"Client id - {clientId} not exist");
-            }
+            Client? client = await _clientRepository.GetByIdAsync(clientId, cancellationToken)
+                ?? throw new ArgumentException($"Client id - {clientId} not exist"); ;
 
             AccountId accountId = AccountId.From(client.UserId);
             Account account = await _accountRepository.GetByIdAsync(accountId, cancellationToken);
@@ -26,7 +23,7 @@ namespace Gym.Application.Services.AccountApi.ChargeAccount
 
             await _accountRepository.SaveAsync(account, cancellationToken);
 
-            return account.ToDetails();
+            return new ChargeAccountResult(account.AvailableTrainingsCount);
         }
     }
 }

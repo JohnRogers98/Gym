@@ -2,9 +2,7 @@
 using Gym.Domain.CalendarEventContext;
 using Gym.Domain.InstructorContext;
 using Gym.Domain.TrainingContext;
-using Gym.Infrastructure.Entities.Repositories.Instructors;
-using Gym.Infrastructure.Entities.Repositories.Trainings;
-using MongoConsoleApp.Repositories.CalendarEvents;
+using Gym.Infrastructure.Entities.Repositories.CalendarEvents;
 
 namespace Gym.Infrastructure.Entities.Extensions.Mappings
 {
@@ -12,54 +10,29 @@ namespace Gym.Infrastructure.Entities.Extensions.Mappings
     {
         public static CalendarEvent ToDomain(this CalendarEventEntity entity)
         {
-            TrainingInfo trainingInfo = TrainingInfo.Create(TrainingId.From(entity.Training.Id.ToString()), entity.Training.Name, entity.Training.Description);
-
-            List<InstructorInfo> instructors = new();
-            if (entity.Instructors is not null)
-            {
-                foreach (var anInstructorEntity in entity.Instructors)
-                {
-                    instructors.Add(InstructorInfo.Create(InstructorId.From(anInstructorEntity.Id.ToString()), anInstructorEntity.FirstName, anInstructorEntity.LastName));
-                }
-            }
-
             return CalendarEvent.Restore(
                 CalendarEventId.From(entity.Id.ToString()),
                 entity.Start,
                 entity.End,
-                trainingInfo,
+                Enum.Parse<CalendarEventStatus>(entity.Status),
+                TrainingId.From(entity.TrainingId.ToString()),
                 entity.Bookings?.Select(x => UserId.From(x.ToString())) ?? new HashSet<UserId>(),
                 entity.MaxClientCount,
-                instructors);
+                entity.Instructors?.Select(instructorId => InstructorId.From(instructorId.ToString())));
         }
 
         public static CalendarEventEntity ToEntity(this CalendarEvent calendarEvent)
         {
-            TrainingEntity trainingEntity = new()
-            {
-                Id = calendarEvent.Training.Id.Value.ToObjectId(),
-                Name = calendarEvent.Training.Name,
-                Description = calendarEvent.Training.Description
-            };
-
-            List<InstructorEntity> instructorEntities = new();
-            if (calendarEvent.Instructors is not null)
-            {
-                foreach (var anInstructorInfo in calendarEvent.Instructors)
-                {
-                    instructorEntities.Add(new() { Id = anInstructorInfo.Id.Value.ToObjectId(), FirstName = anInstructorInfo.FirstName, LastName = anInstructorInfo.LastName });
-                }
-            }
-
-            return new()
+            return new CalendarEventEntity()
             {
                 Id = calendarEvent.Id.Value.ToObjectId(),
                 Start = calendarEvent.Start,
                 End = calendarEvent.End,
-                Training = trainingEntity,
+                Status = calendarEvent.Status.ToString(),
+                TrainingId = calendarEvent.TrainingId.Value.ToObjectId(),
                 Bookings = calendarEvent.Bookings.Select(anUserId => anUserId.Value.ToObjectId()),
                 MaxClientCount = calendarEvent.MaxClientCount,
-                Instructors = instructorEntities
+                Instructors = calendarEvent.Instructors?.Select(instructorId => instructorId.Value.ToObjectId())
             };
         }
     }

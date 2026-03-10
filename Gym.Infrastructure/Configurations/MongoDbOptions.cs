@@ -7,18 +7,32 @@
 
     public sealed record CollectionOptions(
         String Instructors,
+        String InstructorProjections,
         String Trainings,
+        String TrainingProjections,
         String CalendarEvents,
+        String CalendarEventProjections,
         String Users,
         String Clients,
-        String Events)
+        String ClientProjections,
+        String Events,
+        String EventProjections,
+        String Messages,
+        String OutboxChangeStreams)
     {
         public static CollectionOptions Default => new CollectionOptions(
             "instructors",
+            "instructor-projections",
             "trainings",
+            "training-projections",
             "calendar-events",
+            "calendar-event-projections",
             "users",
             "clients",
-            "events");
+            "client-projections",
+            "events",
+            "event-projections",
+            "messages",
+            "outbox-changes-streams");
     }
 }

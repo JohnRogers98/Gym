@@ -30,7 +30,7 @@ namespace Gym.Domain.AccountContext
 
         internal void Cancel()
         {
-            if (Status != BookingStatus.Upcoming)
+            if (Status is not BookingStatus.Upcoming)
             {
                 throw new DomainException(IncorrectBookingStatusStateError.Create(Id, Status));
             }
@@ -40,7 +40,7 @@ namespace Gym.Domain.AccountContext
 
         internal void Rebook()
         {
-            if (Status != BookingStatus.Cancelled)
+            if (Status is not BookingStatus.Cancelled)
             {
                 throw new DomainException(IncorrectBookingStatusStateError.Create(Id, Status));
             }
@@ -50,7 +50,7 @@ namespace Gym.Domain.AccountContext
 
         internal void MarkAsCompleted()
         {
-            if (Status != BookingStatus.Upcoming)
+            if (Status is not BookingStatus.Upcoming)
             {
                 throw new DomainException(IncorrectBookingStatusStateError.Create(Id, Status));
             }

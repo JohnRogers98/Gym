@@ -1,0 +1,49 @@
+﻿@using Gym.WebApplication.Features.Account.Details.Servises
+
+@inject IGetClientDetailsService GetClientDetailsService
+
+@if (_clientViewModel is null)
+{
+    <MudSkeleton />
+}
+else
+{
+    <MudContainer>
+
+        <MudCard Outlined="false" Elevation="3">
+
+            <MudCardHeader>
+                <CardHeaderAvatar>
+                    <div style="display: flex; flex-direction: column; align-items: center;">
+                        <MudAvatar Size="Size.Large" Color="Color.Primary" Class="mb-1">
+                            <MudIcon Icon="@Icons.Material.Outlined.Person" />
+                        </MudAvatar>
+                    </div>
+                </CardHeaderAvatar>
+
+                <CardHeaderContent>
+                    <MudStack Spacing="2">
+                        <MudText Typo="Typo.h6" Class="text-truncate">
+                            @_clientViewModel.FullName
+                        </MudText>
+                    </MudStack>
+                </CardHeaderContent>
+            </MudCardHeader>
+
+            <MudCardContent>
+                <MudNumericField Variant="Variant.Outlined" T="Int32" Value="@_clientViewModel.AvailableTrainingsCount" ReadOnly="true" HideSpinButtons="true" Label="Available trainings" />
+            </MudCardContent>
+        </MudCard>
+
+    </MudContainer>
+}
+
+
+@code {
+    private ClientViewModel _clientViewModel = default!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _clientViewModel = await GetClientDetailsService.HandleAsync();
+    }
+}

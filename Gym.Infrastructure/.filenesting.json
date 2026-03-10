@@ -1,0 +1,13 @@
+{
+  "version": "2.0",
+  "autoNest": true,
+  "rules": [
+    {
+      "name": "Partial Classes",
+      "pattern": "{fileNameWithoutExtension}.{fileExtension}",
+      "children": [
+        "{fileNameWithoutExtension}.*.{fileExtension}"
+      ]
+    }
+  ]
+}

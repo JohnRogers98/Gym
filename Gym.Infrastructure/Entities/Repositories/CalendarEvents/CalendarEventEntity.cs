@@ -1,8 +1,6 @@
-﻿using Gym.Infrastructure.Entities.Repositories.Instructors;
-using Gym.Infrastructure.Entities.Repositories.Trainings;
-using MongoDB.Bson;
+﻿using MongoDB.Bson;
 
-namespace MongoConsoleApp.Repositories.CalendarEvents
+namespace Gym.Infrastructure.Entities.Repositories.CalendarEvents
 {
     internal class CalendarEventEntity
     {
@@ -11,12 +9,14 @@ namespace MongoConsoleApp.Repositories.CalendarEvents
         public required DateTime Start {  get; set; }
         public DateTime? End { get; set; }
 
+        public required String Status {  get; set; }
+
         public IEnumerable<ObjectId>? Bookings { get; set; }
         
         public Int32? MaxClientCount { get; set; }
 
-        public required TrainingEntity Training { get; set; }
+        public required ObjectId TrainingId { get; set; }
 
-        public IEnumerable<InstructorEntity>? Instructors { get; set; }
+        public IEnumerable<ObjectId>? Instructors { get; set; }
     }
 }

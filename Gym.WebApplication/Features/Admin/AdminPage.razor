@@ -1,0 +1,22 @@
+﻿@page "/admin"
+@using Gym.WebApplication.Features.Admin.CalendarEvents
+@using Gym.WebApplication.Features.Admin.Clients
+@using Gym.WebApplication.Features.Admin.Instructors
+@using Gym.WebApplication.Features.Admin.Trainings
+
+@attribute [Authorize(Roles = "Admin")]
+
+<MudContainer >
+
+    <MudExpansionPanels MultiExpansion="true" Elevation="5">
+        <InstructorPanels></InstructorPanels>
+        <TrainingPanels></TrainingPanels>
+        <CalendarEventPanels></CalendarEventPanels>
+        <ClientPanels></ClientPanels>
+    </MudExpansionPanels>
+
+</MudContainer>
+
+@code {
+
+}

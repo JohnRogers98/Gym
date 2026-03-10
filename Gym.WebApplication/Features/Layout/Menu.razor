@@ -1,25 +1,59 @@
 ﻿
-<MudAppBar Color="Color.Primary" Fixed="false">
-    <MudMenu Dense
-             Variant="Variant.Text"
-             Size="Size.Medium"
-             Color="Color.Inherit"
-             Icon="@Icons.Material.TwoTone.MoreVert">
+<MudAppBar Color="Color.Primary" Fixed="true">
 
-        <MudMenuItem Href="/"
-                     Icon="@Icons.Material.Filled.Home"
-                     IconColor="Color.Primary"
-                     Label="Home" />
+    <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => ToggleDrawer())" />
 
-        <MudMenuItem Href="/calendar"
-                     Icon="@Icons.Material.Filled.DateRange"
-                     IconColor="Color.Primary"
-                     Label="Calendar" />
-    </MudMenu>
+    <MudDrawer @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2">
+        <MudNavMenu>
+            <MudMenuItem Href="/"
+                         Icon="@Icons.Material.Filled.Home"
+                         IconColor="Color.Primary"
+                         Label="Home"
+                         OnClick="@ToggleDrawer"/>
+
+
+            <AuthorizeView Roles="Client">
+
+                <MudMenuItem Href="/calendar"
+                             Icon="@Icons.Material.Filled.DateRange"
+                             IconColor="Color.Primary"
+                             Label="Calendar"
+                             OnClick="@ToggleDrawer" />
+
+                <MudMenuItem Href="/account"
+                             Icon="@Icons.Material.Filled.AccountBalanceWallet"
+                             IconColor="Color.Primary"
+                             Label="Account"
+                             OnClick="@ToggleDrawer" />
+
+            </AuthorizeView>
+          
+            <AuthorizeView Roles="Admin">
+
+                <MudMenuItem Href="/admin"
+                             Icon="@Icons.Material.Filled.Edit"
+                             IconColor="Color.Primary"
+                             Label="Administration"
+                             OnClick="@ToggleDrawer" />
+
+            </AuthorizeView>
+           
+        </MudNavMenu>
+      
+    </MudDrawer>
+  
+
+    <MudSpacer></MudSpacer>
 
     <MockedWebAppLogin></MockedWebAppLogin>
+    <MockedAdminLogin></MockedAdminLogin>
 </MudAppBar>
 
 @code {
+    bool _drawerOpen = false;
 
+    void ToggleDrawer()
+    {
+        _drawerOpen = !_drawerOpen;
+    }
 }

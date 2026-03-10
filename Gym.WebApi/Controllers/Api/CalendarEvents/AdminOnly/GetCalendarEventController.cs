@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using Gym.Application.Services.CalendarEventApi;
+using Gym.Abstractions.Query.CalendarEvents;
 using Gym.Application.Services.CalendarEventApi.GetCalendarEventById;
 using Gym.WebApi.Extensions;
 using Gym.WebDto.Responses.CalendarEvent;
@@ -15,10 +15,13 @@ namespace Gym.WebApi.Controllers.Api.CalendarEvents.AdminOnly
     public class GetCalendarEventController(IMediator _mediator, IMapper _mapper) : ControllerBase
     {
         [HttpGet]
-        public async Task<GetAdminCalendarEventResponse> GetCalendarEvent(String id)
+        public async Task<ActionResult<GetAdminCalendarEventResponse>> GetCalendarEvent(String id)
         {
-            CalendarEventDetails calendarEventDetails = await _mediator.Send(_mapper.Map<GetCalendarEventById>(id));
-            return _mapper.Map<GetAdminCalendarEventResponse>(calendarEventDetails);
+            CalendarEventProjection calendarEventProjection = await _mediator.Send(new GetCalendarEventById(id));
+
+            return base.Ok(
+                _mapper.Map<GetAdminCalendarEventResponse>(calendarEventProjection)
+            );
         }
     }
 }

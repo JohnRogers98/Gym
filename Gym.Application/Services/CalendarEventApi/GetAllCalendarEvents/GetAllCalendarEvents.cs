@@ -1,6 +1,7 @@
-﻿using MediatR;
+﻿using Gym.Abstractions.Query.CalendarEvents;
+using MediatR;
 
 namespace Gym.Application.Services.CalendarEventApi.GetAllCalendarEvents
 {
-    public class GetAllCalendarEvents : IRequest<IEnumerable<CalendarEventDetails>>;
+    public class GetAllCalendarEvents : IRequest<IEnumerable<CalendarEventProjection>>;
 }

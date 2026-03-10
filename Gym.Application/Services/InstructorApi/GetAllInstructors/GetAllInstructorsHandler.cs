@@ -1,14 +1,13 @@
-﻿using Gym.Domain.InstructorContext;
+﻿using Gym.Abstractions.Query.Instructors;
 using MediatR;
 
 namespace Gym.Application.Services.InstructorApi.GetAllInstructors
 {
-    internal class GetAllInstructorsHandler(IInstructorQueryService _instructorQueryService) : IRequestHandler<GetAllInstructors, IEnumerable<InstructorDetails>>
+    internal class GetAllInstructorsHandler(IInstructorProjectionQueryService _instructorProjectionQueryService) : IRequestHandler<GetAllInstructors, IEnumerable<InstructorProjection>>
     {
-        public async Task<IEnumerable<InstructorDetails>> Handle(GetAllInstructors request, CancellationToken cancellationToken)
+        public async Task<IEnumerable<InstructorProjection>> Handle(GetAllInstructors request, CancellationToken cancellationToken)
         {
-            var instructors = await _instructorQueryService.GetAllAsync(cancellationToken);
-            return instructors.Select(instructor => instructor.ToDetails());
+            return await _instructorProjectionQueryService.GetAllAsync(cancellationToken);
         }
     }
 }
