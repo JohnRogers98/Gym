@@ -1,5 +1,21 @@
 ﻿@page "/"
+@using Gym.WebApplication.Features.Login.Services
+
+@inject NavigationManager Navigation
+@inject IWebAppAuthService WebAppAuthService
+
 
 @code{
+
+    protected override async Task OnInitializedAsync()
+    {
+        Uri? uri = Navigation.ToAbsoluteUri(Navigation.Uri);
+        String telegramData = uri.Fragment.TrimStart('#');
+
+        if (String.IsNullOrEmpty(telegramData) is false)
+        {
+            await WebAppAuthService.AuthenticateAsync(telegramData);      
+        }
+    }
 
 }
