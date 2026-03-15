@@ -1,409 +1,92 @@
 [{
   "_id": {
-    "$oid": "697c906d0f583e9523360ee3"
+    "$oid": "69980f632650b1ec54344d42"
   },
   "start": {
-    "$date": "2026-01-31T07:00:00.000Z"
+    "$date": "2026-02-21T07:00:00.000Z"
   },
   "end": {
-    "$date": "2026-01-31T08:30:00.000Z"
-  },
-  "bookings": [],
-  "maxClientCount": 5,
-  "training": {
-    "_id": {
-      "$oid": "6964df99214485526ab12762"
-    },
-    "name": "Бачата",
-    "description": "Потанцуем"
-  },
-  "instructors": [
-    {
-      "_id": {
-        "$oid": "693ec754633885c0552c22a1"
-      },
-      "firstName": "Pauline",
-      "lastName": null
-    }
-  ]
-},
-{
-  "_id": {
-    "$oid": "697c90870f583e9523360ee4"
-  },
-  "start": {
-    "$date": "2026-02-01T07:00:00.000Z"
-  },
-  "end": {
-    "$date": "2026-01-01T08:30:00.000Z"
-  },
-  "bookings": [],
-  "maxClientCount": 5,
-  "training": {
-    "_id": {
-      "$oid": "6964df99214485526ab12762"
-    },
-    "name": "Бачата",
-    "description": "Потанцуем"
-  },
-  "instructors": [
-    {
-      "_id": {
-        "$oid": "693ec754633885c0552c22a1"
-      },
-      "firstName": "Pauline",
-      "lastName": null
-    }
-  ]
-},
-{
-  "_id": {
-    "$oid": "697c90910f583e9523360ee5"
-  },
-  "start": {
-    "$date": "2026-02-02T07:00:00.000Z"
-  },
-  "end": {
-    "$date": "2026-01-02T08:30:00.000Z"
-  },
-  "bookings": [],
-  "maxClientCount": 5,
-  "training": {
-    "_id": {
-      "$oid": "6964df99214485526ab12762"
-    },
-    "name": "Бачата",
-    "description": "Потанцуем"
-  },
-  "instructors": [
-    {
-      "_id": {
-        "$oid": "693ec754633885c0552c22a1"
-      },
-      "firstName": "Pauline",
-      "lastName": null
-    }
-  ]
-},
-{
-  "_id": {
-    "$oid": "697c909a0f583e9523360ee6"
-  },
-  "start": {
-    "$date": "2026-02-03T07:00:00.000Z"
-  },
-  "end": {
-    "$date": "2026-01-03T08:30:00.000Z"
-  },
-  "bookings": [],
-  "maxClientCount": 5,
-  "training": {
-    "_id": {
-      "$oid": "6964df99214485526ab12762"
-    },
-    "name": "Бачата",
-    "description": "Потанцуем"
-  },
-  "instructors": [
-    {
-      "_id": {
-        "$oid": "693ec754633885c0552c22a1"
-      },
-      "firstName": "Pauline",
-      "lastName": null
-    }
-  ]
-},
-{
-  "_id": {
-    "$oid": "697c90b20f583e9523360ee7"
-  },
-  "start": {
-    "$date": "2026-02-05T07:00:00.000Z"
-  },
-  "end": {
-    "$date": "2026-01-05T08:30:00.000Z"
-  },
-  "bookings": [],
-  "maxClientCount": 5,
-  "training": {
-    "_id": {
-      "$oid": "6964df99214485526ab12762"
-    },
-    "name": "Бачата",
-    "description": "Потанцуем"
-  },
-  "instructors": [
-    {
-      "_id": {
-        "$oid": "693ec754633885c0552c22a1"
-      },
-      "firstName": "Pauline",
-      "lastName": null
-    }
-  ]
-},
-{
-  "_id": {
-    "$oid": "697c90c60f583e9523360ee8"
-  },
-  "start": {
-    "$date": "2026-02-06T07:00:00.000Z"
-  },
-  "end": {
-    "$date": "2026-02-06T08:30:00.000Z"
-  },
-  "bookings": [],
-  "maxClientCount": 5,
-  "training": {
-    "_id": {
-      "$oid": "6964df99214485526ab12762"
-    },
-    "name": "Бачата",
-    "description": "Потанцуем"
-  },
-  "instructors": [
-    {
-      "_id": {
-        "$oid": "693ec754633885c0552c22a1"
-      },
-      "firstName": "Pauline",
-      "lastName": null
-    }
-  ]
-},
-{
-  "_id": {
-    "$oid": "697c91350f583e9523360ee9"
-  },
-  "start": {
-    "$date": "2026-02-01T07:00:00.000Z"
-  },
-  "end": {
-    "$date": "2026-02-01T08:30:00.000Z"
-  },
-  "bookings": [],
-  "maxClientCount": 5,
-  "training": {
-    "_id": {
-      "$oid": "694515ff683816f83d4f79c0"
-    },
-    "name": "Press F",
-    "description": "Научимся pay respect"
-  },
-  "instructors": [
-    {
-      "_id": {
-        "$oid": "693ec754633885c0552c22a1"
-      },
-      "firstName": "Pauline",
-      "lastName": null
-    },
-    {
-      "_id": {
-        "$oid": "6941c40f2069e8a0a412f10d"
-      },
-      "firstName": "Bob",
-      "lastName": "Minion"
-    }
-  ]
-},
-{
-  "_id": {
-    "$oid": "697c914c0f583e9523360eea"
-  },
-  "start": {
-    "$date": "2026-02-01T11:00:00.000Z"
-  },
-  "end": {
-    "$date": "2026-02-03T12:30:00.000Z"
-  },
-  "bookings": [],
-  "maxClientCount": 5,
-  "training": {
-    "_id": {
-      "$oid": "694515ff683816f83d4f79c0"
-    },
-    "name": "Press F",
-    "description": "Научимся pay respect"
-  },
-  "instructors": [
-    {
-      "_id": {
-        "$oid": "693ec754633885c0552c22a1"
-      },
-      "firstName": "Pauline",
-      "lastName": null
-    },
-    {
-      "_id": {
-        "$oid": "6941c40f2069e8a0a412f10d"
-      },
-      "firstName": "Bob",
-      "lastName": "Minion"
-    }
-  ]
-},
-{
-  "_id": {
-    "$oid": "697c91550f583e9523360eeb"
-  },
-  "start": {
-    "$date": "2026-02-03T11:00:00.000Z"
-  },
-  "end": {
-    "$date": "2026-02-03T12:30:00.000Z"
-  },
-  "bookings": [],
-  "maxClientCount": 5,
-  "training": {
-    "_id": {
-      "$oid": "694515ff683816f83d4f79c0"
-    },
-    "name": "Press F",
-    "description": "Научимся pay respect"
-  },
-  "instructors": [
-    {
-      "_id": {
-        "$oid": "693ec754633885c0552c22a1"
-      },
-      "firstName": "Pauline",
-      "lastName": null
-    },
-    {
-      "_id": {
-        "$oid": "6941c40f2069e8a0a412f10d"
-      },
-      "firstName": "Bob",
-      "lastName": "Minion"
-    }
-  ]
-},
-{
-  "_id": {
-    "$oid": "697c915d0f583e9523360eec"
-  },
-  "start": {
-    "$date": "2026-02-05T11:00:00.000Z"
-  },
-  "end": {
-    "$date": "2026-02-05T12:30:00.000Z"
+    "$date": "2026-02-21T08:30:00.000Z"
   },
   "bookings": [
     {
-      "$oid": "696a87f1ec278fbdf37241e9"
+      "$oid": "6996b9fcc7484a99c222b3d3"
     }
   ],
-  "maxClientCount": 5,
-  "training": {
-    "_id": {
-      "$oid": "694515ff683816f83d4f79c0"
-    },
-    "name": "Press F",
-    "description": "Научимся pay respect"
+  "maxClientCount": 15,
+  "trainingId": {
+    "$oid": "693ec754633885c0552c22a3"
   },
   "instructors": [
     {
-      "_id": {
-        "$oid": "693ec754633885c0552c22a1"
-      },
-      "firstName": "Pauline",
-      "lastName": null
-    },
-    {
-      "_id": {
-        "$oid": "6941c40f2069e8a0a412f10d"
-      },
-      "firstName": "Bob",
-      "lastName": "Minion"
+      "$oid": "6941c40f2069e8a0a412f10d"
     }
   ]
 },
 {
   "_id": {
-    "$oid": "697c91d50f583e9523360eed"
+    "$oid": "6998a3f91434e8f72ede9e52"
   },
   "start": {
-    "$date": "2026-02-02T11:00:00.000Z"
+    "$date": "2026-02-22T07:00:00.000Z"
   },
   "end": {
-    "$date": "2026-02-02T12:30:00.000Z"
+    "$date": "2026-02-22T08:30:00.000Z"
   },
-  "bookings": [],
-  "maxClientCount": 5,
-  "training": {
-    "_id": {
-      "$oid": "694322a29355cb1fd26be088"
-    },
-    "name": "Качалка",
-    "description": "Накачаем всё!"
+  "bookings": [
+    {
+      "$oid": "6996b9fcc7484a99c222b3d3"
+    }
+  ],
+  "maxClientCount": 15,
+  "trainingId": {
+    "$oid": "693ec754633885c0552c22a3"
   },
   "instructors": [
     {
-      "_id": {
-        "$oid": "6941c40f2069e8a0a412f10d"
-      },
-      "firstName": "Bob",
-      "lastName": "Minion"
+      "$oid": "6941c40f2069e8a0a412f10d"
     }
   ]
 },
 {
   "_id": {
-    "$oid": "697c91da0f583e9523360eee"
+    "$oid": "699c58d3483ce12b7b29e4a9"
   },
   "start": {
-    "$date": "2026-02-04T11:00:00.000Z"
+    "$date": "2026-02-24T07:00:00.000Z"
   },
   "end": {
-    "$date": "2026-02-04T12:30:00.000Z"
+    "$date": "2026-02-24T08:30:00.000Z"
   },
   "bookings": [],
-  "maxClientCount": 5,
-  "training": {
-    "_id": {
-      "$oid": "694322a29355cb1fd26be088"
-    },
-    "name": "Качалка",
-    "description": "Накачаем всё!"
+  "maxClientCount": 15,
+  "trainingId": {
+    "$oid": "6998b2100e5e20819d4f09f1"
   },
   "instructors": [
     {
-      "_id": {
-        "$oid": "6941c40f2069e8a0a412f10d"
-      },
-      "firstName": "Bob",
-      "lastName": "Minion"
+      "$oid": "6998a5e1797758f01d6bef90"
     }
   ]
 },
 {
   "_id": {
-    "$oid": "697c91e00f583e9523360eef"
+    "$oid": "699c58dc483ce12b7b29e4ab"
   },
   "start": {
-    "$date": "2026-02-06T11:00:00.000Z"
+    "$date": "2026-02-25T07:00:00.000Z"
   },
   "end": {
-    "$date": "2026-02-06T12:30:00.000Z"
+    "$date": "2026-02-25T08:30:00.000Z"
   },
   "bookings": [],
-  "maxClientCount": 5,
-  "training": {
-    "_id": {
-      "$oid": "694322a29355cb1fd26be088"
-    },
-    "name": "Качалка",
-    "description": "Накачаем всё!"
+  "maxClientCount": 15,
+  "trainingId": {
+    "$oid": "6998b2100e5e20819d4f09f1"
   },
   "instructors": [
     {
-      "_id": {
-        "$oid": "6941c40f2069e8a0a412f10d"
-      },
-      "firstName": "Bob",
-      "lastName": "Minion"
+      "$oid": "6998a5e1797758f01d6bef90"
     }
   ]
 }]

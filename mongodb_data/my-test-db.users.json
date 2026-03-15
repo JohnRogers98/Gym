@@ -1,0 +1,9 @@
+[{
+  "_id": {
+    "$oid": "699c5688e14f1654a4476939"
+  },
+  "telegramId": {
+    "$numberLong": "5265776755"
+  },
+  "role": "Admin"
+}]

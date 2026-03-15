@@ -32,4 +32,60 @@
   },
   "name": "Бачата",
   "description": "Потанцуем"
+},
+{
+  "_id": {
+    "$oid": "6998a5d2797758f01d6bef8f"
+  },
+  "name": "test_training",
+  "description": "some test data"
+},
+{
+  "_id": {
+    "$oid": "6998b2100e5e20819d4f09f1"
+  },
+  "name": "How to be with Milana",
+  "description": "Red hair !"
+},
+{
+  "_id": {
+    "$oid": "6998b252de3c2b1f99ceac4b"
+  },
+  "name": "How to be with Milana",
+  "description": "Red hair !"
+},
+{
+  "_id": {
+    "$oid": "6998b286de3c2b1f99ceac4c"
+  },
+  "name": "How to be with Milana",
+  "description": "Red hair !"
+},
+{
+  "_id": {
+    "$oid": "6998b2adf8056d66dab832b0"
+  },
+  "name": "How to be with Milana",
+  "description": "Red hair !"
+},
+{
+  "_id": {
+    "$oid": "6998b2d397179dee4af5448b"
+  },
+  "name": "How to be with Milana",
+  "description": "Red hair !"
+},
+{
+  "_id": {
+    "$oid": "6998b3276b2333758f1c12e9"
+  },
+  "name": "How to be with Milana",
+  "description": "Red hair !"
+},
+{
+  "_id": {
+    "$oid": "6998b3fb4a6ad5de74834ebd"
+  },
+  "name": "How to be with Milana",
+  "description": "Red hair !"
 }]

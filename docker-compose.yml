@@ -32,32 +32,47 @@ services:
       context: .
       dockerfile: Gym.WebApi/Dockerfile
     container_name: gym-backend
-    ports:
-      - "8080:8080"
-      #- "8081:8081"
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - JWT_SECRET=${JWT_SECRET}
       - TG_BOT_TOKEN=${TG_BOT_TOKEN}
-      - WebApplicationUrl=http://localhost
+      # - WebApplicationUrl=http://gym-buddy.ru
+      - ASPNETCORE_URLS=http://+:8080
       #- ASPNETCORE_Kestrel__Certificates__Default__Password=gymgym
       #- ASPNETCORE_Kestrel__Certificates__Default__Path=/https/gym.pfx
     #volumes:
     #- ~/.aspnet/https:/https:ro
     depends_on:
-      - mongodb-init
+      mongodb-init:
+        condition: service_completed_successfully
     networks:
       - gym-net
+    restart: always
 
   ui:
     build:
       context: .
       dockerfile: Gym.WebApplication/Dockerfile
     container_name: gym-ui
-    ports:
-      - "80:80"
     networks:
       - gym-net
+    restart: always
+
+  nginx:
+    image: nginx:alpine
+    container_name: gym-nginx
+    ports:
+      - "80:80" # ЕДИНСТВЕННЫЙ порт, открытый наружу
+      - "443:443" # Если позже добавите SSL
+    volumes:
+      # Монтируем ваш конфиг из корня проекта
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - ui
+      - backend
+    networks:
+      - gym-net
+    restart: always
 
 volumes:
   mongodb_data:
