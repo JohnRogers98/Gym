@@ -28,8 +28,8 @@ namespace Gym.WebApi.Controllers.Api.Users.Anonymous
             {
                 HttpOnly = true,
                 IsEssential = true,
-                Secure = true,
-                SameSite = SameSiteMode.None
+                Secure = false,
+                SameSite = SameSiteMode.Lax
             });
         }
     }

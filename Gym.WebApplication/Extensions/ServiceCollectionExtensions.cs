@@ -11,6 +11,7 @@ namespace Gym.WebApplication.Extensions
     {
         public static IServiceCollection AddHttpClient(this IServiceCollection services, IConfiguration configuration) 
         {
+            Console.WriteLine("****" + configuration["WebApiBaseUrl"]!);
             services.AddScoped<CookieHandler>();
             services.AddScoped(sp =>
             {
