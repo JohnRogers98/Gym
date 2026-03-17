@@ -38,6 +38,8 @@ services:
       context: .
       dockerfile: Gym.WebApplication/Dockerfile
     container_name: gym-ui
+    # expose:
+    #   - "3000"
     networks:
       - gym-net
     restart: always
@@ -56,12 +58,14 @@ services:
     volumes:
       # Монтируем ваш конфиг из корня проекта
       - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./gym-buddy.ru_cert.pem:/etc/nginx/certs/gym-buddy.ru_cert.pem:ro
+      - ./gym-buddy.ru_private_key.pem:/etc/nginx/certs/gym-buddy.ru_private_key.pem:ro
     depends_on:
       - ui
       - backend
     networks:
       - gym-net
-    restart: always
+    restart: unless-stopped
 
 volumes:
   mongodb_data:
