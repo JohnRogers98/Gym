@@ -32,7 +32,7 @@ namespace Gym.Infrastructure.Telegram
                         TelegramId.From(tgUser.Id).Unwrap(),
                         tgUser.Username is not null ? TelegramUsername.From(tgUser.Username).Unwrap() : null,
                         tgUser.FirstName is not null ? FirstName.From(tgUser.FirstName).Unwrap() : null,
-                        String.IsNullOrWhiteSpace(tgUser.LastName) ? null : LastName.From(tgUser.LastName).Unwrap() 
+                        tgUser.LastName is not null ? LastName.From(tgUser.LastName).Unwrap() : null
                     )
                 );
             }
@@ -99,8 +99,8 @@ namespace Gym.Infrastructure.Telegram
             {
                 Id = root.GetProperty("id").GetInt64(),
                 FirstName = root.GetProperty("first_name").GetString(),
-                LastName = root.GetProperty("last_name").GetString(),
-                Username = root.GetProperty("username").GetString(),
+                LastName = root.TryGetProperty("last_name", out var lastName) is true ? lastName.GetString() : null,
+                Username = root.TryGetProperty("username", out var username) is true ? username.GetString() : null,
             };
         }
     }
