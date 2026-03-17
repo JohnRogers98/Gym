@@ -28,8 +28,6 @@ namespace Gym.WebApplication.Mappings
 
             base.CreateMap<CreateTrainingFormModel, CreateTrainingRequest>();
             base.CreateMap<CreateTrainingResponse, CreateTrainingResult>();
-
-            base.CreateMap<GetTrainingResponse, TrainingViewModel>();
             #endregion
 
             #region Instructor
@@ -38,8 +36,6 @@ namespace Gym.WebApplication.Mappings
 
             base.CreateMap<InstructorRegistrationFormModel, CreateInstructorRequest>();
             base.CreateMap<CreateInstructorResponse, CreateInstructorResult>();
-
-            base.CreateMap<GetInstructorResponse, InstructorViewModel>();
             #endregion
 
             #region CalendarEvent
@@ -49,13 +45,10 @@ namespace Gym.WebApplication.Mappings
             base.CreateMap<CreateCalendarEventFormModel, CreateCalendarEventRequest>();
             
             base.CreateMap<CreateCalendarEventResponse, CreateCalendarEventResult>();
-
-            base.CreateMap<GetAdminCalendarEventResponse, AdminCalendarItemViewModel>();
             #endregion
 
             #region Client
             base.CreateMap<ClientDto, ClientViewModel>();
-            base.CreateMap<GetClientResponse, ClientViewModel>();
             base.CreateMap<ChargeAccountResponse, ChargeClientResult>();
             #endregion
         }

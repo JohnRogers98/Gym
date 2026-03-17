@@ -1,7 +1,9 @@
-﻿using Gym.Domain._Shared;
+﻿using Gym.Application.Extensions;
+using Gym.Domain._Shared;
 using Gym.Domain.CalendarEventContext;
-using Gym.Domain.InstructorContext;
-using Gym.Domain.TrainingContext;
+using Gym.Domain.CalendarEventContext.ValueObjects;
+using Gym.Domain.InstructorContext.ValueObjects;
+using Gym.Domain.TrainingContext.ValueObjects;
 using Gym.Infrastructure.Entities.Repositories.CalendarEvents;
 
 namespace Gym.Infrastructure.Entities.Extensions.Mappings
@@ -11,14 +13,17 @@ namespace Gym.Infrastructure.Entities.Extensions.Mappings
         public static CalendarEvent ToDomain(this CalendarEventEntity entity)
         {
             return CalendarEvent.Restore(
-                CalendarEventId.From(entity.Id.ToString()),
-                entity.Start,
-                entity.End,
+                CalendarEventId.From(entity.Id.ToString()).Unwrap(),
+                TrainingPeriod.From(
+                    StartsAt.From(entity.Start).Unwrap(),
+                    entity.End.HasValue ? EndsAt.From(entity.End.Value).Unwrap() : null
+                ).Unwrap(),
                 Enum.Parse<CalendarEventStatus>(entity.Status),
-                TrainingId.From(entity.TrainingId.ToString()),
-                entity.Bookings?.Select(x => UserId.From(x.ToString())) ?? new HashSet<UserId>(),
-                entity.MaxClientCount,
-                entity.Instructors?.Select(instructorId => InstructorId.From(instructorId.ToString())));
+                entity.MaxClientCount.HasValue ? Capacity.From(entity.MaxClientCount.Value).Unwrap() : Capacity.Unlimited(), 
+                TrainingId.From(entity.TrainingId.ToString()).Unwrap(),
+                entity.Bookings?.Select(x => UserId.From(x.ToString()).Unwrap()) ?? new HashSet<UserId>(),
+                entity.Instructors?.Select(instructorId => InstructorId.From(instructorId.ToString()).Unwrap())
+            );
         }
 
         public static CalendarEventEntity ToEntity(this CalendarEvent calendarEvent)
@@ -26,12 +31,12 @@ namespace Gym.Infrastructure.Entities.Extensions.Mappings
             return new CalendarEventEntity()
             {
                 Id = calendarEvent.Id.Value.ToObjectId(),
-                Start = calendarEvent.Start,
-                End = calendarEvent.End,
+                Start = calendarEvent.TrainingPeriod.StartsAt.Value,
+                End = calendarEvent.TrainingPeriod.EndsAt?.Value,
                 Status = calendarEvent.Status.ToString(),
                 TrainingId = calendarEvent.TrainingId.Value.ToObjectId(),
                 Bookings = calendarEvent.Bookings.Select(anUserId => anUserId.Value.ToObjectId()),
-                MaxClientCount = calendarEvent.MaxClientCount,
+                MaxClientCount = calendarEvent.Capacity.Value,
                 Instructors = calendarEvent.Instructors?.Select(instructorId => instructorId.Value.ToObjectId())
             };
         }

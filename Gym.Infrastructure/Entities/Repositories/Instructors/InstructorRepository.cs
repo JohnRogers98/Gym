@@ -1,4 +1,6 @@
-﻿using Gym.Domain.InstructorContext;
+﻿using Gym.Application.Extensions;
+using Gym.Domain.InstructorContext;
+using Gym.Domain.InstructorContext.ValueObjects;
 using Gym.Infrastructure.Entities.Extensions;
 using Gym.Infrastructure.Entities.Extensions.Mappings;
 using MongoDB.Bson;
@@ -8,7 +10,7 @@ namespace Gym.Infrastructure.Entities.Repositories.Instructors
 {
     internal class InstructorRepository(IMongoCollection<InstructorEntity> _instructorCollection, MongoUnitOfWork _mongoUnitOfWork) : IInstructorRepository
     {
-        public InstructorId NextIdentity() => InstructorId.From(ObjectId.GenerateNewId().ToString());
+        public InstructorId NextIdentity() => InstructorId.From(ObjectId.GenerateNewId().ToString()).Unwrap();
 
         public async Task SaveAsync(Instructor instructor, CancellationToken cancellationToken)
         {

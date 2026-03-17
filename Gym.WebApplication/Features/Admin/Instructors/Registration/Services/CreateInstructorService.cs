@@ -9,12 +9,12 @@ namespace Gym.WebApplication.Features.Admin.Instructors.Registration.Services
 {
     public interface ICreateInstructorService
     {
-        Task<CreateInstructorResult> ExecuteAsync(InstructorRegistrationFormModel registrationFormModel, CancellationToken cancellationToken = default);
+        Task<CreateInstructorResult> HandleAsync(InstructorRegistrationFormModel registrationFormModel, CancellationToken cancellationToken = default);
     }
 
     public class CreateInstructorService(HttpClient _httpClient, IMapper _mapper) : ICreateInstructorService
     {
-        public async Task<CreateInstructorResult> ExecuteAsync(InstructorRegistrationFormModel registrationFormModel, CancellationToken cancellationToken = default)
+        public async Task<CreateInstructorResult> HandleAsync(InstructorRegistrationFormModel registrationFormModel, CancellationToken cancellationToken = default)
         {
             var createInstructorRequest = _mapper.Map<CreateInstructorRequest>(registrationFormModel);
             var response = await _httpClient.PostAsJsonAsync("api/instructors", createInstructorRequest, cancellationToken);

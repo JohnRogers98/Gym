@@ -1,5 +1,7 @@
-﻿using Gym.Domain._Shared;
+﻿using Gym.Application.Extensions;
+using Gym.Domain._Shared;
 using Gym.Domain.UserContext;
+using Gym.Domain.UserContext.ValueObjects;
 using Gym.Infrastructure.Entities.Repositories.Users;
 
 namespace Gym.Infrastructure.Entities.Extensions.Mappings
@@ -15,12 +17,12 @@ namespace Gym.Infrastructure.Entities.Extensions.Mappings
             }
 
             return User.Restore(
-                UserId.From(entity.Id.ToString()),
-                userRole, 
-                TelegramId.From(entity.TelegramId ?? default),
-                entity.TelegramUsername is not null ? TelegramUsername.From(entity.TelegramUsername) : null, 
-                entity.FirstName is not null ? FirstName.From(entity.FirstName) : null, 
-                entity.LastName is not null ? LastName.From(entity.LastName) : null
+                UserId.From(entity.Id.ToString()).Unwrap(),
+                userRole,
+                TelegramId.From(entity.TelegramId ?? default).Unwrap(),
+                entity.TelegramUsername is not null ? TelegramUsername.From(entity.TelegramUsername).Unwrap() : null, 
+                entity.FirstName is not null ? FirstName.From(entity.FirstName).Unwrap() : null, 
+                entity.LastName is not null ? LastName.From(entity.LastName).Unwrap() : null
             );
         }
 

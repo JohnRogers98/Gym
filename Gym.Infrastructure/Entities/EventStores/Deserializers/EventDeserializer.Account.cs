@@ -1,7 +1,9 @@
-﻿using Gym.Domain._Common;
+﻿using Gym.Application.Extensions;
+using Gym.Domain._Common;
 using Gym.Domain._Shared;
-using Gym.Domain.AccountContext;
 using Gym.Domain.AccountContext.Events;
+using Gym.Domain.AccountContext.ValueObjects;
+using Gym.Domain.CalendarEventContext.ValueObjects;
 using Gym.Infrastructure.Entities.Repositories.Accounts.EventsDto;
 
 namespace Gym.Infrastructure.Entities.EventStores.Deserializers
@@ -13,10 +15,10 @@ namespace Gym.Infrastructure.Entities.EventStores.Deserializers
             return AccountChargedDomainEvent.Restore(
                 DomainEventId.From(Guid.Parse(dto.Id)),
                 dto.OccurredOn,
-                UserId.From(dto.UserId),
+                UserId.From(dto.UserId).Unwrap(),
                 dto.ByCount,
                 dto.Reason
-                );
+            );
         }
 
         private DomainEvent ToDomainEvent(AccountCreatedDto dto)
@@ -24,7 +26,7 @@ namespace Gym.Infrastructure.Entities.EventStores.Deserializers
             return AccountCreatedDomainEvent.Restore(
                 DomainEventId.From(Guid.Parse(dto.Id)),
                 dto.OccurredOn
-                );
+            );
         }
 
         private DomainEvent ToDomainEvent(TrainingBookedDto dto)
@@ -33,9 +35,9 @@ namespace Gym.Infrastructure.Entities.EventStores.Deserializers
                 DomainEventId.From(Guid.Parse(dto.Id)),
                 dto.OccurredOn,
                 BookingId.From(dto.BookingId),
-                UserId.From(dto.UserId),
-                CalendarEventId.From(dto.CalendarEventId)
-                );
+                UserId.From(dto.UserId).Unwrap(),
+                CalendarEventId.From(dto.CalendarEventId).Unwrap()
+            );
         }
 
         private DomainEvent ToDomainEvent(TrainingCompletedDto dto)
@@ -44,9 +46,9 @@ namespace Gym.Infrastructure.Entities.EventStores.Deserializers
                 DomainEventId.From(Guid.Parse(dto.Id)),
                 dto.OccurredOn,
                 BookingId.From(dto.BookingId),
-                UserId.From(dto.UserId),
-                CalendarEventId.From(dto.CalendarEventId)
-                );
+                UserId.From(dto.UserId).Unwrap(),
+                CalendarEventId.From(dto.CalendarEventId).Unwrap()
+            );
         }
 
         private DomainEvent ToDomainEvent(TrainingCancelledDto dto)
@@ -55,9 +57,9 @@ namespace Gym.Infrastructure.Entities.EventStores.Deserializers
                 DomainEventId.From(Guid.Parse(dto.Id)),
                 dto.OccurredOn,
                 BookingId.From(dto.BookingId),
-                UserId.From(dto.UserId),
-                CalendarEventId.From(dto.CalendarEventId)
-                );
+                UserId.From(dto.UserId).Unwrap(),
+                CalendarEventId.From(dto.CalendarEventId).Unwrap()
+            );
         }
     }
 }

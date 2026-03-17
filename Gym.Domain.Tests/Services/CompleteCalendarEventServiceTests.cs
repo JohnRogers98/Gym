@@ -1,6 +1,8 @@
 ﻿using Gym.Domain._Shared.Services;
 using Gym.Domain.AccountContext;
+using Gym.Domain.AccountContext.ValueObjects;
 using Gym.Domain.CalendarEventContext;
+using Gym.Domain.CalendarEventContext.ValueObjects;
 
 namespace Gym.Domain.Tests.Services
 {

@@ -6,11 +6,5 @@
         {
             ((dynamic)this).ApplyEvent((dynamic)@event);
         }
-
-    /*    protected virtual void ApplyGeneric<TDomainEvent>(TDomainEvent @event)
-            where TDomainEvent : DomainEvent
-        {
-            this.ApplyEvent(@event);
-        }*/
     }
 }

@@ -34,14 +34,14 @@
     protected override async Task OnInitializedAsync()
     {
         CalendarEventCreationState.CalendarEventCreated += AddCreatedCalendarEvent;
-        _calendarEvents = [.. await GetAllAdminCalendarEventsService.ExecuteAsync()];
+        _calendarEvents = [.. await GetAllAdminCalendarEventsService.HandleAsync()];
     }
 
     private async void AddCreatedCalendarEvent(CreateCalendarEventResult createCalendarEventResult)
     {
         CalendarEventId calendarEventId = new CalendarEventId(createCalendarEventResult.CalendarEventId);
 
-        AdminCalendarItemViewModel? adminCalendarItemViewModel = await GetAdminCalendarEventByIdService.ExecuteAsync(calendarEventId);
+        AdminCalendarItemViewModel? adminCalendarItemViewModel = await GetAdminCalendarEventByIdService.HandleAsync(calendarEventId);
 
         if (adminCalendarItemViewModel is null)
             return;

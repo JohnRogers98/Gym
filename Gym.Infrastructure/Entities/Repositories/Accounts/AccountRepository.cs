@@ -1,6 +1,8 @@
-﻿using Gym.Domain._Common;
+﻿using Gym.Application.Extensions;
+using Gym.Domain._Common;
 using Gym.Domain._Shared;
 using Gym.Domain.AccountContext;
+using Gym.Domain.AccountContext.ValueObjects;
 using Gym.Infrastructure.Entities.EventStores;
 using Gym.Infrastructure.Entities.EventStores.Deserializers;
 using Gym.Infrastructure.Entities.EventStores.Serializers;
@@ -23,7 +25,7 @@ namespace Gym.Infrastructure.Entities.Repositories.Accounts
                 domainEvents.Add(_eventDeserializer.Deserialize(entity));
             }
 
-            UserId userId = UserId.From(Regex.Replace(accountId.Value, "^account_", ""));
+            UserId userId = UserId.From(Regex.Replace(accountId.Value, "^account_", "")).Unwrap();
             Account account = Account.Restore(accountId, userId, domainEvents);
 
             Int32 lastFetchedVersion = domainEvents.Any() ? entities.Max(x => x.Version) : 0;

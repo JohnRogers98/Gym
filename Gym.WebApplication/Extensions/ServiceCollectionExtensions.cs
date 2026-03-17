@@ -1,6 +1,20 @@
-﻿using Gym.WebApplication.Features.Admin.Shared.Services;
+﻿using Gym.WebApplication.Features.Account.Details.Servises;
+using Gym.WebApplication.Features.Account.History.Services;
+using Gym.WebApplication.Features.Admin.CalendarEvents.Creation.Services;
+using Gym.WebApplication.Features.Admin.CalendarEvents.States;
+using Gym.WebApplication.Features.Admin.CalendarEvents.TableView.Services;
+using Gym.WebApplication.Features.Admin.Clients.TableView.Services;
+using Gym.WebApplication.Features.Admin.Instructors.Registration.Services;
+using Gym.WebApplication.Features.Admin.Instructors.States;
+using Gym.WebApplication.Features.Admin.Shared.Services;
+using Gym.WebApplication.Features.Admin.Trainings.Creation.Services;
+using Gym.WebApplication.Features.Admin.Trainings.States;
+using Gym.WebApplication.Features.Calendar.Services;
+using Gym.WebApplication.Features.Login.Services;
+using Gym.WebApplication.JSAdapters;
 using Gym.WebApplication.Providers;
 using Gym.WebApplication.ViewModels;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.WebAssembly.Http;
 using Polly;
 using Polly.Fallback;
@@ -26,6 +40,86 @@ namespace Gym.WebApplication.Extensions
                     BaseAddress = new Uri(configuration["WebApiBaseUrl"]!)
                 };
             });
+
+            return services;
+        }
+
+        public static IServiceCollection AddAuthenticationServices(this IServiceCollection services)
+        {
+            services.AddScoped<IWebAppAuthService, WebAppAuthService>();
+            services.AddScoped<AuthenticationStateProvider, WebAppAuthStateProvider>();
+
+            return services;
+        }
+
+        public static IServiceCollection AddLocalStorage(this IServiceCollection services)
+        {
+            services.AddScoped<LocalStorageAdapter>();
+
+            return services;
+        }
+
+        public static IServiceCollection AddCalendarEventServices(this IServiceCollection services)
+        {
+            services.AddScoped<IGetAllCalendarItemsService, GetAllCalendarItemsService>();
+            services.AddScoped<IBookCalendarItemService, BookCalendarItemService>();
+
+            services.AddScoped<IGetAllAdminCalendarEventsService, GetAllAdminCalendarEventsService>();
+            services.Decorate<IGetAllAdminCalendarEventsService, CachableGetAllAdminCalendarEventsSetvice>();
+
+            services.AddScoped<IGetAdminCalendarEventByIdService, GetAdminCalendarEventByIdService>();
+            services.Decorate<IGetAdminCalendarEventByIdService, RetryableGetAdminCalendarEventByIdService>();
+
+            services.AddScoped<ICreateCalendarEventService, CreateCalendarEventService>();
+            services.AddScoped<ICalendarEventCreationState, CalendarEventCreationState>();
+
+            services.AddScoped<ICancelCalendarEventService, CancelCalendarEventService>();
+            services.AddScoped<ICalendarEventCancellationState, CalendarEventCancellationState>();
+
+            return services;
+        }
+
+        public static IServiceCollection AddAccountServices(this IServiceCollection services)
+        {
+            services.AddScoped<AccountHistoryViewModelMapper>();
+            services.AddScoped<IGetAllAccountHistoryItemsService, GetAllAccountHistoryItemsService>();
+
+            return services;
+        }
+
+        public static IServiceCollection AddInstructorServices(this IServiceCollection services)
+        {
+            services.AddScoped<IGetAllInstructorsService, GetAllInstructorsService>();
+            services.Decorate<IGetAllInstructorsService, CachableGetAllInstructosSetvice>();
+
+            services.AddScoped<IGetInstructorByIdService, GetInstructorByIdService>();
+            services.Decorate<IGetInstructorByIdService, RetryableGetInstructorByIdService>();
+
+            services.AddScoped<ICreateInstructorService, CreateInstructorService>();
+            services.AddScoped<IInstructorRegisteredSharedState, InstructorRegistrationSharedState>();
+
+            return services;
+        }
+
+        public static IServiceCollection AddTrainingServices(this IServiceCollection services)
+        {
+            services.AddScoped<ICreateTrainingService, CreateTrainingService>();
+            services.AddScoped<ITrainingCreationSharedState, TrainingCreationSharedState>();
+
+            services.AddScoped<IGetAllTrainingsService, GetAllTrainingsService>();
+            services.Decorate<IGetAllTrainingsService, CachableGetAllTrainingsSetvice>();
+
+            services.AddScoped<IGetTrainingByIdService, GetTrainingByIdService>();
+            services.Decorate<IGetTrainingByIdService, RetryableGetTrainingByIdService>();
+
+            return services;
+        }
+
+        public static IServiceCollection AddClientServices(this IServiceCollection services)
+        {
+            services.AddScoped<IGetAllClientsService, GetAllClientsService>();
+            services.AddScoped<IGetClientDetailsService, GetClientDetailsService>();
+            services.AddScoped<IChargeClientService, ChargeClientService>();
 
             return services;
         }

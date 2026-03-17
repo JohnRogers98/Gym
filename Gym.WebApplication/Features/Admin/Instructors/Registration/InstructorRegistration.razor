@@ -30,7 +30,7 @@
 
     private async void OnValidSubmit(EditContext context)
     {
-        CreateInstructorResult createdInstructorViewModel = await CreateInstructorService.ExecuteAsync(_formModel);
+        CreateInstructorResult createdInstructorViewModel = await CreateInstructorService.HandleAsync(_formModel);
         InstructorRegisteredSharedState.Notify(createdInstructorViewModel);
 
         this.ClearForm();

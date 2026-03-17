@@ -9,12 +9,12 @@ namespace Gym.WebApplication.Features.Admin.CalendarEvents.Creation.Services
 {
     public interface ICreateCalendarEventService
     {
-        Task<CreateCalendarEventResult> ExecuteAsync(CreateCalendarEventFormModel createCalendarEventFormModel, CancellationToken cancellationToken = default);
+        Task<CreateCalendarEventResult> HandleAsync(CreateCalendarEventFormModel createCalendarEventFormModel, CancellationToken cancellationToken = default);
     }
 
     public class CreateCalendarEventService(HttpClient _httpClient, IMapper _mapper) : ICreateCalendarEventService
     {
-        public async Task<CreateCalendarEventResult> ExecuteAsync(CreateCalendarEventFormModel createCalendarEventFormModel, CancellationToken cancellationToken = default)
+        public async Task<CreateCalendarEventResult> HandleAsync(CreateCalendarEventFormModel createCalendarEventFormModel, CancellationToken cancellationToken = default)
         {
             var createCalendarEventRequest = _mapper.Map<CreateCalendarEventRequest>(createCalendarEventFormModel);
 

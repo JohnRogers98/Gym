@@ -13,7 +13,6 @@ namespace Gym.WebApi.Controllers.Api.Instructors
             CreateMap<CreateInstructorRequest, CreateInstructor>();
             CreateMap<CreateInstructorResult, CreateInstructorResponse>();
 
-            CreateMap<InstructorProjection, GetInstructorResponse>();
             CreateMap<InstructorProjection, InstructorDto>();
         }
     }

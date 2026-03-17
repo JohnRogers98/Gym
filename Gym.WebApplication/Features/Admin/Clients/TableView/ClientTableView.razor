@@ -41,7 +41,7 @@
         {
             if (result.Data is ChargeClientFormModel chargeClientFormModel)
             {
-                var chargeClientResult = await ChargeClientService.ExecuteAsync(chargeClientFormModel);
+                var chargeClientResult = await ChargeClientService.HandleAsync(chargeClientFormModel);
 
                 Snackbar.Add($"Client account is {chargeClientResult.AvailableTrainingsCount}", Severity.Info);
 

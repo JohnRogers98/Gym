@@ -1,23 +1,32 @@
-﻿using Gym.Domain.AccountContext;
+﻿using Gym.Application.Extensions;
+using Gym.Domain._Common;
+using Gym.Domain.AccountContext;
 using Gym.Domain.CalendarEventContext;
 
 namespace Gym.Domain._Shared.Services
 {
     public interface ICompleteCalendarEventService
     {
-        void Complete(CalendarEvent calendarEvent, IReadOnlyCollection<Account> bookingAccounts);
+        Result Complete(CalendarEvent calendarEvent, IReadOnlyCollection<Account> bookingAccounts);
     }
 
     public class CompleteCalendarEventService : ICompleteCalendarEventService
     {
-        public void Complete(CalendarEvent calendarEvent, IReadOnlyCollection<Account> bookingAccounts)
+        public Result Complete(CalendarEvent calendarEvent, IReadOnlyCollection<Account> bookingAccounts)
         {
-            calendarEvent.Complete();
-
-            foreach (var account in bookingAccounts)
-            {
-                account.CompleteBooking(calendarEvent.Id);
-            }
+            return calendarEvent.Complete()
+                .Bind(() =>
+                {
+                    foreach (var account in bookingAccounts)
+                    {
+                        Result completeBookingResult = account.CompleteBooking(calendarEvent.Id);
+                        if (completeBookingResult.Success is false)
+                        {
+                            return completeBookingResult;
+                        }
+                    }
+                    return Result.Ok();
+                }); 
         }
     }
 }

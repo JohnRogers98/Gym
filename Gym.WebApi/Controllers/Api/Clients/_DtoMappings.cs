@@ -9,7 +9,6 @@ namespace Gym.WebApi.Controllers.Api.Clients
         public _DtoMappings()
         {
             CreateMap<ClientProjection, ClientDto>();
-            CreateMap<ClientProjection, GetClientResponse>();
         }
     }
 }

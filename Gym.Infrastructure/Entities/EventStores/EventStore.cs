@@ -1,4 +1,4 @@
-﻿using Gym.Infrastructure.Entities.EventStores.Extensions;
+﻿using Gym.Infrastructure.Entities.Extensions;
 using MongoDB.Driver;
 
 namespace Gym.Infrastructure.Entities.EventStores

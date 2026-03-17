@@ -1,8 +1,11 @@
-﻿using Gym.Domain._Common;
-using Gym.Domain._Exceptions;
+﻿using Gym.Application.Extensions;
+using Gym.Domain._Common;
 using Gym.Domain._Shared;
+using Gym.Domain.AccountContext.Entities;
 using Gym.Domain.AccountContext.Errors;
 using Gym.Domain.AccountContext.Events;
+using Gym.Domain.AccountContext.ValueObjects;
+using Gym.Domain.CalendarEventContext.ValueObjects;
 namespace Gym.Domain.AccountContext
 {
     public partial class Account : EventSourcedAggregateRoot
@@ -11,29 +14,29 @@ namespace Gym.Domain.AccountContext
 
         public UserId UserId { get; }
 
-        public Int32 AvailableTrainingsCount { get; private set; }
+        public RemainingTrainings RemainingTrainings { get; private set; }
 
         private HashSet<Booking> _bookings;
         public IReadOnlyCollection<Booking> Bookings => _bookings.AsReadOnly();
 
-        private Account(AccountId id, UserId userId)
+        private Account(AccountId id, UserId userId, RemainingTrainings remainingTrainings)
         {
             Id = id;
             UserId = userId;
-            AvailableTrainingsCount = 0;
+            RemainingTrainings = remainingTrainings;
             _bookings = new HashSet<Booking>();
         }
 
         public static Account Create(AccountId id, UserId userId) 
         {
-            Account account = new(id, userId);
+            Account account = new(id, userId, RemainingTrainings.From(0).Unwrap());
             account.AddDomainEvent(AccountCreatedDomainEvent.Create());
             return account;
         }
 
         public static Account Restore(AccountId id, UserId userId, IEnumerable<DomainEvent> events)
         {
-            Account account = new(id, userId);
+            Account account = new(id, userId, RemainingTrainings.From(0).Unwrap());
             foreach (DomainEvent @event in events)
             {
                 account.ApplyEvent(@event);
@@ -41,79 +44,99 @@ namespace Gym.Domain.AccountContext
             return account;
         }
 
-        internal void Charge(Int32 byCount)
+        internal Result Charge(Int32 byCount)
         {
             if(byCount <= 0)
-            {
-                throw new DomainException(AccountNotChargedError.Create(UserId));
-            }
+                return Result.Fail(AccountNotChargedError.Create(UserId));
 
-            AvailableTrainingsCount += byCount;
+            this.IncrementRemainingTrainings(byCount);
 
             base.AddDomainEvent(AccountChargedDomainEvent.Create(UserId, byCount));
+
+            return Result.Ok();
         }
 
-        internal Booking MakeBooking(CalendarEventId calendarEventId)
+        internal Result<Booking> MakeBooking(CalendarEventId calendarEventId)
         {
             if (this.HasCalendarEventBooking(calendarEventId))
             {
-                throw new DomainException(CalendarEventAlreadyBookedError.Create(UserId, calendarEventId));
+                return Result<Booking>.Fail(CalendarEventAlreadyBookedError.Create(UserId, calendarEventId));
             }
             if (this.HasAvailableTraining() is false)
             {
-                throw new DomainException(AccountNotChargedError.Create(UserId));
+                return Result<Booking>.Fail(AccountNotChargedError.Create(UserId));
             }
 
             BookingId bookingId = BookingId.From(UserId, calendarEventId);
             Booking booking = Booking.Create(bookingId, UserId, calendarEventId);
 
             _bookings.Add(booking);
-            AvailableTrainingsCount--;
+            this.DecrementRemainingTrainings();
 
             base.AddDomainEvent(TrainingBookedDomainEvent.Create(booking.Id, booking.UserId, booking.CalendarEventId));
             
-            return booking;
+            return Result<Booking>.Ok(booking);
         }
 
-        internal void CancelBooking(CalendarEventId calendarEventId)
+        internal Result CancelBooking(CalendarEventId calendarEventId)
         {
             Booking? booking = this.FindBookingByCalendarEvent(calendarEventId);
             if (booking is null)
             {
-                throw new DomainException(CalendarEventBookingNotExistError.Create(UserId, calendarEventId));
+                return Result.Fail(CalendarEventBookingNotExistError.Create(UserId, calendarEventId));
             }
 
-            booking.Cancel();
-            AvailableTrainingsCount++;
+            Result cancellingResult = booking.Cancel();
+            if(cancellingResult.Success is false)
+            {
+                return cancellingResult;
+            }
+
+            this.IncrementRemainingTrainings();
 
             base.AddDomainEvent(TrainingCancelledDomainEvent.Create(booking.Id, UserId, calendarEventId));
+
+            return Result.Ok();
         }
 
-        internal void Rebook(CalendarEventId calendarEventId)
+        internal Result Rebook(CalendarEventId calendarEventId)
         {
             Booking? booking = this.FindBookingByCalendarEvent(calendarEventId);
             if (booking is null)
             {
-                throw new DomainException(CalendarEventBookingNotExistError.Create(UserId, calendarEventId));
+                return Result.Fail(CalendarEventBookingNotExistError.Create(UserId, calendarEventId));
             }
 
-            booking.Rebook();
-            AvailableTrainingsCount--;
+            Result rebookingResult = booking.Rebook();
+            if (rebookingResult.Success is false)
+            {
+                return rebookingResult;
+            }
+
+            this.DecrementRemainingTrainings();
 
             base.AddDomainEvent(TrainingRebookedDomainEvent.Create(booking.Id, UserId, calendarEventId));
+
+            return Result.Ok();
         }
 
-        internal void CompleteBooking(CalendarEventId calendarEventId)
+        internal Result CompleteBooking(CalendarEventId calendarEventId)
         {
             Booking? booking = this.FindBookingByCalendarEvent(calendarEventId);
             if (booking is null)
             {
-                throw new DomainException(CalendarEventBookingNotExistError.Create(UserId, calendarEventId));
+                return Result.Fail(CalendarEventBookingNotExistError.Create(UserId, calendarEventId));
             }
 
-            booking.MarkAsCompleted();
+            Result markingResult = booking.MarkAsCompleted();
+            if (markingResult.Success is false)
+            {
+                return markingResult;
+            }
 
             base.AddDomainEvent(TrainingCompletedDomainEvent.Create(booking.Id, UserId, calendarEventId));
+
+            return Result.Ok();
         }
 
         internal Boolean HasCalendarEventBooking(CalendarEventId calendarEventId) => 
@@ -122,7 +145,16 @@ namespace Gym.Domain.AccountContext
         internal Booking? FindBookingByCalendarEvent(CalendarEventId calendarEventId) =>
             _bookings.FirstOrDefault(aBooking => aBooking.CalendarEventId == calendarEventId);
 
-        internal Boolean HasAvailableTraining() => AvailableTrainingsCount > 0;
+        internal Boolean HasAvailableTraining() => RemainingTrainings.CanBook();
 
+        private void DecrementRemainingTrainings(Int32 byCount = 1)
+        {
+            RemainingTrainings = RemainingTrainings.Decrement(byCount).Unwrap();
+        }
+
+        private void IncrementRemainingTrainings(Int32 byCount = 1)
+        {
+            RemainingTrainings = RemainingTrainings.Increment(byCount).Unwrap();
+        }
     }
 }

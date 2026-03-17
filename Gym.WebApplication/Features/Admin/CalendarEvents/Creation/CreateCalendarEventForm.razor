@@ -64,8 +64,8 @@
 
     protected override async Task OnInitializedAsync()
     {
-        _trainings = [.. await GetAllTrainingsService.ExecuteAsync()];
-        _instructors = [.. await GetAllInstructorsService.ExecuteAsync()];
+        _trainings = [.. await GetAllTrainingsService.HandleAsync()];
+        _instructors = [.. await GetAllInstructorsService.HandleAsync()];
     }
 
     private String GetMultiSelectionText(IReadOnlyList<String> selectedValues)
@@ -78,7 +78,7 @@
 
     private async void OnValidSubmit(EditContext context)
     {
-        CreateCalendarEventResult createCalendarEventResult = await CreateCalendarEventService.ExecuteAsync(_formModel);
+        CreateCalendarEventResult createCalendarEventResult = await CreateCalendarEventService.HandleAsync(_formModel);
         CalendarEventCreationState.Notify(createCalendarEventResult);
         this.ClearForm();
     }

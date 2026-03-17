@@ -1,5 +1,6 @@
-﻿using Gym.Domain._Shared;
+﻿using Gym.Application.Extensions;
 using Gym.Domain.CalendarEventContext;
+using Gym.Domain.CalendarEventContext.ValueObjects;
 using Gym.Infrastructure.Entities.Extensions;
 using Gym.Infrastructure.Entities.Extensions.Mappings;
 using MongoDB.Bson;
@@ -10,7 +11,7 @@ namespace Gym.Infrastructure.Entities.Repositories.CalendarEvents
     internal class CalendarEventRepository(IMongoCollection<CalendarEventEntity> _calendarEventCollection, MongoUnitOfWork _mongoUnitOfWork) 
         : ICalendarEventRepository, IPastCalendarEventsFinder
     {
-        public CalendarEventId NextIdentity() => CalendarEventId.From(ObjectId.GenerateNewId().ToString());
+        public CalendarEventId NextIdentity() => CalendarEventId.From(ObjectId.GenerateNewId().ToString()).Unwrap();
 
         public async Task SaveAsync(CalendarEvent calendarEvent, CancellationToken cancellationToken)
         {

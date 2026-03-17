@@ -1,4 +1,6 @@
-﻿using Gym.Domain.TrainingContext;
+﻿using Gym.Application.Extensions;
+using Gym.Domain.TrainingContext;
+using Gym.Domain.TrainingContext.ValueObjects;
 using Gym.Infrastructure.Entities.Extensions;
 using Gym.Infrastructure.Entities.Extensions.Mappings;
 using MongoDB.Bson;
@@ -8,7 +10,7 @@ namespace Gym.Infrastructure.Entities.Repositories.Trainings
 {
     internal class TrainingRepository(IMongoCollection<TrainingEntity> _trainingCollection, MongoUnitOfWork _mongoUnitOfWork) : ITrainingRepository
     {
-        public TrainingId NextIdentity() => TrainingId.From(ObjectId.GenerateNewId().ToString());
+        public TrainingId NextIdentity() => TrainingId.From(ObjectId.GenerateNewId().ToString()).Unwrap();
 
         public async Task SaveAsync(Training training, CancellationToken cancellationToken)
         {

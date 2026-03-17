@@ -1,5 +1,7 @@
-﻿using Gym.Domain._Shared;
+﻿using Gym.Application.Extensions;
+using Gym.Domain._Shared;
 using Gym.Domain.ClientContext;
+using Gym.Domain.ClientContext.ValueObjects;
 using Gym.Infrastructure.Entities.Extensions;
 using Gym.Infrastructure.Entities.Extensions.Mappings;
 using MongoDB.Bson;
@@ -9,7 +11,7 @@ namespace Gym.Infrastructure.Entities.Repositories.Clients
 {
     internal class ClientRepository(IMongoCollection<ClientEntity> _clientCollection, MongoUnitOfWork _mongoUnitOfWork) : IClientRepository, IClientByUserIdFinder
     {
-        public ClientId NextIdentity() => ClientId.From(ObjectId.GenerateNewId().ToString());
+        public ClientId NextIdentity() => ClientId.From(ObjectId.GenerateNewId().ToString()).Unwrap();
 
         public async Task<Boolean> ExistsByUserIdAsync(UserId userId, CancellationToken cancellationToken)
             => await _clientCollection.Find(_mongoUnitOfWork.Session, eClient => eClient.UserId == userId.Value.ToObjectId()).AnyAsync(cancellationToken);

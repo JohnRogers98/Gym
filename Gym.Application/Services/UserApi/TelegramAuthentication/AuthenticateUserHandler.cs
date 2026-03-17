@@ -1,9 +1,12 @@
 ﻿using Gym.Domain._Common;
 using Gym.Domain._Shared;
 using Gym.Domain.AccountContext;
+using Gym.Domain.AccountContext.ValueObjects;
 using Gym.Domain.ClientContext;
+using Gym.Domain.ClientContext.Errors;
 using Gym.Domain.UserContext;
 using Gym.Domain.UserContext.Authentication;
+using Gym.Domain.UserContext.ValueObjects;
 using MediatR;
 
 namespace Gym.Application.Services.UserApi.TelegramAuthentication
@@ -14,13 +17,13 @@ namespace Gym.Application.Services.UserApi.TelegramAuthentication
         IUserByTelegramIdFinder _userByTelegramIdFinder,
         IClientByUserIdFinder _clientByUserIdFinder,
         IClientRepository _clientRepository,
-        IAccountRepository _accountRepository) : IRequestHandler<AuthenticateUser, AuthenticatedUserDetails>
+        IAccountRepository _accountRepository) : IRequestHandler<AuthenticateUser, Result<AuthenticatedUserDetails>>
     {
-        public async Task<AuthenticatedUserDetails> Handle(AuthenticateUser request, CancellationToken cancellationToken)
+        public async Task<Result<AuthenticatedUserDetails>> Handle(AuthenticateUser request, CancellationToken cancellationToken)
         {
             Result<ValidatedTelegramUserInfo> verificationResult = _telegramSignatureVerifier.Verify(request.EscapedInitData);
-            if (!verificationResult.Success)
-                throw new ArgumentException(verificationResult.Error!.GetErrorMessage());
+            if (verificationResult.Success is false)
+                return Result<AuthenticatedUserDetails>.Fail(verificationResult.Error!);
 
             User? user = await _userByTelegramIdFinder.GetByTelegramIdAsync(verificationResult.Data!.Id, cancellationToken);
             if (user is null)
@@ -28,10 +31,11 @@ namespace Gym.Application.Services.UserApi.TelegramAuthentication
                 user = await this.RegisterUser(verificationResult.Data, cancellationToken);
             }
 
-            Client client = await _clientByUserIdFinder.GetByUserIdAsync(user.Id, cancellationToken)
-                    ?? throw new ArgumentNullException();
+            Client? client = await _clientByUserIdFinder.GetByUserIdAsync(user.Id, cancellationToken);
+            if (client is null)
+                return Result<AuthenticatedUserDetails>.Fail(ClientNotFoundByUserIdError.Create(user.Id));
 
-            return new AuthenticatedUserDetails(user.Id.Value, client.Id.Value, user.Role.ToString(), user.TelegramId?.Value);
+            return Result<AuthenticatedUserDetails>.Ok(new AuthenticatedUserDetails(user.Id.Value, client.Id.Value, user.Role.ToString(), user.TelegramId?.Value));
         }
 
         private async Task<User> RegisterUser(ValidatedTelegramUserInfo validatedTelegramUserInfo, CancellationToken cancellationToken)

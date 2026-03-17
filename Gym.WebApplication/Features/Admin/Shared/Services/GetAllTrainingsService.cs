@@ -9,7 +9,7 @@ namespace Gym.WebApplication.Features.Admin.Shared.Services
 {
     public interface IGetAllTrainingsService
     {
-        Task<IEnumerable<TrainingViewModel>> ExecuteAsync(CancellationToken cancellationToken = default);
+        Task<IEnumerable<TrainingViewModel>> HandleAsync(CancellationToken cancellationToken = default);
     }
 
     public class CachableGetAllTrainingsSetvice : IGetAllTrainingsService
@@ -27,21 +27,21 @@ namespace Gym.WebApplication.Features.Admin.Shared.Services
             _trainingCreationSharedState.TrainingCreated += _ => _cache = null; 
         }
 
-        public async Task<IEnumerable<TrainingViewModel>> ExecuteAsync(CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<TrainingViewModel>> HandleAsync(CancellationToken cancellationToken = default)
         {
             if(_cache is not null)
             {
                 return _cache;
             }
 
-            _cache = [.. await _decoratee.ExecuteAsync(cancellationToken)];
+            _cache = [.. await _decoratee.HandleAsync(cancellationToken)];
             return _cache;
         }
     }
 
     public class GetAllTrainingsService(HttpClient _httpClient, IMapper _mapper) : IGetAllTrainingsService
     {
-        public async Task<IEnumerable<TrainingViewModel>> ExecuteAsync(CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<TrainingViewModel>> HandleAsync(CancellationToken cancellationToken = default)
         {
             var response = await _httpClient.GetFromJsonAsync<ListResponse<TrainingDto>>("api/trainings", cancellationToken: cancellationToken);
             

@@ -1,4 +1,6 @@
-﻿namespace Gym.Domain.TrainingContext
+﻿using Gym.Domain.TrainingContext.ValueObjects;
+
+namespace Gym.Domain.TrainingContext
 {
     public interface ITrainingRepository
     {

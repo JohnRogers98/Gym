@@ -17,7 +17,7 @@ namespace Gym.Domain.Tests.Services
 
             sut.MakeEventBooking(account, calendarEvent);
 
-            Assert.Equal(0, account.AvailableTrainingsCount);
+            Assert.Equal(0, account.RemainingTrainings.Value);
             Assert.Single(account.Bookings);
             Assert.Single(calendarEvent.Bookings);
             Assert.True(calendarEvent.HasBookingFor(_fakeDataFixture.UserId));

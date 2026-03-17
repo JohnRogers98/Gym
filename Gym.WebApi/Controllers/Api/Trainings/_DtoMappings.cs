@@ -13,7 +13,6 @@ namespace Gym.WebApi.Controllers.Api.Trainings
             CreateMap<CreateTrainingRequest, CreateTraining>();
             CreateMap<CreateTrainingResult, CreateTrainingResponse>();
 
-            CreateMap<TrainingProjection, GetTrainingResponse>();
             CreateMap<TrainingProjection, TrainingDto>();
         }
     }

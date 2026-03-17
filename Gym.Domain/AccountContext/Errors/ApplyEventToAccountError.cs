@@ -1,4 +1,5 @@
 ﻿using Gym.Domain._Common;
+using Gym.Domain.AccountContext.ValueObjects;
 
 namespace Gym.Domain.AccountContext.Errors
 {

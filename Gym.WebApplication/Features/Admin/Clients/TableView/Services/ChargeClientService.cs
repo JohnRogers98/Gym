@@ -9,12 +9,12 @@ namespace Gym.WebApplication.Features.Admin.Clients.TableView.Services
 {
     public interface IChargeClientService
     {
-        Task<ChargeClientResult> ExecuteAsync(ChargeClientFormModel chargeClientFormModel, CancellationToken cancellationToken = default);
+        Task<ChargeClientResult> HandleAsync(ChargeClientFormModel chargeClientFormModel, CancellationToken cancellationToken = default);
     }
 
     public class ChargeClientService(HttpClient _httpClient, IMapper _mapper) : IChargeClientService
     {
-        public async Task<ChargeClientResult> ExecuteAsync(ChargeClientFormModel chargeClientFormModel, CancellationToken cancellationToken = default)
+        public async Task<ChargeClientResult> HandleAsync(ChargeClientFormModel chargeClientFormModel, CancellationToken cancellationToken = default)
         {
             var response = await _httpClient.PostAsJsonAsync(
                 $"/api/clients/{chargeClientFormModel.ClientId}/account/actions/charge",
