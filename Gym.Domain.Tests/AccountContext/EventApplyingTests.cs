@@ -18,7 +18,7 @@ namespace Gym.Domain.Tests.AccountContext
 
             sut.ApplyEvent(trainingBookedDomainEvent);
 
-            Assert.Equal(expectedCountAfterApplying, sut.AvailableTrainingsCount);
+            Assert.Equal(expectedCountAfterApplying, sut.RemainingTrainings.Value);
             Assert.Single(sut.Bookings);
         }
         #endregion
@@ -35,7 +35,7 @@ namespace Gym.Domain.Tests.AccountContext
 
             sut.ApplyEvent(trainingBookingCancelledDomainEvent);
 
-            Assert.Equal(expectedCountAfterApplying, sut.AvailableTrainingsCount);
+            Assert.Equal(expectedCountAfterApplying, sut.RemainingTrainings.Value);
         }
         #endregion
 
@@ -53,7 +53,7 @@ namespace Gym.Domain.Tests.AccountContext
 
             sut.ApplyEvent(trainingRebookedDomainEvent);
 
-            Assert.Equal(expectedCountAfterApplying, sut.AvailableTrainingsCount);
+            Assert.Equal(expectedCountAfterApplying, sut.RemainingTrainings.Value);
         }
         #endregion
 
@@ -68,7 +68,7 @@ namespace Gym.Domain.Tests.AccountContext
 
             sut.ApplyEvent(accountChargedDomainEvent);
 
-            Assert.Equal(expectedCountAfterApplying, sut.AvailableTrainingsCount);
+            Assert.Equal(expectedCountAfterApplying, sut.RemainingTrainings.Value);
         }
         #endregion
 

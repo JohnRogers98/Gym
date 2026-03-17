@@ -1,6 +1,7 @@
 ﻿using Gym.Domain._Common;
 using Gym.Domain._Shared;
 using Gym.Domain.ClientContext.Events;
+using Gym.Domain.ClientContext.ValueObjects;
 
 namespace Gym.Domain.ClientContext
 {

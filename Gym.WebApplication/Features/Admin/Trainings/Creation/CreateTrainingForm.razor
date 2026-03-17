@@ -29,7 +29,7 @@
 
     private async void OnValidSubmit(EditContext context)
     {
-        CreateTrainingResult createTrainingResult = await CreateTrainingService.ExecuteAsync(_formModel);
+        CreateTrainingResult createTrainingResult = await CreateTrainingService.HandleAsync(_formModel);
         TrainingCreationSharedState.Notify(createTrainingResult);
 
         this.ClearForm();

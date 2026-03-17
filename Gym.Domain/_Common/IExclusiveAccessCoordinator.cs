@@ -20,4 +20,13 @@
         public static ExclusiveAccessResult Successful(String accessKey) => new(true, accessKey);
         public static ExclusiveAccessResult Denied() => new(false, default);
     }
+
+    public class ExclusiveAccessError : DomainError
+    {
+        private ExclusiveAccessError() : base(nameof(ExclusiveAccessError)) { }
+
+        public static ExclusiveAccessError Create() => new();
+
+        public override String GetErrorMessage() => $"Exclusive access is denied.";
+    }
 }

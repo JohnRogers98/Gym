@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Gym.WebApplication.ViewModels;
+using Gym.WebDto.Responses;
 using Gym.WebDto.Responses.Clients;
 using System.Net.Http.Json;
 
@@ -14,8 +15,8 @@ namespace Gym.WebApplication.Features.Account.Details.Servises
     {
         public async Task<ClientViewModel> HandleAsync(CancellationToken cancellationToken = default)
         {
-            var response = await _httpClient.GetFromJsonAsync<GetClientResponse>("api/clients", cancellationToken: cancellationToken);
-            return _mapper.Map<ClientViewModel>(response);
+            var response = await _httpClient.GetFromJsonAsync<Response<ClientDto>>("api/clients", cancellationToken: cancellationToken);
+            return _mapper.Map<ClientViewModel>(response!.Data);
         }
     }
 }

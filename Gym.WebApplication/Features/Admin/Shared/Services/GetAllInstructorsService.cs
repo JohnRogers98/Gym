@@ -9,7 +9,7 @@ namespace Gym.WebApplication.Features.Admin.Shared.Services
 {
     public interface IGetAllInstructorsService
     {
-        Task<IEnumerable<InstructorViewModel>> ExecuteAsync(CancellationToken cancellationToken = default);
+        Task<IEnumerable<InstructorViewModel>> HandleAsync(CancellationToken cancellationToken = default);
     }
 
     public class CachableGetAllInstructosSetvice : IGetAllInstructorsService
@@ -27,21 +27,21 @@ namespace Gym.WebApplication.Features.Admin.Shared.Services
             _instructorRegisteredSharedState.InstructorCreated += _ => _cache = null;
         }
 
-        public async Task<IEnumerable<InstructorViewModel>> ExecuteAsync(CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<InstructorViewModel>> HandleAsync(CancellationToken cancellationToken = default)
         {
             if (_cache is not null)
             {
                 return _cache;
             }
 
-            _cache = [.. await _decoratee.ExecuteAsync(cancellationToken)];
+            _cache = [.. await _decoratee.HandleAsync(cancellationToken)];
             return _cache;
         }
     }
 
     public class GetAllInstructorsService(HttpClient _httpClient, IMapper _mapper) : IGetAllInstructorsService
     {
-        public async Task<IEnumerable<InstructorViewModel>> ExecuteAsync(CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<InstructorViewModel>> HandleAsync(CancellationToken cancellationToken = default)
         {
             var response = await _httpClient.GetFromJsonAsync<ListResponse<InstructorDto>>("api/instructors", cancellationToken: cancellationToken);
             IEnumerable<InstructorDto> dtos = response!.Data;

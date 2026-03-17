@@ -1,7 +1,9 @@
-﻿using Gym.Domain._Common;
-using Gym.Domain.UserContext;
+﻿using Gym.Application.Extensions;
+using Gym.Domain._Common;
+using Gym.Domain._Shared;
 using Gym.Domain.UserContext.Authentication;
 using Gym.Domain.UserContext.Errors;
+using Gym.Domain.UserContext.ValueObjects;
 using System.Collections.Specialized;
 using System.Security.Cryptography;
 using System.Text;
@@ -27,10 +29,10 @@ namespace Gym.Infrastructure.Telegram
                 
                 return Result<ValidatedTelegramUserInfo>.Ok(
                     ValidatedTelegramUserInfo.From(
-                        TelegramId.From(tgUser.Id),
-                        tgUser.Username is not null ? TelegramUsername.From(tgUser.Username) : null,
-                        tgUser.FirstName is not null ? FirstName.From(tgUser.FirstName) : null,
-                        tgUser.LastName is not null ? LastName.From(tgUser.LastName) : null
+                        TelegramId.From(tgUser.Id).Unwrap(),
+                        tgUser.Username is not null ? TelegramUsername.From(tgUser.Username).Unwrap() : null,
+                        tgUser.FirstName is not null ? FirstName.From(tgUser.FirstName).Unwrap() : null,
+                        tgUser.LastName is not null ? LastName.From(tgUser.LastName).Unwrap() : null
                     )
                 );
             }

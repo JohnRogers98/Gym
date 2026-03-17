@@ -16,21 +16,7 @@ namespace Gym.WebApi.Controllers.Api.CalendarEvents
             CreateMap<CreateCalendarEventRequest, CreateCalendarEvent>();
             CreateMap<CreateCalendarEventResult, CreateCalendarEventResponse>();
 
-            CreateMap<CalendarEventProjection, GetAdminCalendarEventResponse>();
             CreateMap<CalendarEventProjection, AdminCalendarEventDto>();
-
-            CreateMap<CalendarEventProjection, GetClientCalendarEventResponse>()
-              .ForMember(dest => dest.IsAlreadyBooked,
-                opt => opt.MapFrom((src, dest, _, context) =>
-                {
-                    var currentUserId = (String)context.Items["CurrentUserId"];
-                    return src.BookingUsers?.Any(aUserInfo => aUserInfo.Id == currentUserId);
-                }))
-              .ForMember(dest => dest.CurrentClientCount,
-                opt => opt.MapFrom((src, dest, _, context) =>
-                {
-                    return src.BookingUsers?.Count();
-                }));
 
             CreateMap<CalendarEventProjection, ClientCalendarEventDto>()
               .ForMember(dest => dest.IsAlreadyBooked,

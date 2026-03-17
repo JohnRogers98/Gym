@@ -23,13 +23,13 @@
     protected override async Task OnInitializedAsync()
     {
         InstructorRegisteredSharedState.InstructorCreated += AddCreatedInstructor;
-        _instructors = [.. await GetAllInstructorsService.ExecuteAsync()];
+        _instructors = [.. await GetAllInstructorsService.HandleAsync()];
     }
 
     private async void AddCreatedInstructor(CreateInstructorResult createdInstructorViewModel)
     {
         InstructorId instructorId = new InstructorId(createdInstructorViewModel.InstructorId);
-        InstructorViewModel? instructorViewModel = await GetInstructorByIdService.ExecuteAsync(instructorId);
+        InstructorViewModel? instructorViewModel = await GetInstructorByIdService.HandleAsync(instructorId);
 
         if (instructorViewModel is null)
             return;

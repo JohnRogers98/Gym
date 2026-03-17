@@ -30,7 +30,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        var loadedCalendarEvents = await GetAllCalendarItemsService.ExecuteAsync();
+        var loadedCalendarEvents = await GetAllCalendarItemsService.HandleAsync();
         _calendarItems = new List<ClientCalendarItemViewModel>(loadedCalendarEvents);
 
         _pickedDate = DateTime.Now.ToDateOnly();
@@ -46,7 +46,7 @@ else
 
     private async void BookEvent(ClientCalendarItemViewModel selectdCalendarEvent)
     {
-        Boolean bookingSuccessful = await BookCalendarItemService.ExecuteAsync(selectdCalendarEvent);
+        Boolean bookingSuccessful = await BookCalendarItemService.HandleAsync(selectdCalendarEvent);
         if (bookingSuccessful)
         {
             var indexOfEvent = _calendarItems.IndexOf(selectdCalendarEvent);

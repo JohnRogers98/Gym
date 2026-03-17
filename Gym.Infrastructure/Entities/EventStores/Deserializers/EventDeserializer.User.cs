@@ -1,4 +1,5 @@
-﻿using Gym.Domain._Common;
+﻿using Gym.Application.Extensions;
+using Gym.Domain._Common;
 using Gym.Domain._Shared;
 using Gym.Domain.UserContext.Events;
 using Gym.Infrastructure.Entities.Repositories.Users.EventsDto;
@@ -12,7 +13,8 @@ namespace Gym.Infrastructure.Entities.EventStores.Deserializers
             return UserCreatedDomainEvent.Restore(
                 DomainEventId.From(Guid.Parse(dto.Id)),
                 dto.occurredOn,
-                UserId.From(dto.UserId));
+                UserId.From(dto.UserId).Unwrap()
+            );
         }
     }
 }

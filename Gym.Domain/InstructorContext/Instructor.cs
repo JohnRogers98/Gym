@@ -1,33 +1,35 @@
 ﻿using Gym.Domain._Common;
+using Gym.Domain._Shared;
 using Gym.Domain.InstructorContext.Events;
+using Gym.Domain.InstructorContext.ValueObjects;
 
 namespace Gym.Domain.InstructorContext
 {
     public class Instructor : AggregateRoot
     {
         public InstructorId Id { get; }
-        public String FirstName { get; private set; }
-        public String? LastName { get; private set; }
+        public FirstName FirstName { get; private set; }
+        public LastName? LastName { get; private set; }
 
-        private Instructor(InstructorId id, String firstName, String? lastName)
+        private Instructor(InstructorId id, FirstName firstName, LastName? lastName)
         {
             Id = id;
             FirstName = firstName;
             LastName = lastName;
         }
 
-        public static Instructor Create(InstructorId id, String firstName, String? lastName)
+        public static Instructor Create(InstructorId id, FirstName firstName, LastName? lastName)
         {
             Instructor instructor = new(id, firstName, lastName);
             instructor.AddDomainEvent(InstructorCreatedDomainEvent.Create(instructor.Id));
             return instructor;
         } 
 
-        public static Instructor Restore(InstructorId id, String firstName, String? lastName)
+        public static Instructor Restore(InstructorId id, FirstName firstName, LastName? lastName)
             => new Instructor(id, firstName, lastName);
 
         public override String ToString() 
-            => $"{nameof(Id)}: {Id} \t {nameof(FirstName)}: {FirstName} \t {nameof(LastName)}: {LastName ?? "_"}";
+            => $"{nameof(Id)}: {Id} \t {nameof(FirstName)}: {FirstName} \t {nameof(LastName)}: {LastName?.Value ?? "_"}";
 
         public override Boolean Equals(Object? obj)
         {

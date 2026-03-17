@@ -1,6 +1,7 @@
 ﻿using Gym.Domain._Shared;
 using Gym.Domain._Shared.Services;
 using Gym.Domain.AccountContext;
+using Gym.Domain.AccountContext.ValueObjects;
 using Gym.Domain.CalendarEventContext;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;

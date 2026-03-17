@@ -1,4 +1,6 @@
-﻿namespace Gym.Domain.AccountContext
+﻿using Gym.Domain.AccountContext.ValueObjects;
+
+namespace Gym.Domain.AccountContext
 {
     public interface IAccountRepository
     {

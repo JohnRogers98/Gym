@@ -1,32 +1,34 @@
 ﻿using Gym.Domain._Common;
+using Gym.Domain._Shared;
 using Gym.Domain.TrainingContext.Events;
+using Gym.Domain.TrainingContext.ValueObjects;
 
 namespace Gym.Domain.TrainingContext
 {
     public class Training : AggregateRoot
     {
         public TrainingId Id { get; }
-        public String Name { get; private set; }
-        public String? Description { get; private set; }
+        public TrainingName Name { get; private set; }
+        public Description? Description { get; private set; }
 
-        public Training(TrainingId id, String name, String? description)
+        public Training(TrainingId id, TrainingName trainingName, Description? description)
         {
             Id = id;
-            Name = name;
+            Name = trainingName;
             Description = description;
         }
 
-        public static Training Create(TrainingId id, String name, String? description)
+        public static Training Create(TrainingId id, TrainingName trainingName, Description? description)
         {
-            Training training = new (id, name, description);
+            Training training = new (id, trainingName, description);
             training.AddDomainEvent(TrainingCreatedDomainEvent.Create(training.Id));
             return training;
         }
 
-        public static Training Restore(TrainingId id, String name, String? description)
-            => new Training(id, name, description);
+        public static Training Restore(TrainingId id, TrainingName trainingName, Description? description)
+            => new Training(id, trainingName, description);
 
-        public override String ToString() => $"{nameof(Id)}: {Id} \t {nameof(Name)}: {Name} \t {nameof(Description)}: {Description ?? "_"}";
+        public override String ToString() => $"{nameof(Id)}: {Id} \t {nameof(Name)}: {Name} \t {nameof(Description)}: {Description?.Value ?? "_"}";
 
         public override Boolean Equals(Object? obj)
         {

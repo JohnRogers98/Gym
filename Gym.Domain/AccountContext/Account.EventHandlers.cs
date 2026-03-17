@@ -1,4 +1,6 @@
-﻿using Gym.Domain.AccountContext.Events;
+﻿using Gym.Domain.AccountContext.Entities;
+using Gym.Domain.AccountContext.Events;
+using Gym.Domain.AccountContext.ValueObjects;
 
 namespace Gym.Domain.AccountContext
 {
@@ -8,21 +10,21 @@ namespace Gym.Domain.AccountContext
         {
             Booking booking = Booking.Restore(@event.BookingId, @event.UserId, @event.CalendarEventId, BookingStatus.Upcoming);
             _bookings.Add(booking);
-            AvailableTrainingsCount--;
+            this.DecrementRemainingTrainings();
         }
 
         public void ApplyEvent(TrainingCancelledDomainEvent @event)
         {
             Booking booking = this.FindBookingByCalendarEvent(@event.CalendarEventId)!;
             booking.Cancel();
-            AvailableTrainingsCount++;
+            this.IncrementRemainingTrainings();
         }
 
         public void ApplyEvent(TrainingRebookedDomainEvent @event)
         {
             Booking booking = this.FindBookingByCalendarEvent(@event.CalendarEventId)!;
             booking.Rebook();
-            AvailableTrainingsCount--;
+            this.DecrementRemainingTrainings();
         }
 
         public void ApplyEvent(TrainingCompletedDomainEvent @event)
@@ -33,7 +35,7 @@ namespace Gym.Domain.AccountContext
 
         public void ApplyEvent(AccountChargedDomainEvent @event)
         {
-            AvailableTrainingsCount += @event.ByCount;
+            this.IncrementRemainingTrainings(@event.ByCount);
         }
 
         public void ApplyEvent(AccountCreatedDomainEvent @event) { }

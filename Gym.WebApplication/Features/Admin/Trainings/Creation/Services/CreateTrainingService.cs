@@ -9,12 +9,12 @@ namespace Gym.WebApplication.Features.Admin.Trainings.Creation.Services
 {
     public interface ICreateTrainingService
     {
-        Task<CreateTrainingResult> ExecuteAsync(CreateTrainingFormModel createTrainingFormModel, CancellationToken cancellationToken = default);
+        Task<CreateTrainingResult> HandleAsync(CreateTrainingFormModel createTrainingFormModel, CancellationToken cancellationToken = default);
     }
 
     public class CreateTrainingService(HttpClient _httpClient, IMapper _mapper) : ICreateTrainingService
     {
-        public async Task<CreateTrainingResult> ExecuteAsync(CreateTrainingFormModel createTrainingFormModel, CancellationToken cancellationToken = default)
+        public async Task<CreateTrainingResult> HandleAsync(CreateTrainingFormModel createTrainingFormModel, CancellationToken cancellationToken = default)
         {
             var createTrainingRequest = _mapper.Map<CreateTrainingRequest>(createTrainingFormModel);
 

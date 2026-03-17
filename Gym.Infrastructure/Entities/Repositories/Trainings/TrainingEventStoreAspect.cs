@@ -1,5 +1,6 @@
 ﻿using Gym.Domain._Common;
 using Gym.Domain.TrainingContext;
+using Gym.Domain.TrainingContext.ValueObjects;
 using Gym.Infrastructure.Entities.EventStores;
 using Gym.Infrastructure.Entities.EventStores.Serializers;
 

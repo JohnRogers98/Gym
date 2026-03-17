@@ -1,6 +1,7 @@
 ﻿using Gym.Abstractions.Query.CalendarEvents;
 using Gym.Domain.CalendarEventContext;
 using Gym.Domain.CalendarEventContext.Events;
+using Gym.Domain.CalendarEventContext.ValueObjects;
 using Gym.Infrastructure.Entities.EventStores;
 using Gym.Infrastructure.Entities.EventStores.DtoDeserializers;
 using Gym.Infrastructure.Entities.Repositories.CalendarEvents.EventsDto;

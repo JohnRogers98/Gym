@@ -1,5 +1,7 @@
-﻿using Gym.Domain._Shared;
+﻿using Gym.Application.Extensions;
+using Gym.Domain._Shared;
 using Gym.Domain.UserContext;
+using Gym.Domain.UserContext.ValueObjects;
 using Gym.Infrastructure.Entities.Extensions;
 using Gym.Infrastructure.Entities.Extensions.Mappings;
 using MongoDB.Bson;
@@ -9,7 +11,7 @@ namespace Gym.Infrastructure.Entities.Repositories.Users
 {
     internal class UserRepository(IMongoCollection<UserEntity> _userCollection, MongoUnitOfWork _mongoUnitOfWork) : IUserRepository, IUserByTelegramIdFinder
     {
-        public UserId NextIdentity() => UserId.From(ObjectId.GenerateNewId().ToString());
+        public UserId NextIdentity() => UserId.From(ObjectId.GenerateNewId().ToString()).Unwrap();
 
         public async Task<User?> GetByTelegramIdAsync(TelegramId telegramUserId, CancellationToken cancellationToken)
         {

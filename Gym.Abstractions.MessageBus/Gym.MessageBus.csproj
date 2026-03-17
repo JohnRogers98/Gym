@@ -16,8 +16,4 @@
     <ProjectReference Include="..\Gym.Domain\Gym.Domain.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Notifiers\Users\" />
-  </ItemGroup>
-
 </Project>

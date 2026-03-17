@@ -1,11 +1,14 @@
-﻿namespace Gym.Domain.UserContext.Authentication
+﻿using Gym.Domain._Shared;
+using Gym.Domain.UserContext.ValueObjects;
+
+namespace Gym.Domain.UserContext.Authentication
 {
     public record ValidatedTelegramUserInfo
     {
-        public TelegramId Id { get; init; }
-        public TelegramUsername? Username { get; init; }
-        public FirstName? FirstName { get; init; }
-        public LastName? LastName { get; init; }
+        public TelegramId Id { get; }
+        public TelegramUsername? Username { get; }
+        public FirstName? FirstName { get; }
+        public LastName? LastName { get; }
         
         private ValidatedTelegramUserInfo(TelegramId id, TelegramUsername? username, FirstName? firstName, LastName? lastName)
         {

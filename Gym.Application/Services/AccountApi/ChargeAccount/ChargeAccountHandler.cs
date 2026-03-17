@@ -1,6 +1,10 @@
-﻿using Gym.Domain._Shared.Services;
+﻿using Gym.Domain._Common;
+using Gym.Domain._Shared.Services;
 using Gym.Domain.AccountContext;
+using Gym.Domain.AccountContext.ValueObjects;
 using Gym.Domain.ClientContext;
+using Gym.Domain.ClientContext.Errors;
+using Gym.Domain.ClientContext.ValueObjects;
 using MediatR;
 
 namespace Gym.Application.Services.AccountApi.ChargeAccount
@@ -8,22 +12,28 @@ namespace Gym.Application.Services.AccountApi.ChargeAccount
     internal class ChargeAccountHandler(
         IAccountRepository _accountRepository,
         IClientRepository _clientRepository,
-        IChargeAccountService _chargeAccountService) : IRequestHandler<ChargeAccount, ChargeAccountResult>
+        IChargeAccountService _chargeAccountService) : IRequestHandler<ChargeAccount, Result<ChargeAccountResult>>
     {
-        public async Task<ChargeAccountResult> Handle(ChargeAccount request, CancellationToken cancellationToken)
+        public async Task<Result<ChargeAccountResult>> Handle(ChargeAccount request, CancellationToken cancellationToken)
         {
-            ClientId clientId = ClientId.From(request.ClientId);
-            Client? client = await _clientRepository.GetByIdAsync(clientId, cancellationToken)
-                ?? throw new ArgumentException($"Client id - {clientId} not exist"); ;
+            var clientIdResult = ClientId.From(request.ClientId);
+            if (clientIdResult.Success is false)
+                return Result<ChargeAccountResult>.Fail(clientIdResult.Error!);
 
-            AccountId accountId = AccountId.From(client.UserId);
+            Client? client = await _clientRepository.GetByIdAsync(clientIdResult.Data!, cancellationToken);
+            if (client is null)
+                return Result<ChargeAccountResult>.Fail(ClientNotFoundError.Create(clientIdResult.Data!));
+
+            AccountId accountId = AccountId.From(client!.UserId);
             Account account = await _accountRepository.GetByIdAsync(accountId, cancellationToken);
 
-            _chargeAccountService.ChargeAccount(account, request.ByCount);
+            var chargeResult = _chargeAccountService.ChargeAccount(account, request.ByCount);
+            if(chargeResult.Success is false)
+                return Result<ChargeAccountResult>.Fail(chargeResult.Error!);
 
             await _accountRepository.SaveAsync(account, cancellationToken);
 
-            return new ChargeAccountResult(account.AvailableTrainingsCount);
+            return Result<ChargeAccountResult>.Ok(new ChargeAccountResult(account.RemainingTrainings.Value));
         }
     }
 }

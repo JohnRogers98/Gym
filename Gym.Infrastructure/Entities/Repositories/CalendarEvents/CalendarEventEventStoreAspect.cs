@@ -1,6 +1,6 @@
 ﻿using Gym.Domain._Common;
-using Gym.Domain._Shared;
 using Gym.Domain.CalendarEventContext;
+using Gym.Domain.CalendarEventContext.ValueObjects;
 using Gym.Infrastructure.Entities.EventStores;
 using Gym.Infrastructure.Entities.EventStores.Serializers;
 

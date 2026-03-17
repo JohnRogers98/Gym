@@ -1,7 +1,11 @@
-﻿using Gym.Domain._Shared;
+﻿using Gym.Domain._Common;
+using Gym.Domain._Shared;
 using Gym.Domain._Shared.Services;
 using Gym.Domain.AccountContext;
+using Gym.Domain.AccountContext.ValueObjects;
 using Gym.Domain.CalendarEventContext;
+using Gym.Domain.CalendarEventContext.Errors;
+using Gym.Domain.CalendarEventContext.ValueObjects;
 using MediatR;
 
 namespace Gym.Application.Services.CalendarEventApi.CancelCalendarEvent
@@ -9,12 +13,17 @@ namespace Gym.Application.Services.CalendarEventApi.CancelCalendarEvent
     internal class CancelCalendarEventHandler(
         ICalendarEventRepository _calendarEventRepository,
         IAccountRepository _accountRepository,
-        ICancelCalendarEventService _cancelCalendarEventService) : IRequestHandler<CancelCalendarEvent, CancelCalendarEventResult>
+        ICancelCalendarEventService _cancelCalendarEventService) : IRequestHandler<CancelCalendarEvent, Result<CancelCalendarEventResult>>
     {
-        public async Task<CancelCalendarEventResult> Handle(CancelCalendarEvent request, CancellationToken cancellationToken)
+        public async Task<Result<CancelCalendarEventResult>> Handle(CancelCalendarEvent request, CancellationToken cancellationToken)
         {
-            CalendarEvent calendarEvent = await _calendarEventRepository.GetByIdAsync(CalendarEventId.From(request.CalendarEventId), cancellationToken)
-                ?? throw new ArgumentNullException();
+            var calendarEventIdResult = CalendarEventId.From(request.CalendarEventId);
+            if (calendarEventIdResult.Success is false)
+                return Result<CancelCalendarEventResult>.Fail(calendarEventIdResult.Error!);
+
+            CalendarEvent? calendarEvent = await _calendarEventRepository.GetByIdAsync(calendarEventIdResult.Data!, cancellationToken);
+            if (calendarEvent is null)
+                return Result<CancelCalendarEventResult>.Fail(CalendarEventNotFoundError.Create(calendarEventIdResult.Data!));
 
             List<Account> accounts = new();
             foreach (UserId bookingUser in calendarEvent.Bookings)
@@ -23,7 +32,9 @@ namespace Gym.Application.Services.CalendarEventApi.CancelCalendarEvent
                 accounts.Add(anAccount);
             }
 
-            _cancelCalendarEventService.Cancel(calendarEvent, accounts);
+            Result cancelResult = _cancelCalendarEventService.Cancel(calendarEvent, accounts);
+            if(cancelResult.Success is false)
+                return Result<CancelCalendarEventResult>.Fail(cancelResult.Error!);
 
             await _calendarEventRepository.SaveAsync(calendarEvent, cancellationToken);
 
@@ -32,7 +43,7 @@ namespace Gym.Application.Services.CalendarEventApi.CancelCalendarEvent
                 await _accountRepository.SaveAsync(anAccount, cancellationToken);
             }
 
-            return new CancelCalendarEventResult();
+            return Result<CancelCalendarEventResult>.Ok(new CancelCalendarEventResult());
         }
     }
 }

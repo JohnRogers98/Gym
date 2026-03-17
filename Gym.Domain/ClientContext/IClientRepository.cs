@@ -1,4 +1,6 @@
-﻿namespace Gym.Domain.ClientContext
+﻿using Gym.Domain.ClientContext.ValueObjects;
+
+namespace Gym.Domain.ClientContext
 {
     public interface IClientRepository
     {

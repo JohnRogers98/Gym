@@ -9,7 +9,7 @@ namespace Gym.WebApplication.Features.Admin.Shared.Services
 {
     public interface IGetAllAdminCalendarEventsService
     {
-        Task<IEnumerable<AdminCalendarItemViewModel>> ExecuteAsync(CancellationToken cancellationToken = default);
+        Task<IEnumerable<AdminCalendarItemViewModel>> HandleAsync(CancellationToken cancellationToken = default);
     }
 
     public class CachableGetAllAdminCalendarEventsSetvice : IGetAllAdminCalendarEventsService
@@ -31,21 +31,21 @@ namespace Gym.WebApplication.Features.Admin.Shared.Services
             calendarEventCancellationState.CalendarEventCancelled += _ => _cache = null;
         }
 
-        public async Task<IEnumerable<AdminCalendarItemViewModel>> ExecuteAsync(CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<AdminCalendarItemViewModel>> HandleAsync(CancellationToken cancellationToken = default)
         {
             if (_cache is not null)
             {
                 return _cache;
             }
 
-            _cache = [.. await _decoratee.ExecuteAsync(cancellationToken)];
+            _cache = [.. await _decoratee.HandleAsync(cancellationToken)];
             return _cache;
         }
     }
 
     public class GetAllAdminCalendarEventsService(HttpClient _httpClient, IMapper _mapper) : IGetAllAdminCalendarEventsService
     {
-        public async Task<IEnumerable<AdminCalendarItemViewModel>> ExecuteAsync(CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<AdminCalendarItemViewModel>> HandleAsync(CancellationToken cancellationToken = default)
         {
             var response = await _httpClient.GetFromJsonAsync<ListResponse<AdminCalendarEventDto>>("api/admin-calendar-events", cancellationToken: cancellationToken);
             IEnumerable<AdminCalendarEventDto> dtos = response!.Data;

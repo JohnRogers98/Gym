@@ -6,12 +6,12 @@ namespace Gym.WebApplication.Features.Calendar.Services
 {
     public interface IBookCalendarItemService
     {
-        Task<Boolean> ExecuteAsync(ClientCalendarItemViewModel calendarItem, CancellationToken cancellationToken = default);
+        Task<Boolean> HandleAsync(ClientCalendarItemViewModel calendarItem, CancellationToken cancellationToken = default);
     }
 
     public class BookCalendarItemService(HttpClient _httpClient) : IBookCalendarItemService
     {
-        public async Task<Boolean> ExecuteAsync(ClientCalendarItemViewModel calendarItem, CancellationToken cancellationToken = default)
+        public async Task<Boolean> HandleAsync(ClientCalendarItemViewModel calendarItem, CancellationToken cancellationToken = default)
         {
             var response = await _httpClient.PostAsJsonAsync(
                 "api/client-calendar-events/actions/book",

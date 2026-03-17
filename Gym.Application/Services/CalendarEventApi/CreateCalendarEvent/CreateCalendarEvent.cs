@@ -1,4 +1,5 @@
 ﻿using Gym.Application.Aspects;
+using Gym.Domain._Common;
 using MediatR;
 
 namespace Gym.Application.Services.CalendarEventApi.CreateCalendarEvent
@@ -8,5 +9,5 @@ namespace Gym.Application.Services.CalendarEventApi.CreateCalendarEvent
         DateTime? End,
         Int32? MaxClientCount,
         String TrainingId,
-        IEnumerable<String>? Instructors) : IRequest<CreateCalendarEventResult>, ITransactionalRequest;
+        IEnumerable<String>? Instructors) : IRequest<Result<CreateCalendarEventResult>>, ITransactionalRequest;
 }

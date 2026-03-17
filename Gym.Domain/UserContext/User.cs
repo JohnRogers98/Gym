@@ -1,6 +1,7 @@
 ﻿using Gym.Domain._Common;
 using Gym.Domain._Shared;
 using Gym.Domain.UserContext.Events;
+using Gym.Domain.UserContext.ValueObjects;
 
 namespace Gym.Domain.UserContext
 {

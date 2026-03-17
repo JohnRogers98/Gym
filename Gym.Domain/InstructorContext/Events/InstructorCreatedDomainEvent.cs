@@ -1,4 +1,5 @@
 ﻿using Gym.Domain._Common;
+using Gym.Domain.InstructorContext.ValueObjects;
 
 namespace Gym.Domain.InstructorContext.Events
 {

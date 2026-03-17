@@ -21,7 +21,6 @@ using Gym.Infrastructure.Entities.EventStores.Serializers;
 using Gym.Infrastructure.Entities.Outbox;
 using Gym.Infrastructure.Entities.Outbox.Readers;
 using Gym.Infrastructure.Entities.Outbox.Updaters;
-using Gym.Infrastructure.Entities.Projections;
 using Gym.Infrastructure.Entities.Projections.CalendarEvents;
 using Gym.Infrastructure.Entities.Projections.Clients;
 using Gym.Infrastructure.Entities.Projections.Events;
@@ -34,6 +33,7 @@ using Gym.Infrastructure.Entities.Repositories.Instructors;
 using Gym.Infrastructure.Entities.Repositories.Trainings;
 using Gym.Infrastructure.Entities.Repositories.Users;
 using Gym.Infrastructure.HostedServices;
+using Gym.Infrastructure.Scanners;
 using Gym.Infrastructure.Telegram;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -151,33 +151,7 @@ namespace Gym.Infrastructure
 
         private static IServiceCollection AddProjections(this IServiceCollection services)
         {
-            var factoryTypes = typeof(IProjectionHandler).Assembly
-                .GetTypes()
-                .Where(t => !t.IsAbstract &&
-                            !t.IsInterface &&
-                            typeof(IProjectionHandler).IsAssignableFrom(t) &&
-                            t != typeof(CompositeProjectionHandler))
-                .ToList();
-
-            foreach (var type in factoryTypes)
-            {
-                services.TryAddScoped(type);
-            }
-
-            services.TryAddScoped<IProjectionHandler>(sp =>
-            {
-                var handlers = new List<IProjectionHandler>();
-                foreach (var type in factoryTypes)
-                {
-                    var handler = sp.GetRequiredService(type) as IProjectionHandler;
-                    if (handler != null)
-                    {
-                        handlers.Add(handler);
-                    }
-                }
-
-                return new CompositeProjectionHandler(handlers);
-            });
+            services.AddProjectionHanlders();
 
             services.TryAddScoped<EventProjectionStore>();
             services.TryAddScoped<IEventProjectionQueryService, EventProjectionQueryService>();
@@ -204,9 +178,16 @@ namespace Gym.Infrastructure
             services.TryAddScoped<IEventStore, EventStore>();
             services.TryDecorate<IEventStore, OutboxEventStoreAspect>();
 
-            services.TryAddScoped<IEventSerializer, EventSerializer>();
-            services.TryAddScoped<IEventDeserializer, EventDeserializer>();
-            services.TryAddScoped<IEventDtoDeserializer, EventDtoDeserializer>();
+            var eventContractScanner = EventContractScanner.ScanAssembly(
+                assembly: typeof(DependencyInjection).Assembly,
+                serializer: typeof(EventSerializer),
+                deserializer: typeof(EventDeserializer));
+
+            services.TryAddSingleton<EventContractScanner>(eventContractScanner);
+
+            services.TryAddSingleton<IEventSerializer, EventSerializer>();
+            services.TryAddSingleton<IEventDeserializer, EventDeserializer>();
+            services.TryAddSingleton<IEventDtoDeserializer, EventDtoDeserializer>();
 
             return services;
         }

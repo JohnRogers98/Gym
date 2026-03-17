@@ -1,5 +1,6 @@
 ﻿using Gym.Domain._Common;
 using Gym.Domain._Shared;
+using Gym.Domain.CalendarEventContext.ValueObjects;
 
 namespace Gym.Domain.CalendarEventContext.Errors
 {

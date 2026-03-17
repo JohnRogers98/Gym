@@ -1,4 +1,6 @@
-﻿namespace Gym.Domain.InstructorContext
+﻿using Gym.Domain.InstructorContext.ValueObjects;
+
+namespace Gym.Domain.InstructorContext
 {
     public interface IInstructorRepository
     {

@@ -1,5 +1,7 @@
 ﻿using Gym.Domain._Common;
 using Gym.Domain._Shared;
+using Gym.Domain.AccountContext.ValueObjects;
+using Gym.Domain.CalendarEventContext.ValueObjects;
 
 namespace Gym.Domain.AccountContext.Events
 {

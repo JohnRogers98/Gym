@@ -1,6 +1,7 @@
-﻿using Gym.Domain._Common;
-using Gym.Domain.TrainingContext;
+﻿using Gym.Application.Extensions;
+using Gym.Domain._Common;
 using Gym.Domain.TrainingContext.Events;
+using Gym.Domain.TrainingContext.ValueObjects;
 using Gym.Infrastructure.Entities.Repositories.Trainings.EventsDto;
 
 namespace Gym.Infrastructure.Entities.EventStores.Deserializers
@@ -12,7 +13,8 @@ namespace Gym.Infrastructure.Entities.EventStores.Deserializers
             return TrainingCreatedDomainEvent.Restore(
                 DomainEventId.From(Guid.Parse(dto.Id)),
                 dto.occurredOn,
-                TrainingId.From(dto.TrainingId));
+                TrainingId.From(dto.TrainingId).Unwrap()
+            );
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace Gym.Domain.UserContext
+﻿using Gym.Domain.UserContext.ValueObjects;
+
+namespace Gym.Domain.UserContext
 {
     public interface IUserByTelegramIdFinder
     {

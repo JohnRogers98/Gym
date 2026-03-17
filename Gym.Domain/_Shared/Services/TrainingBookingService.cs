@@ -1,20 +1,22 @@
-﻿using Gym.Domain.AccountContext;
+﻿using Gym.Application.Extensions;
+using Gym.Domain._Common;
+using Gym.Domain.AccountContext;
+using Gym.Domain.AccountContext.Entities;
 using Gym.Domain.CalendarEventContext;
 
 namespace Gym.Domain._Shared.Services
 {
     public interface ITrainingBookingService
     {
-        Booking MakeEventBooking(Account account, CalendarEvent calendarEvent);
+        Result<Booking> MakeEventBooking(Account account, CalendarEvent calendarEvent);
     }
 
     public class TrainingBookingService : ITrainingBookingService
     {
-        public Booking MakeEventBooking(Account account, CalendarEvent calendarEvent)
+        public Result<Booking> MakeEventBooking(Account account, CalendarEvent calendarEvent)
         {
-            calendarEvent.AddBooking(account.UserId);
-            
-            return account.MakeBooking(calendarEvent.Id);
+            return calendarEvent.AddBooking(account.UserId)
+                .Bind(() => account.MakeBooking(calendarEvent.Id));
         }
     }
 }

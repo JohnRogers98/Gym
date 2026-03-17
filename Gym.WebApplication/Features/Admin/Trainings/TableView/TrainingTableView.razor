@@ -21,13 +21,13 @@
     protected override async Task OnInitializedAsync()
     {
         TrainingCreationSharedState.TrainingCreated += AddCreatedTraining;
-        _trainings = [.. await GetAllTrainingsService.ExecuteAsync()];
+        _trainings = [.. await GetAllTrainingsService.HandleAsync()];
     }
 
     private async void AddCreatedTraining(CreateTrainingResult createTrainingResult)
     {
         TrainingId trainingId = new TrainingId(createTrainingResult.TrainingId);
-        TrainingViewModel? trainingViewModel = await GetTrainingByIdService.ExecuteAsync(trainingId);
+        TrainingViewModel? trainingViewModel = await GetTrainingByIdService.HandleAsync(trainingId);
 
         if (trainingViewModel is null)
             return;

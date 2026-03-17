@@ -1,20 +1,5 @@
 using Gym.WebApplication;
 using Gym.WebApplication.Extensions;
-using Gym.WebApplication.Features.Account.Details.Servises;
-using Gym.WebApplication.Features.Account.History.Services;
-using Gym.WebApplication.Features.Admin.CalendarEvents.Creation.Services;
-using Gym.WebApplication.Features.Admin.CalendarEvents.States;
-using Gym.WebApplication.Features.Admin.CalendarEvents.TableView.Services;
-using Gym.WebApplication.Features.Admin.Clients.TableView.Services;
-using Gym.WebApplication.Features.Admin.Instructors.Registration.Services;
-using Gym.WebApplication.Features.Admin.Instructors.States;
-using Gym.WebApplication.Features.Admin.Shared.Services;
-using Gym.WebApplication.Features.Admin.Trainings.Creation.Services;
-using Gym.WebApplication.Features.Admin.Trainings.States;
-using Gym.WebApplication.Features.Calendar.Services;
-using Gym.WebApplication.Features.Login.Services;
-using Gym.WebApplication.JSAdapters;
-using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using MudBlazor;
@@ -49,49 +34,18 @@ builder.Services.AddCascadingAuthenticationState();
 
 builder.Services.AddHttpClient(builder.Configuration);
 
-builder.Services.AddScoped<IWebAppAuthService, WebAppAuthService>();
-builder.Services.AddScoped<AuthenticationStateProvider, WebAppAuthStateProvider>();
+builder.Services.AddAuthenticationServices();
 
-builder.Services.AddScoped<LocalStorageAdapter>();
+builder.Services.AddLocalStorage();
 
-builder.Services.AddScoped<IGetAllCalendarItemsService, GetAllCalendarItemsService>();
-builder.Services.AddScoped<IBookCalendarItemService, BookCalendarItemService>();
+builder.Services.AddCalendarEventServices();
 
-builder.Services.AddScoped<IGetAllAdminCalendarEventsService, GetAllAdminCalendarEventsService>();
-builder.Services.Decorate<IGetAllAdminCalendarEventsService, CachableGetAllAdminCalendarEventsSetvice>();
+builder.Services.AddAccountServices();
 
-builder.Services.AddScoped<IGetAdminCalendarEventByIdService, GetAdminCalendarEventByIdService>();
-builder.Services.Decorate<IGetAdminCalendarEventByIdService, RetryableGetAdminCalendarEventByIdService>();
+builder.Services.AddInstructorServices();
 
-builder.Services.AddScoped<ICreateCalendarEventService, CreateCalendarEventService>();
-builder.Services.AddScoped<ICalendarEventCreationState, CalendarEventCreationState>();
+builder.Services.AddTrainingServices();
 
-builder.Services.AddScoped<ICancelCalendarEventService, CancelCalendarEventService>();
-builder.Services.AddScoped<ICalendarEventCancellationState, CalendarEventCancellationState>();
-
-builder.Services.AddScoped<AccountHistoryViewModelMapper>();
-builder.Services.AddScoped<IGetAllAccountHistoryItemsService, GetAllAccountHistoryItemsService>();
-
-builder.Services.AddScoped<IGetAllInstructorsService, GetAllInstructorsService>();
-builder.Services.Decorate<IGetAllInstructorsService, CachableGetAllInstructosSetvice>();
-
-builder.Services.AddScoped<IGetInstructorByIdService, GetInstructorByIdService>();
-builder.Services.Decorate<IGetInstructorByIdService, RetryableGetInstructorByIdService>();
-
-builder.Services.AddScoped<ICreateInstructorService, CreateInstructorService>();
-builder.Services.AddScoped<IInstructorRegisteredSharedState, InstructorRegistrationSharedState>();
-
-builder.Services.AddScoped<ICreateTrainingService, CreateTrainingService>();
-builder.Services.AddScoped<ITrainingCreationSharedState, TrainingCreationSharedState>();
-
-builder.Services.AddScoped<IGetAllTrainingsService, GetAllTrainingsService>();
-builder.Services.Decorate<IGetAllTrainingsService, CachableGetAllTrainingsSetvice>();
-
-builder.Services.AddScoped<IGetTrainingByIdService, GetTrainingByIdService>();
-builder.Services.Decorate<IGetTrainingByIdService, RetryableGetTrainingByIdService>();
-
-builder.Services.AddScoped<IGetAllClientsService, GetAllClientsService>();
-builder.Services.AddScoped<IGetClientDetailsService, GetClientDetailsService>();
-builder.Services.AddScoped<IChargeClientService, ChargeClientService>();
+builder.Services.AddClientServices();
 
 await builder.Build().RunAsync();
