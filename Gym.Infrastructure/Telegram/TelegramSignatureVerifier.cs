@@ -32,7 +32,7 @@ namespace Gym.Infrastructure.Telegram
                         TelegramId.From(tgUser.Id).Unwrap(),
                         tgUser.Username is not null ? TelegramUsername.From(tgUser.Username).Unwrap() : null,
                         tgUser.FirstName is not null ? FirstName.From(tgUser.FirstName).Unwrap() : null,
-                        tgUser.LastName is not null ? LastName.From(tgUser.LastName).Unwrap() : null
+                        String.IsNullOrWhiteSpace(tgUser.LastName) ? null : LastName.From(tgUser.LastName).Unwrap() 
                     )
                 );
             }
