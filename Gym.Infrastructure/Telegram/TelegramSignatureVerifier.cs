@@ -99,8 +99,8 @@ namespace Gym.Infrastructure.Telegram
             {
                 Id = root.GetProperty("id").GetInt64(),
                 FirstName = root.GetProperty("first_name").GetString(),
-                LastName = root.GetProperty("last_name").GetString(),
-                Username = root.GetProperty("username").GetString(),
+                LastName = root.TryGetProperty("last_name", out var lastName) is true ? lastName.GetString() : null,
+                Username = root.TryGetProperty("username", out var username) is true ? username.GetString() : null,
             };
         }
     }

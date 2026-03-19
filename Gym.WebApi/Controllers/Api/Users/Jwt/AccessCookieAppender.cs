@@ -13,7 +13,7 @@
             {
                 HttpOnly = true,
                 IsEssential = true,
-                Secure = this.IsRequestHttps(httpContext) ? true : false,
+                Secure = this.IsRequestHttps(httpContext),
                 SameSite = SameSiteMode.Unspecified
             });
         }
