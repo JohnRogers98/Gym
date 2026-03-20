@@ -70,5 +70,5 @@ else
         }
     }
 
-    private void RefreshSelectedItems() => _selectedItems = new(_calendarItems.Where(aCalendarEvent => aCalendarEvent.Start.ToDateOnly() == _pickedDate));
+    private void RefreshSelectedItems() => _selectedItems = new(_calendarItems.Where(aCalendarEvent => aCalendarEvent.UtcStart.ToDateOnly() == _pickedDate));
 }

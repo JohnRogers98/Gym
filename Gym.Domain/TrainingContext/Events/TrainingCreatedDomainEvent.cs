@@ -12,7 +12,7 @@ namespace Gym.Domain.TrainingContext.Events
             => (TrainingId) = (trainingId);
 
         public static TrainingCreatedDomainEvent Create(TrainingId trainingId)
-            => new(DomainEventId.Generate(), DateTime.Now, trainingId);
+            => new(DomainEventId.Generate(), DateTime.UtcNow, trainingId);
 
         public static TrainingCreatedDomainEvent Restore(DomainEventId id, DateTime occurredOn, TrainingId trainingId)
            => new(id, occurredOn, trainingId);

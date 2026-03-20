@@ -14,7 +14,7 @@ namespace Gym.Domain.CalendarEventContext.Events
             => (CalendarEventId, UserId) = (calendarEventId, userId);
 
         public static CalendarEventBookedDomainEvent Create(CalendarEventId calendarEventId, UserId userId)
-            => new(DomainEventId.Generate(), DateTime.Now, calendarEventId, userId);
+            => new(DomainEventId.Generate(), DateTime.UtcNow, calendarEventId, userId);
 
         public static CalendarEventBookedDomainEvent Restore(DomainEventId id, DateTime occurredOn, CalendarEventId calendarEventId, UserId userId)
            => new(id, occurredOn, calendarEventId, userId);

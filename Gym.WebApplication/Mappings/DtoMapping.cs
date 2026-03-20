@@ -39,11 +39,42 @@ namespace Gym.WebApplication.Mappings
             #endregion
 
             #region CalendarEvent
-            base.CreateMap<ClientCalendarEventDto, ClientCalendarItemViewModel>();
-            base.CreateMap<AdminCalendarEventDto, AdminCalendarItemViewModel>();
+            base.CreateMap<ClientCalendarEventDto, ClientCalendarItemViewModel>()
+             .ForMember(dest => dest.UtcStart,
+                opt => opt.MapFrom((src, dest, _, context) =>
+                {
+                    return src.Start;
+                }))
+                .ForMember(dest => dest.UtcEnd,
+                opt => opt.MapFrom((src, dest, _, context) =>
+                {
+                    return src.End;
+                }));
 
-            base.CreateMap<CreateCalendarEventFormModel, CreateCalendarEventRequest>();
-            
+            base.CreateMap<AdminCalendarEventDto, AdminCalendarItemViewModel>()
+                 .ForMember(dest => dest.UtcStart,
+                opt => opt.MapFrom((src, dest, _, context) =>
+                {
+                    return src.Start;
+                }))
+                .ForMember(dest => dest.UtcEnd,
+                opt => opt.MapFrom((src, dest, _, context) =>
+                {
+                    return src.End;
+                }));
+
+            base.CreateMap<CreateCalendarEventFormModel, CreateCalendarEventRequest>()
+                .ForMember(dest => dest.Start,
+                opt => opt.MapFrom((src, dest, _, context) =>
+                {
+                    return src.UtcStart;
+                }))
+                .ForMember(dest => dest.End,
+                opt => opt.MapFrom((src, dest, _, context) =>
+                {
+                    return src.UtcEnd;
+                }));
+
             base.CreateMap<CreateCalendarEventResponse, CreateCalendarEventResult>();
             #endregion
 

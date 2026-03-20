@@ -16,7 +16,7 @@
             <MudCard Elevation="0">
                 <MudCardContent>
                     <MudDatePicker PickerVariant="PickerVariant.Dialog" HelperText="Choose day" AutoClose="true"    
-                                   MinDate="@DateTime.Today" @bind-Date="@_formModel.StartDateTime" For="@(() => _formModel.StartDateTime)"/>
+                                   MinDate="@DateTime.Today" @bind-Date="@_formModel.LocalStartDateTime" For="@(() => _formModel.LocalStartDateTime)"/>
 
                     <MudTimePicker PickerVariant="PickerVariant.Dialog" HelperText="Choose time" AutoClose="true" 
                                    @bind-Time="@_formModel.StartTimeSpan" For="@(() => _formModel.StartTimeSpan)" />

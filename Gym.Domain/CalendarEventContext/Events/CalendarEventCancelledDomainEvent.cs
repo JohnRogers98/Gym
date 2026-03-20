@@ -14,7 +14,7 @@ namespace Gym.Domain.CalendarEventContext.Events
             => (CalendarEventId, BookingUsers) = (calendarEventId, bookingUsers);
 
         public static CalendarEventCancelledDomainEvent Create(CalendarEventId calendarEventId, IReadOnlyCollection<UserId> bookingUsers)
-            => new(DomainEventId.Generate(), DateTime.Now, calendarEventId, bookingUsers);
+            => new(DomainEventId.Generate(), DateTime.UtcNow, calendarEventId, bookingUsers);
 
         public static CalendarEventCancelledDomainEvent Restore(DomainEventId id, DateTime occurredOn, CalendarEventId calendarEventId, IReadOnlyCollection<UserId> bookingUsers)
            => new(id, occurredOn, calendarEventId, bookingUsers);

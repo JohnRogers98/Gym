@@ -3,8 +3,13 @@
     public record ClientCalendarItemViewModel
     {
         public required String Id { get; init; }
-        public DateTime Start { get; init; }
-        public DateTime? End { get; init; }
+
+        public DateTime UtcStart { get; init; }
+        public DateTime LocalStart => UtcStart.ToLocalTime();
+
+        public DateTime? UtcEnd { get; init; }
+        public DateTime? LocalEnd => UtcEnd?.ToLocalTime();
+
         public required String Status { get; set; }
         public required TrainingViewModel Training { get; init; }
         public Int32? MaxClientCount { get; init; }
@@ -16,7 +21,5 @@
 
         public Boolean IsUpcoming => Status == "Upcoming";
 
-        public DateTime LocalStart => Start.ToLocalTime();
-        public DateTime? LocalEnd => End?.ToLocalTime();
     }
 }

@@ -14,7 +14,7 @@ namespace Gym.Domain.PollResponseContext.Events
             => (PollId, PollResponseId) = (pollId, pollResponseId);
 
         public static CalendarEventPollResponseCreatedDomainEvent Create(PollId pollId, PollResponseId pollResponseId)
-            => new(DomainEventId.Generate(), DateTime.Now, pollId, pollResponseId);
+            => new(DomainEventId.Generate(), DateTime.UtcNow, pollId, pollResponseId);
 
         public static CalendarEventPollResponseCreatedDomainEvent Restore(DomainEventId id, DateTime occurredOn, PollId pollId, PollResponseId pollResponseId)
            => new(id, occurredOn, pollId, pollResponseId);
