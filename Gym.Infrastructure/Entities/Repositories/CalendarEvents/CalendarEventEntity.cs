@@ -1,4 +1,5 @@
 ﻿using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 
 namespace Gym.Infrastructure.Entities.Repositories.CalendarEvents
 {
@@ -18,5 +19,8 @@ namespace Gym.Infrastructure.Entities.Repositories.CalendarEvents
         public required ObjectId TrainingId { get; set; }
 
         public IEnumerable<ObjectId>? Instructors { get; set; }
+
+        [BsonIgnoreIfNull]
+        public ObjectId? PollId { get; set; }
     }
 }

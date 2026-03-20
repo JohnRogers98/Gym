@@ -8,6 +8,8 @@ using Gym.Domain.AccountContext;
 using Gym.Domain.CalendarEventContext;
 using Gym.Domain.ClientContext;
 using Gym.Domain.InstructorContext;
+using Gym.Domain.PollContext;
+using Gym.Domain.PollResponseContext;
 using Gym.Domain.TrainingContext;
 using Gym.Domain.UserContext;
 using Gym.Domain.UserContext.Authentication;
@@ -30,6 +32,8 @@ using Gym.Infrastructure.Entities.Repositories.Accounts;
 using Gym.Infrastructure.Entities.Repositories.CalendarEvents;
 using Gym.Infrastructure.Entities.Repositories.Clients;
 using Gym.Infrastructure.Entities.Repositories.Instructors;
+using Gym.Infrastructure.Entities.Repositories.PollResponses;
+using Gym.Infrastructure.Entities.Repositories.Polls;
 using Gym.Infrastructure.Entities.Repositories.Trainings;
 using Gym.Infrastructure.Entities.Repositories.Users;
 using Gym.Infrastructure.HostedServices;
@@ -104,6 +108,9 @@ namespace Gym.Infrastructure
             services.AddMongoCollection<MessageEntity>(mongoDbOptions.CollectionOptions.Messages);
 
             services.AddMongoCollection<OutboxChangeStreamState>(mongoDbOptions.CollectionOptions.OutboxChangeStreams);
+            
+            services.AddMongoCollection<PollEntity>(mongoDbOptions.CollectionOptions.Polls);
+            services.AddMongoCollection<PollResponseEntity>(mongoDbOptions.CollectionOptions.PollResponses);
 
             return services;
         }
@@ -146,6 +153,13 @@ namespace Gym.Infrastructure
             services.TryDecorate<IClientRepository, ClientEventStoreAspect>();
             
             services.TryAddScoped<IAccountRepository, AccountRepository>();
+
+            services.TryAddScoped<IPollRepository, PollRepository>();
+            services.TryDecorate<IPollRepository, PollEventStoreAspect>();
+
+            services.TryAddScoped<IPollResponseRepository, PollResponseRepository>();
+            services.TryDecorate<IPollResponseRepository, PollResponseEventStoreAspect>();
+
             return services;
         }
 

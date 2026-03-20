@@ -9,5 +9,12 @@ namespace Gym.Application.Services.CalendarEventApi.CreateCalendarEvent
         DateTime? End,
         Int32? MaxClientCount,
         String TrainingId,
-        IEnumerable<String>? Instructors) : IRequest<Result<CreateCalendarEventResult>>, ITransactionalRequest;
+        IEnumerable<String>? Instructors,
+        CalendarEventPoll? Poll = null) : IRequest<Result<CreateCalendarEventResult>>, ITransactionalRequest;
+
+    public record CalendarEventPoll(
+        String Title,
+        Boolean IsResponseRequired,
+        Boolean CanAcceptMany,
+        IEnumerable<String> ChoiceVariants);
 }

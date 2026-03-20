@@ -16,6 +16,12 @@ namespace Gym.WebApi.Controllers.Api.CalendarEvents
             CreateMap<CreateCalendarEventRequest, CreateCalendarEvent>();
             CreateMap<CreateCalendarEventResult, CreateCalendarEventResponse>();
 
+            CreateMap<CalendarEventPollDto, CalendarEventPoll>();
+            CreateMap<CalendarEventPollResponseDto, CalendarEventPollResponse>();
+
+            CreateMap<ChoiceInfo, ChoiceStateInfo>();
+            CreateMap<PollInfo, CalendarEventPollStateDto>();
+
             CreateMap<CalendarEventProjection, AdminCalendarEventDto>();
 
             CreateMap<CalendarEventProjection, ClientCalendarEventDto>()
