@@ -21,5 +21,6 @@
 
         public Boolean IsUpcoming => Status == "Upcoming";
 
+        public PollViewModel? Poll { get; init; }
     }
 }

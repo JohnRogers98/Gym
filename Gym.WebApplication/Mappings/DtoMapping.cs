@@ -40,7 +40,7 @@ namespace Gym.WebApplication.Mappings
 
             #region CalendarEvent
             base.CreateMap<ClientCalendarEventDto, ClientCalendarItemViewModel>()
-             .ForMember(dest => dest.UtcStart,
+                .ForMember(dest => dest.UtcStart,
                 opt => opt.MapFrom((src, dest, _, context) =>
                 {
                     return src.Start;
@@ -49,10 +49,15 @@ namespace Gym.WebApplication.Mappings
                 opt => opt.MapFrom((src, dest, _, context) =>
                 {
                     return src.End;
+                }))
+                .ForMember(dest => dest.Poll,
+                opt => opt.MapFrom((src, dest, _, context) =>
+                {
+                    return src.PollInfo;
                 }));
 
             base.CreateMap<AdminCalendarEventDto, AdminCalendarItemViewModel>()
-                 .ForMember(dest => dest.UtcStart,
+                .ForMember(dest => dest.UtcStart,
                 opt => opt.MapFrom((src, dest, _, context) =>
                 {
                     return src.Start;
@@ -81,6 +86,11 @@ namespace Gym.WebApplication.Mappings
             #region Client
             base.CreateMap<ClientDto, ClientViewModel>();
             base.CreateMap<ChargeAccountResponse, ChargeClientResult>();
+            #endregion
+
+            #region Poll
+            base.CreateMap<CalendarEventPollStateDto, PollViewModel>();
+            base.CreateMap<ChoiceStateInfo, ChoiceViewModel>();
             #endregion
         }
     }

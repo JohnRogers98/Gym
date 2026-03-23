@@ -1,0 +1,21 @@
+﻿
+<MudStack Spacing="3">
+    <MudButton OnClick="OnExpandCollapseClick" Variant="Variant.Filled" Color="Color.Tertiary">@(_expanded? CollapseTitle : ExpandTitle)</MudButton>
+    <MudCollapse Expanded="_expanded">
+        @ChildContent
+    </MudCollapse>
+</MudStack>
+
+@code {
+    private Boolean _expanded = false;
+
+    [Parameter] public String ExpandTitle { get; set; } = "Expand";
+    [Parameter] public String CollapseTitle { get; set; } = "Collapse";
+
+    [Parameter] public RenderFragment ChildContent { get; set; } = default!;
+
+    private void OnExpandCollapseClick()
+    {
+        _expanded = !_expanded;
+    }
+}

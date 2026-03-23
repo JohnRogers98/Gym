@@ -1,4 +1,5 @@
-﻿using Gym.Domain._Common;
+﻿using Gym.Application.Extensions;
+using Gym.Domain._Common;
 using Gym.Domain._Shared;
 using Gym.Domain._Shared.Services;
 using Gym.Domain.AccountContext;
