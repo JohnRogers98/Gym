@@ -4,6 +4,8 @@
     {
         public required String Id { get; init; }
         public required String Title { get; init; }
+        public required Boolean IsRequired { get; init; }
+        public required Boolean CanSelectMany { get; init; }
         public required List<ChoiceViewModel> Choices { get; init; }
     }
 

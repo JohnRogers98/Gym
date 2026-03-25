@@ -62,7 +62,7 @@ namespace Gym.Infrastructure.Entities.Projections.CalendarEvents
                     .Find(ePoll => ePoll.Id == calendarEvent.PollId.Value)
                     .FirstAsync(cancellationToken);
 
-                pollInfo = new PollInfo(poll.Id.ToString(), poll.Title, [.. poll.Choices.Select(aChoice => new ChoiceInfo(aChoice.Id, aChoice.Text))]);
+                pollInfo = new PollInfo(poll.Id.ToString(), poll.Title, poll.IsRequired, poll.CanAcceptManyChoices, [.. poll.Choices.Select(aChoice => new ChoiceInfo(aChoice.Id, aChoice.Text))]);
             }
 
             var projection = new CalendarEventProjection(

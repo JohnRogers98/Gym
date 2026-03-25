@@ -1,4 +1,5 @@
 ﻿@page "/calendar"
+@using Gym.WebApplication.Features.Calendar.Models
 @using Gym.WebApplication.Features.Calendar.Services
 @using System.Collections.ObjectModel
 @using System.Collections.Specialized
@@ -8,6 +9,7 @@
 @inject IGetAllCalendarItemsService GetAllCalendarItemsService
 @inject IBookCalendarItemService BookCalendarItemService
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IDialogService DialogService
 
 @if (_calendarItems is null)
 {
@@ -46,7 +48,24 @@ else
 
     private async void BookEvent(ClientCalendarItemViewModel selectdCalendarEvent)
     {
-        Boolean bookingSuccessful = await BookCalendarItemService.HandleAsync(selectdCalendarEvent);
+        PollResponse? pollResponse = null;
+        if (selectdCalendarEvent.Poll is not null)
+        {
+            var parameters = new DialogParameters<SubmitPollDialog> { { x => x.PollViewModel, selectdCalendarEvent.Poll } };
+
+            var dialog = await DialogService.ShowAsync<SubmitPollDialog>("Response poll", parameters);
+            var result = await dialog.Result;
+
+            if (result!.Canceled)
+            {
+                return;
+            }
+
+            if (result?.Data is PollResponse shapedResponse)
+                pollResponse = shapedResponse;
+        }
+
+        Boolean bookingSuccessful = await BookCalendarItemService.HandleAsync(selectdCalendarEvent, pollResponse);
         if (bookingSuccessful)
         {
             var indexOfEvent = _calendarItems.IndexOf(selectdCalendarEvent);

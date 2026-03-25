@@ -8,6 +8,7 @@
 @inject ICalendarEventCreationState CalendarEventCreationState
 @inject IGetAllTrainingsService GetAllTrainingsService
 @inject IGetAllInstructorsService GetAllInstructorsService
+@inject IDialogService DialogService
 
 <EditForm Model="@_formModel" OnValidSubmit="@OnValidSubmit">
     <DataAnnotationsValidator />
@@ -49,7 +50,19 @@
                 </MudCardContent>
 
                 <MudCardActions>
-                    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Create</MudButton>
+                    <MudStack Row="true" Class="ml-auto">
+                        <MudCheckBox Disabled="true" ReadOnly="true" @bind-Value="@_pollAdded" />
+                        @if (_pollAdded is false)
+                        {
+                            <MudButton ButtonType="ButtonType.Button" Variant="Variant.Filled" Color="Color.Tertiary" OnClick="@CallAddPollDialog">Add poll</MudButton>
+                        }
+                        else
+                        {
+                            <MudButton ButtonType="ButtonType.Button" Variant="Variant.Filled" Color="Color.Error" OnClick="@ResetPoll">Reset poll</MudButton>
+                        }                        
+                        <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Create</MudButton>
+                    </MudStack>
+                  
                 </MudCardActions>
             </MudCard>
         </MudItem>
@@ -58,6 +71,8 @@
 
 @code {
     private CreateCalendarEventFormModel _formModel = new CreateCalendarEventFormModel();
+
+    private Boolean _pollAdded = false;
 
     private IList<TrainingViewModel> _trainings = [];
     private IList<InstructorViewModel> _instructors = [];
@@ -74,6 +89,36 @@
             ", ",
            _instructors.Where(anInstructor => selectedValues.Contains(anInstructor.Id)).Select(anInstructor => anInstructor.FullName)
         );
+    }
+
+    private async void ResetPoll()
+    {
+        _pollAdded = false;
+        _formModel.PollFormModel = null;
+
+        base.StateHasChanged();
+    }
+
+    private async void CallAddPollDialog()
+    {
+
+        var parameters = new DialogParameters<CreatePollDialog> { };
+        if (_formModel.PollFormModel is not null)
+            parameters.Add(x => x.FormModel, _formModel.PollFormModel);
+
+        var dialog = await DialogService.ShowAsync<CreatePollDialog>("Create poll", parameters);
+        var result = await dialog.Result;
+
+        if(result is not null && result.Canceled is false)
+        {
+            if (result.Data is CreatePollFormModel createPollFormModel)
+            {
+                _pollAdded = true;
+                _formModel.PollFormModel = createPollFormModel;
+            }
+        }
+
+        base.StateHasChanged();
     }
 
     private async void OnValidSubmit(EditContext context)

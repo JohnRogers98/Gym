@@ -6,6 +6,7 @@ using Gym.WebApplication.Features.Admin.Instructors.Registration.Models.Forms;
 using Gym.WebApplication.Features.Admin.Instructors.Registration.Models.Results;
 using Gym.WebApplication.Features.Admin.Trainings.Creation.Models.Forms;
 using Gym.WebApplication.Features.Admin.Trainings.Creation.Models.Results;
+using Gym.WebApplication.Features.Calendar.Models;
 using Gym.WebApplication.ViewModels;
 using Gym.WebDto.Requests.CalendarEvent;
 using Gym.WebDto.Requests.Instructor;
@@ -78,6 +79,11 @@ namespace Gym.WebApplication.Mappings
                 opt => opt.MapFrom((src, dest, _, context) =>
                 {
                     return src.UtcEnd;
+                }))
+                .ForMember(dest => dest.Poll,
+                opt => opt.MapFrom((src, dest, _, context) =>
+                {
+                    return src.PollFormModel;
                 }));
 
             base.CreateMap<CreateCalendarEventResponse, CreateCalendarEventResult>();
@@ -89,8 +95,39 @@ namespace Gym.WebApplication.Mappings
             #endregion
 
             #region Poll
-            base.CreateMap<CalendarEventPollStateDto, PollViewModel>();
+            base.CreateMap<CalendarEventPollStateDto, PollViewModel>()
+                 .ForMember(dest => dest.IsRequired,
+                opt => opt.MapFrom((src, dest, _, context) =>
+                {
+                    return src.IsResponseRequired;
+                }))
+                .ForMember(dest => dest.CanSelectMany,
+                opt => opt.MapFrom((src, dest, _, context) =>
+                {
+                    return src.CanAcceptMany;
+                }));
+
+
             base.CreateMap<ChoiceStateInfo, ChoiceViewModel>();
+
+            base.CreateMap <CreatePollFormModel, CalendarEventPollDto>()
+                .ForMember(dest => dest.IsResponseRequired,
+                opt => opt.MapFrom((src, dest, _, context) =>
+                {
+                    return src.IsRequired;
+                }))
+                .ForMember(dest => dest.CanAcceptMany,
+                opt => opt.MapFrom((src, dest, _, context) =>
+                {
+                    return src.CanSelectMany;
+                }))
+                .ForMember(dest => dest.ChoiceVariants,
+                opt => opt.MapFrom((src, dest, _, context) =>
+                {
+                    return src.Choices;
+                }));
+
+            base.CreateMap<PollResponse, CalendarEventPollResponseDto>();
             #endregion
         }
     }

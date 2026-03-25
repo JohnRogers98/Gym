@@ -4,6 +4,8 @@
     {
         public required String Id { get; init; }
         public required String Title { get; init; }
+        public required Boolean IsResponseRequired { get; init; }
+        public required Boolean CanAcceptMany { get; init; }
         public required List<ChoiceStateInfo> Choices { get; init; }
     }
 

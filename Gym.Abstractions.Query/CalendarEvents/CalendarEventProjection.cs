@@ -16,7 +16,7 @@
     
     public record InstructorInfo(String Id, String FullName);
 
-    public record PollInfo(String Id, String Title, List<ChoiceInfo> Choices);
+    public record PollInfo(String Id, String Title, Boolean IsResponseRequired, Boolean CanAcceptMany, List<ChoiceInfo> Choices);
 
     public record ChoiceInfo(Int32 Id, String Text, Int32 VoteCount = 0);
 
