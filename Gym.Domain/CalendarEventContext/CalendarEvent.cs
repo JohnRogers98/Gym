@@ -4,6 +4,7 @@ using Gym.Domain.CalendarEventContext.Errors;
 using Gym.Domain.CalendarEventContext.Events;
 using Gym.Domain.CalendarEventContext.ValueObjects;
 using Gym.Domain.InstructorContext.ValueObjects;
+using Gym.Domain.PollContext.ValueObjects;
 using Gym.Domain.TrainingContext.ValueObjects;
 
 namespace Gym.Domain.CalendarEventContext
@@ -26,6 +27,8 @@ namespace Gym.Domain.CalendarEventContext
         private List<InstructorId>? _instructors;
         public IReadOnlyCollection<InstructorId>? Instructors => _instructors?.AsReadOnly();
 
+        public PollId? PollId { get; private set; }
+
         private CalendarEvent(
             CalendarEventId id,
             TrainingPeriod trainingPeriod,
@@ -33,7 +36,8 @@ namespace Gym.Domain.CalendarEventContext
             Capacity capacity,
             TrainingId trainingId,
             IEnumerable<UserId> bookings,
-            IEnumerable<InstructorId>? instructors = default)
+            IEnumerable<InstructorId>? instructors = default,
+            PollId? pollId = default)
         {
             Id = id;
             TrainingPeriod = trainingPeriod;
@@ -42,6 +46,7 @@ namespace Gym.Domain.CalendarEventContext
             TrainingId = trainingId;
             _bookings = bookings.ToHashSet();
             _instructors = instructors?.ToList();
+            PollId = pollId;
         }
 
         public static CalendarEvent Create(
@@ -50,9 +55,21 @@ namespace Gym.Domain.CalendarEventContext
             Capacity capacity, 
             TrainingId trainingId, 
             IEnumerable<UserId>? bookings = default, 
-            IEnumerable<InstructorId>? instructors = default)
+            IEnumerable<InstructorId>? instructors = default,
+            PollId? pollId = default
+            )
         {
-            CalendarEvent calendarEvent = new (id, trainingPeriod, CalendarEventStatus.Upcoming, capacity, trainingId, bookings ?? new HashSet<UserId>(), instructors);
+            CalendarEvent calendarEvent = new (
+                id,
+                trainingPeriod,
+                CalendarEventStatus.Upcoming,
+                capacity,
+                trainingId,
+                bookings ?? new HashSet<UserId>(),
+                instructors,
+                pollId
+            );
+            
             calendarEvent.AddDomainEvent(CalendarEventCreatedDomainEvent.Create(calendarEvent.Id));
             return calendarEvent;
         }
@@ -64,9 +81,10 @@ namespace Gym.Domain.CalendarEventContext
             Capacity capacity,
             TrainingId trainingId,
             IEnumerable<UserId> bookings,
-            IEnumerable<InstructorId>? instructors = default)
+            IEnumerable<InstructorId>? instructors = default,
+            PollId? pollId = default)
         {
-            return new (id, trainingPeriod, status, capacity, trainingId, bookings, instructors);
+            return new (id, trainingPeriod, status, capacity, trainingId, bookings, instructors, pollId);
         }
 
         public Result AddBooking(UserId userId)

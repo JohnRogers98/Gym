@@ -10,30 +10,30 @@ namespace Gym.WebApplication.Features.Account.History.Services
         {
             return dto.Operation switch
             {
-                "AccountCreatedDomainEvent" => new AccountCreatedViewModel { OccurredAt = dto.OccurredAt },
+                "AccountCreatedDomainEvent" => new AccountCreatedViewModel { UtcOccurredAt = dto.OccurredAt },
 
                 "AccountChargedDomainEvent" => new AccountChargedViewModel
                 {
-                    OccurredAt = dto.OccurredAt,
+                    UtcOccurredAt = dto.OccurredAt,
                     ByCount = dto.Payload.GetRequiredValue<Int32>(nameof(AccountChargedViewModel.ByCount)),
                     Reason = dto.Payload.GetRequiredValue<String>(nameof(AccountChargedViewModel.Reason))
                 },
 
                 "TrainingBookedDomainEvent" => new TrainingBookedViewModel
                 {
-                    OccurredAt = dto.OccurredAt,
+                    UtcOccurredAt = dto.OccurredAt,
                     TrainingName = dto.Payload.GetRequiredValue<String>(nameof(TrainingBookedViewModel.TrainingName))
                 },
 
                 "TrainingCompletedDomainEvent" => new TrainingCompletedViewModel
                 {
-                    OccurredAt = dto.OccurredAt,
+                    UtcOccurredAt = dto.OccurredAt,
                     TrainingName = dto.Payload.GetRequiredValue<String>(nameof(TrainingBookedViewModel.TrainingName))
                 },
 
                 "TrainingCancelledDomainEvent" => new TrainingCancelledViewModel
                 {
-                    OccurredAt = dto.OccurredAt,
+                    UtcOccurredAt = dto.OccurredAt,
                     TrainingName = dto.Payload.GetRequiredValue<String>(nameof(TrainingCancelledViewModel.TrainingName))
                 },
 

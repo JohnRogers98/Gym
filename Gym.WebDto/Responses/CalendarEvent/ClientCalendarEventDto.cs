@@ -14,5 +14,7 @@ namespace Gym.WebDto.Responses.CalendarEvent
         public Int32 CurrentClientCount { get; init; }
         public IEnumerable<InstructorInfo>? Instructors { get; init; }
         public Boolean IsAlreadyBooked { get; init; }
+        
+        public CalendarEventPollStateDto? PollInfo { get; init; }
     }
 }

@@ -12,7 +12,7 @@ namespace Gym.Domain.ClientContext.Events
             => (UserId) = (userId);
 
         public static ClientCreatedDomainEvent Create(UserId userId)
-            => new(DomainEventId.Generate(), DateTime.Now, userId);
+            => new(DomainEventId.Generate(), DateTime.UtcNow, userId);
 
         public static ClientCreatedDomainEvent Restore(DomainEventId id, DateTime occurredOn, UserId userId)
            => new(id, occurredOn, userId);

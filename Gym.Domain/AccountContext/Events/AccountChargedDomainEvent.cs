@@ -16,7 +16,7 @@ namespace Gym.Domain.AccountContext.Events
             => (UserId, ByCount, Reason) = (userId, byCount, reason);
 
         public static AccountChargedDomainEvent Create(UserId userId, Int32 byCount, String? reason = default) 
-            => new(DomainEventId.Generate(), DateTime.Now, userId, byCount, reason);
+            => new(DomainEventId.Generate(), DateTime.UtcNow, userId, byCount, reason);
 
         public static AccountChargedDomainEvent Restore(DomainEventId id, DateTime occurredOn, UserId userId, Int32 byCount, String? reason = default)
             => new(id, occurredOn, userId, byCount, reason);

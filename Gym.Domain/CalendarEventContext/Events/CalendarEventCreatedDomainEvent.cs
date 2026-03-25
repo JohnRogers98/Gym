@@ -12,7 +12,7 @@ namespace Gym.Domain.CalendarEventContext.Events
             => (CalendarEventId) = (calendarEventId);
 
         public static CalendarEventCreatedDomainEvent Create(CalendarEventId calendarEventId)
-            => new(DomainEventId.Generate(), DateTime.Now, calendarEventId);
+            => new(DomainEventId.Generate(), DateTime.UtcNow, calendarEventId);
 
         public static CalendarEventCreatedDomainEvent Restore(DomainEventId id, DateTime occurredOn, CalendarEventId calendarEventId)
            => new(id, occurredOn, calendarEventId);

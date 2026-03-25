@@ -8,8 +8,7 @@ using MongoDB.Driver;
 
 namespace Gym.Infrastructure.Entities.Repositories.CalendarEvents
 {
-    internal class CalendarEventRepository(IMongoCollection<CalendarEventEntity> _calendarEventCollection, MongoUnitOfWork _mongoUnitOfWork) 
-        : ICalendarEventRepository, IPastCalendarEventsFinder
+    internal class CalendarEventRepository(IMongoCollection<CalendarEventEntity> _calendarEventCollection, MongoUnitOfWork _mongoUnitOfWork) : ICalendarEventRepository, IPastCalendarEventsFinder
     {
         public CalendarEventId NextIdentity() => CalendarEventId.From(ObjectId.GenerateNewId().ToString()).Unwrap();
 
@@ -30,7 +29,7 @@ namespace Gym.Infrastructure.Entities.Repositories.CalendarEvents
             var foundedEntity = await _calendarEventCollection.Find(_mongoUnitOfWork.Session, eCalendarEvent => eCalendarEvent.Id == id.Value.ToObjectId())
                 .FirstOrDefaultAsync(cancellationToken);
 
-            return foundedEntity?.ToDomain(); 
+            return foundedEntity?.ToDomain();
         }
 
         public async Task<Boolean> ExistsAsync(CalendarEventId id, CancellationToken cancellationToken) 

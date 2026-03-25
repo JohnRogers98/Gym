@@ -1,0 +1,117 @@
+﻿@using Gym.WebApplication.Features.Admin.CalendarEvents.Creation.Models.Forms
+@using Gym.WebApplication.Features.Calendar.Models
+
+<MudDialog>
+     
+    <DialogContent>
+        
+        <MudText Typo="Typo.body1" Align="Align.Center" Class="mb-4">@PollViewModel.Title</MudText>
+
+           
+        @if (PollViewModel.CanSelectMany is false)
+        {
+            <MudRadioGroup T="ChoiceViewModel" @bind-Value="@RadioGroupSelectedChoice">
+            
+                <MudStack Spacing="3">
+                @foreach (ChoiceViewModel choice in PollViewModel.Choices)
+                {
+                    <MudStack Row="true" Spacing="1">
+                        <MudRadio Value="@(choice)"></MudRadio>
+                        <MudText Typo="Typo.h6">@choice.Text</MudText>
+                    </MudStack>
+                }
+                </MudStack>
+
+            </MudRadioGroup>
+        }
+        else
+        {
+            <MudStack Spacing="3">
+            @foreach (ChoiceViewModel choice in PollViewModel.Choices)
+            {    
+                <MudStack Row="true" Spacing="1">
+                    <MudCheckBox Value="@GetCheckedValue(choice)" ValueChanged="@((Boolean value) => OnCheckedChanged(choice, value))" />
+                    <MudText Typo="Typo.h6">@choice.Text</MudText>
+                </MudStack>
+            }
+            </MudStack>
+        }
+
+        @if (_choiceError)
+        {
+            <MudAlert Severity="Severity.Error" ContentAlignment="HorizontalAlignment.End">Choice(s) must be selected</MudAlert>
+        }
+        
+      
+    </DialogContent>
+
+    <DialogActions>
+        <MudButton Color="Color.Primary" OnClick="@SubmitPoll">Submit</MudButton>
+    </DialogActions>
+
+</MudDialog>
+
+@code {
+    [Parameter] public PollViewModel PollViewModel { get; set; } = default!;
+
+    [CascadingParameter] private IMudDialogInstance MudDialog { get; set; } = default!;
+
+    private Dictionary<ChoiceViewModel, Boolean> _selectedChoices = new();
+
+    private Boolean _choiceError = false;
+
+    private void ResetSelectedChoices()
+    {
+        foreach (var aKey in _selectedChoices.Keys)
+        {
+            _selectedChoices[aKey] = false;
+        }
+    }
+
+    private Boolean AnyChoicesWasSelected() => _selectedChoices.Values.Any(aChoice => aChoice == true);
+
+    private IReadOnlyCollection<ChoiceViewModel> GetCheckedChoices() => _selectedChoices
+        .Where(group => group.Value == true)
+        .Select(group => group.Key)
+        .ToList();
+
+    private ChoiceViewModel? RadioGroupSelectedChoice
+    {
+        set
+        {
+            field = value;
+            this.ResetSelectedChoices();
+            _selectedChoices[value!] = true;
+        }
+        get;
+    }
+
+    protected override void OnParametersSet()
+    {
+        if (PollViewModel.CanSelectMany)
+        {
+            PollViewModel.Choices.ForEach(aChoice => _selectedChoices.Add(aChoice, false));
+        }
+    }
+
+    private Boolean GetCheckedValue(ChoiceViewModel choice) => _selectedChoices[choice];
+
+    private void OnCheckedChanged(ChoiceViewModel choice, Boolean value) => _selectedChoices[choice] = !_selectedChoices[choice];
+
+    public Int32 TotalVoteCount => PollViewModel.Choices.Sum(x => x.VoteCount);
+
+    private void SubmitPoll()
+    {
+        if (PollViewModel.IsRequired && this.AnyChoicesWasSelected() is false)
+        {
+            _choiceError = true;
+            base.StateHasChanged();
+            return;
+        }
+
+        PollResponse pollResponse = new() { PollId = PollViewModel.Id, SelectedChoices = [.. this.GetCheckedChoices().Select(aChoice => aChoice.Id)] };
+
+        MudDialog.Close(DialogResult.Ok<PollResponse>(pollResponse));
+    }
+
+}

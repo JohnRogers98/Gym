@@ -18,7 +18,9 @@
         String Events,
         String EventProjections,
         String Messages,
-        String OutboxChangeStreams)
+        String OutboxChangeStreams,
+        String Polls,
+        String PollResponses)
     {
         public static CollectionOptions Default => new CollectionOptions(
             "instructors",
@@ -33,6 +35,8 @@
             "events",
             "event-projections",
             "messages",
-            "outbox-changes-streams");
+            "outbox-changes-streams",
+            "polls",
+            "poll-responses");
     }
 }

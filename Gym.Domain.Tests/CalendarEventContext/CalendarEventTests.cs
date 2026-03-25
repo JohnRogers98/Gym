@@ -76,7 +76,7 @@ namespace Gym.Domain.Tests.CalendarEventContext
         {
             CalendarEvent sut = _fakeDataFixture.CreateCalendarEvent(isExpired: false);
 
-            Assert.False(sut.HasExpired(DateTime.Now));
+            Assert.False(sut.HasExpired(DateTime.UtcNow));
         }
 
         [Fact]
@@ -84,7 +84,7 @@ namespace Gym.Domain.Tests.CalendarEventContext
         {
             CalendarEvent sut = _fakeDataFixture.CreateCalendarEvent(isExpired: true);
 
-            Assert.True(sut.HasExpired(DateTime.Now));
+            Assert.True(sut.HasExpired(DateTime.UtcNow));
         }
 
         [Fact]

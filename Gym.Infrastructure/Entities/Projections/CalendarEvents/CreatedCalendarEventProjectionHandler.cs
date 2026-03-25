@@ -7,6 +7,7 @@ using Gym.Infrastructure.Entities.Extensions;
 using Gym.Infrastructure.Entities.Repositories.CalendarEvents;
 using Gym.Infrastructure.Entities.Repositories.CalendarEvents.EventsDto;
 using Gym.Infrastructure.Entities.Repositories.Instructors;
+using Gym.Infrastructure.Entities.Repositories.Polls;
 using Gym.Infrastructure.Entities.Repositories.Trainings;
 using MongoDB.Driver;
 
@@ -16,6 +17,7 @@ namespace Gym.Infrastructure.Entities.Projections.CalendarEvents
         IMongoCollection<CalendarEventEntity> _calendarEventCollection,
         IMongoCollection<TrainingEntity> _trainingColletion,
         IMongoCollection<InstructorEntity> _instructorColletion,
+        IMongoCollection<PollEntity> _pollCollection,
         IMongoCollection<CalendarEventProjection> _projectionCollection,
         MongoUnitOfWork _mongoUnitOfWork,
         IEventDtoDeserializer _eventDtoDeserializer) : IProjectionHandler
@@ -53,6 +55,15 @@ namespace Gym.Infrastructure.Entities.Projections.CalendarEvents
                     .ToListAsync(cancellationToken);
             }
 
+            PollInfo? pollInfo = null;
+            if(calendarEvent.PollId.HasValue)
+            {
+                var poll = await _pollCollection
+                    .Find(ePoll => ePoll.Id == calendarEvent.PollId.Value)
+                    .FirstAsync(cancellationToken);
+
+                pollInfo = new PollInfo(poll.Id.ToString(), poll.Title, poll.IsRequired, poll.CanAcceptManyChoices, [.. poll.Choices.Select(aChoice => new ChoiceInfo(aChoice.Id, aChoice.Text))]);
+            }
 
             var projection = new CalendarEventProjection(
                 Id: calendarEvent.Id.ToString(),
@@ -64,7 +75,8 @@ namespace Gym.Infrastructure.Entities.Projections.CalendarEvents
                 BookingUsers: calendarEvent.Bookings?
                     .Select(userId => new BookingUserInfo(userId.ToString()))
                     .ToList(),
-                Instructors: instructors
+                instructors,
+                pollInfo
             );
 
             await _projectionCollection.InsertOneAsync(_mongoUnitOfWork.Session, projection, cancellationToken: cancellationToken);

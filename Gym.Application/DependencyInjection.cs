@@ -21,6 +21,7 @@ namespace Gym.Application
             services.AddScoped<IChargeAccountService, ChargeAccountService>();
             services.AddScoped<ICompleteCalendarEventService, CompleteCalendarEventService>();
             services.AddScoped<ICancelCalendarEventService, CancelCalendarEventService>();
+            services.AddScoped<ISubmitPollResponseService, SubmitPollResponseService>();
 
             return services;
         }

@@ -8,7 +8,7 @@ namespace Gym.Application.Aspects
     {
         public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
         {
-            if (request is not ITransactionalRequest transactionalRequest)
+            if (request is not ITransactionalRequest)
             {
                 return await next();
             }
@@ -18,7 +18,13 @@ namespace Gym.Application.Aspects
             try
             {
                 var result = await next();
-                await _unitOfWork.CommitAsync(cancellationToken);
+
+                if (this.IsSuccessfulResultReturned(result))
+                    await _unitOfWork.CommitAsync(cancellationToken);
+
+                else
+                    await _unitOfWork.RollbackAsync(cancellationToken);
+
                 return result;
             }
             catch
@@ -26,6 +32,26 @@ namespace Gym.Application.Aspects
                 await _unitOfWork.RollbackAsync(cancellationToken);
                 throw;
             }
+        }
+
+        private Boolean IsSuccessfulResultReturned(TResponse response)
+        {
+            if(response == null)
+                return true;
+
+            if (typeof(TResponse).IsGenericType && typeof(TResponse).GetGenericTypeDefinition() == typeof(Result<>))
+            {
+                dynamic result = response;
+                return result.Success;
+            }
+
+            else if (typeof(TResponse) == typeof(Result))
+            {
+                Result result = (Result)(Object)response;
+                return result.Success;
+            }
+
+            return true;
         }
     }
 }
