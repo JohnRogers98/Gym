@@ -1,12 +1,15 @@
 ﻿using Gym.CompositionRoot.Extensions;
 using Gym.WebApi.Controllers.Api.Users.Jwt;
+using Gym.WebApi.Converters;
 using Gym.WebApi.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new UtcDateTimeConverter()));
+
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi(options =>
 {

@@ -23,14 +23,18 @@ namespace Gym.WebApi.Controllers.Api.CalendarEvents.ClientOnly
         [HttpPost("api/client-calendar-events/actions/book")]
         public override async Task<ActionResult<BookTrainingEventResponse>> HandleAsync(BookTrainingEventRequest request, CancellationToken cancellationToken = default)
         {
-            Result<BookTrainingEventResult> bookTrainingEventResult = await _mediator.Send(
-                new BookTrainingEvent(User.GetRequiredUserId(), request.CalendarEventId), cancellationToken);
+            var bookTrainingEvent = new BookTrainingEvent(
+                User.GetRequiredUserId(),
+                request.CalendarEventId,
+                _mapper.Map<CalendarEventPollResponse>(request.PollResponse)
+            );
+
+            Result<BookTrainingEventResult> bookTrainingEventResult = await _mediator.Send(bookTrainingEvent, cancellationToken);
             
-            if(bookTrainingEventResult.Success)
+            if (bookTrainingEventResult.Success)
             {
                 return base.Ok(_mapper.Map<BookTrainingEventResponse>(bookTrainingEventResult.Data));
             }
-
 
             return bookTrainingEventResult.Error switch
             {

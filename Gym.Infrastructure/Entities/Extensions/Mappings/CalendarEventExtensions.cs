@@ -3,6 +3,7 @@ using Gym.Domain._Shared;
 using Gym.Domain.CalendarEventContext;
 using Gym.Domain.CalendarEventContext.ValueObjects;
 using Gym.Domain.InstructorContext.ValueObjects;
+using Gym.Domain.PollContext.ValueObjects;
 using Gym.Domain.TrainingContext.ValueObjects;
 using Gym.Infrastructure.Entities.Repositories.CalendarEvents;
 
@@ -22,7 +23,8 @@ namespace Gym.Infrastructure.Entities.Extensions.Mappings
                 entity.MaxClientCount.HasValue ? Capacity.From(entity.MaxClientCount.Value).Unwrap() : Capacity.Unlimited(), 
                 TrainingId.From(entity.TrainingId.ToString()).Unwrap(),
                 entity.Bookings?.Select(x => UserId.From(x.ToString()).Unwrap()) ?? new HashSet<UserId>(),
-                entity.Instructors?.Select(instructorId => InstructorId.From(instructorId.ToString()).Unwrap())
+                entity.Instructors?.Select(instructorId => InstructorId.From(instructorId.ToString()).Unwrap()),
+                entity.PollId.HasValue ? PollId.From(entity.PollId.Value.ToString()).Unwrap() : null
             );
         }
 
@@ -37,7 +39,8 @@ namespace Gym.Infrastructure.Entities.Extensions.Mappings
                 TrainingId = calendarEvent.TrainingId.Value.ToObjectId(),
                 Bookings = calendarEvent.Bookings.Select(anUserId => anUserId.Value.ToObjectId()),
                 MaxClientCount = calendarEvent.Capacity.Value,
-                Instructors = calendarEvent.Instructors?.Select(instructorId => instructorId.Value.ToObjectId())
+                Instructors = calendarEvent.Instructors?.Select(instructorId => instructorId.Value.ToObjectId()),
+                PollId = calendarEvent.PollId?.Value.ToObjectId()
             };
         }
     }

@@ -1,0 +1,17 @@
+﻿
+<MudText Typo="Typo.body1" Align="Align.Center" Class="mb-4">@PollViewModel.Title</MudText>
+
+@foreach (ChoiceViewModel choice in PollViewModel.Choices)
+{
+    <MudStack Spacing="1">
+        <MudText Typo="Typo.body2">@choice.Text</MudText>
+        <MudProgressLinear Color="Color.Primary" Min="0" Max="@TotalVoteCount" Value="@choice.VoteCount" Class="mb-4"/>
+    </MudStack>
+}
+
+
+@code {
+    [Parameter, EditorRequired] public PollViewModel PollViewModel { get; set; } = default!;
+
+    public Int32 TotalVoteCount => PollViewModel.Choices.Sum(x => x.VoteCount);
+}
