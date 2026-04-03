@@ -1,4 +1,5 @@
 ﻿@page "/"
+
 @using Gym.WebApplication.Features.Login.Services
 
 @inject NavigationManager Navigation
@@ -12,7 +13,7 @@
             <MudPaper Elevation="3" Class="video-container rounded-lg overflow-hidden">
                 <div class="video-wrapper">
                     <iframe class="video-iframe"
-                            src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&mute=0&playsinline=1&rel=0&modestbranding=1"
+                            src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=0&mute=0&playsinline=1&rel=0&modestbranding=1"
                             allow="autoplay; encrypted-media; picture-in-picture"
                             allowfullscreen>
                     </iframe>
@@ -26,6 +27,7 @@
             </MudPaper>
         </MudItem>
     </MudGrid>
+
 </MudContainer>
 
 @code{
@@ -37,7 +39,7 @@
 
         if (String.IsNullOrEmpty(telegramData) is false)
         {
-            await WebAppAuthService.AuthenticateAsync(telegramData);      
+            await WebAppAuthService.HandleAsync(telegramData);      
         }
     }
 

@@ -1,6 +1,6 @@
 ﻿@using Gym.WebApplication.Features.Login.Services
 
-@inject IWebAppAuthService WevAppAuthService
+@inject IWebAppAuthService WebAppAuthService
 
 <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Login" Color="Color.Primary" OnClick="Authenticate">Login</MudButton>
 
@@ -8,7 +8,7 @@
 
     private async void Authenticate()
     {
-        await WevAppAuthService.AuthenticateAsync(MockedWebAppInitData.Value);
+        await WebAppAuthService.HandleAsync(MockedWebAppInitData.Value);
     }
 
 }

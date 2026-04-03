@@ -7,12 +7,13 @@ using Gym.Domain._Common;
 using Gym.Domain.AccountContext;
 using Gym.Domain.CalendarEventContext;
 using Gym.Domain.ClientContext;
+using Gym.Domain.FormAuthContext;
 using Gym.Domain.InstructorContext;
 using Gym.Domain.PollContext;
 using Gym.Domain.PollResponseContext;
+using Gym.Domain.TelegramAuthContext;
 using Gym.Domain.TrainingContext;
 using Gym.Domain.UserContext;
-using Gym.Domain.UserContext.Authentication;
 using Gym.Infrastructure.Caching;
 using Gym.Infrastructure.Configurations;
 using Gym.Infrastructure.Entities.EventStores;
@@ -31,9 +32,11 @@ using Gym.Infrastructure.Entities.Projections.Trainings;
 using Gym.Infrastructure.Entities.Repositories.Accounts;
 using Gym.Infrastructure.Entities.Repositories.CalendarEvents;
 using Gym.Infrastructure.Entities.Repositories.Clients;
+using Gym.Infrastructure.Entities.Repositories.FormAuths;
 using Gym.Infrastructure.Entities.Repositories.Instructors;
 using Gym.Infrastructure.Entities.Repositories.PollResponses;
 using Gym.Infrastructure.Entities.Repositories.Polls;
+using Gym.Infrastructure.Entities.Repositories.TelgramAuths;
 using Gym.Infrastructure.Entities.Repositories.Trainings;
 using Gym.Infrastructure.Entities.Repositories.Users;
 using Gym.Infrastructure.HostedServices;
@@ -71,6 +74,7 @@ namespace Gym.Infrastructure
             services.AddFinderServices();
             services.AddEventStore();
             services.AddCaching();
+            services.AddPasswordHashServices();
 
             services.AddBackgroundWorkers();
 
@@ -100,6 +104,10 @@ namespace Gym.Infrastructure
             services.AddMongoCollection<CalendarEventProjection>(mongoDbOptions.CollectionOptions.CalendarEventProjections);
 
             services.AddMongoCollection<UserEntity>(mongoDbOptions.CollectionOptions.Users);
+
+            services.AddMongoCollection<TelegramAuthEntity>(mongoDbOptions.CollectionOptions.TelegramAuths);
+            services.AddMongoCollection<FormAuthEntity>(mongoDbOptions.CollectionOptions.FormAuths);
+
             services.AddMongoCollection<ClientEntity>(mongoDbOptions.CollectionOptions.Clients);
             services.AddMongoCollection<ClientProjection>(mongoDbOptions.CollectionOptions.ClientProjections);
 
@@ -149,6 +157,9 @@ namespace Gym.Infrastructure
 
             services.TryAddScoped<IUserRepository, UserRepository>();
 
+            services.TryAddScoped<ITelegramAuthRepository, TelegramAuthRepository>();
+            services.TryAddScoped<IFormAuthRepository, FormAuthRepository>();
+
             services.TryAddScoped<IClientRepository, ClientRepository>();
             services.TryDecorate<IClientRepository, ClientEventStoreAspect>();
             
@@ -180,7 +191,7 @@ namespace Gym.Infrastructure
 
         private static IServiceCollection AddFinderServices(this IServiceCollection services)
         {
-            services.TryAddScoped<IUserByTelegramIdFinder, UserRepository>();
+            services.TryAddScoped<ITelegramAuthByUserIdFinder, TelegramAuthRepository>();
             services.TryAddScoped<IClientByUserIdFinder, ClientRepository>();
             services.TryAddScoped<IClientByUserIdFinder, ClientRepository>();
             services.TryAddScoped<IPastCalendarEventsFinder, CalendarEventRepository>();
@@ -220,6 +231,13 @@ namespace Gym.Infrastructure
         private static IServiceCollection AddCaching(this IServiceCollection services)
         {
             services.TryAddScoped<IExclusiveAccessCoordinator, MemoryCacheExclusiveAccess>();
+            return services;
+        }
+
+        private static IServiceCollection AddPasswordHashServices(this IServiceCollection services)
+        {
+            services.TryAddSingleton<IPasswordHasher, PasswordHasher>();
+            services.TryAddSingleton<IPasswordHashValidator, PasswordHashValidator>();
             return services;
         }
 

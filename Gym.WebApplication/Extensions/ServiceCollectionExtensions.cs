@@ -47,7 +47,10 @@ namespace Gym.WebApplication.Extensions
         public static IServiceCollection AddAuthenticationServices(this IServiceCollection services)
         {
             services.AddScoped<IWebAppAuthService, WebAppAuthService>();
-            services.AddScoped<AuthenticationStateProvider, WebAppAuthStateProvider>();
+            services.AddScoped<IBasicAuthService, BasicAuthService>();
+            services.AddScoped<IMockedAdminAuthService, MockedAdminAuthService>();
+            services.AddScoped<UserAuthState>();
+            services.AddScoped<AuthenticationStateProvider, AuthStateProvider>();
 
             return services;
         }

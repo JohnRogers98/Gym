@@ -8,34 +8,30 @@ namespace Gym.Domain.UserContext
     public class User : AggregateRoot
     {
         public UserId Id { get; }
-        public TelegramId? TelegramId { get; private set; }
-        public TelegramUsername? TelegramUsername { get; private set; }
-        public FirstName? FirstName { get; private set; }
-        public LastName? LastName { get; private set; }
-        public UserRole Role { get; private set; }
+        public UserRole Role { get; }
+        public FirstName? FirstName { get; }
+        public LastName? LastName { get; }
 
-        private User(UserId id, UserRole role, TelegramId? telegramId, TelegramUsername? telegramUsername, FirstName? firstName, LastName? lastName)
+        private User(UserId id, UserRole role, FirstName? firstName, LastName? lastName)
         {
             Id = id;
-            TelegramId = telegramId;
             Role = role;
-            TelegramUsername = telegramUsername;
             FirstName = firstName;
             LastName = lastName;
         }
 
-        public static User Create(UserId id, UserRole role, TelegramId? telegramId, TelegramUsername? telegramUsername, FirstName? firstName, LastName? lastName)
+        public static User Create(UserId id, UserRole role, FirstName? firstName, LastName? lastName)
         {
-            User user = new(id, role, telegramId, telegramUsername, firstName, lastName);
+            User user = new(id, role, firstName, lastName);
             user.AddDomainEvent(UserCreatedDomainEvent.Create(id));
             return user;
         }
 
-        public static User Restore(UserId id, UserRole role, TelegramId? telegramId, TelegramUsername? telegramUsername, FirstName? firstName, LastName? lastName)
-            => new(id, role, telegramId, telegramUsername, firstName, lastName);
+        public static User Restore(UserId id, UserRole role, FirstName? firstName, LastName? lastName)
+            => new(id, role, firstName, lastName);
 
         public override String ToString()
-            => $"{nameof(Id)}: {Id} \t {nameof(Role)}: {Role} \t {nameof(TelegramId)}: {TelegramId?.Value.ToString() ?? "_"}";
+            => $"{nameof(Id)}: {Id} \t {nameof(Role)}: {Role}";
 
         public override Boolean Equals(Object? obj)
         {

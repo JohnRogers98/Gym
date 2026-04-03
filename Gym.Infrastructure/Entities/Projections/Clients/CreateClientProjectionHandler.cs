@@ -37,7 +37,6 @@ namespace Gym.Infrastructure.Entities.Projections.Clients
             var projection = new ClientProjection(
                 Id: clientEntity.Id.ToString(),
                 UserId: clientEntity.UserId.ToString(),
-                Username: userEntity.TelegramUsername,
                 FirstName: userEntity.FirstName,
                 LastName: userEntity.LastName,
                 AvailableTrainingsCount: 0

@@ -19,8 +19,6 @@ namespace Gym.Infrastructure.Entities.Extensions.Mappings
             return User.Restore(
                 UserId.From(entity.Id.ToString()).Unwrap(),
                 userRole,
-                TelegramId.From(entity.TelegramId ?? default).Unwrap(),
-                entity.TelegramUsername is not null ? TelegramUsername.From(entity.TelegramUsername).Unwrap() : null, 
                 entity.FirstName is not null ? FirstName.From(entity.FirstName).Unwrap() : null, 
                 entity.LastName is not null ? LastName.From(entity.LastName).Unwrap() : null
             );
@@ -32,8 +30,6 @@ namespace Gym.Infrastructure.Entities.Extensions.Mappings
             { 
                 Id = user.Id.Value.ToObjectId(),
                 Role = user.Role.ToString(),
-                TelegramId = user.TelegramId?.Value,
-                TelegramUsername = user.TelegramUsername?.Value,
                 FirstName = user.FirstName?.Value,
                 LastName = user.LastName?.Value,
             };
