@@ -74,7 +74,7 @@ namespace Gym.Infrastructure
             services.AddFinderServices();
             services.AddEventStore();
             services.AddCaching();
-            services.AddPasswordHashServices();
+            services.AddPasswordServices();
 
             services.AddBackgroundWorkers();
 
@@ -234,10 +234,11 @@ namespace Gym.Infrastructure
             return services;
         }
 
-        private static IServiceCollection AddPasswordHashServices(this IServiceCollection services)
+        private static IServiceCollection AddPasswordServices(this IServiceCollection services)
         {
             services.TryAddSingleton<IPasswordHasher, PasswordHasher>();
             services.TryAddSingleton<IPasswordHashValidator, PasswordHashValidator>();
+            services.TryAddSingleton<IPasswordGenerator, PasswordGenerator>();
             return services;
         }
 
