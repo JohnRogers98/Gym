@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Gym.Application.Services.UserApi;
+using Gym.Application.Services.UserApi.ChangePassword;
 using Gym.Application.Services.UserApi.CreateUser;
 using Gym.WebDto.Requests.Users;
 using Gym.WebDto.Responses.Users;

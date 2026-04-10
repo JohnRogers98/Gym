@@ -1,11 +1,13 @@
-﻿using Gym.Domain.FormAuthContext;
+﻿using Gym.Domain._Shared;
+using Gym.Domain.FormAuthContext;
 using Gym.Domain.FormAuthContext.ValueObjects;
+using Gym.Infrastructure.Entities.Extensions;
 using Gym.Infrastructure.Entities.Extensions.Mappings;
 using MongoDB.Driver;
 
 namespace Gym.Infrastructure.Entities.Repositories.FormAuths
 {
-    internal class FormAuthRepository(IMongoCollection<FormAuthEntity> _formAuthCollection, MongoUnitOfWork _mongoUnitOfWork) : IFormAuthRepository
+    internal class FormAuthRepository(IMongoCollection<FormAuthEntity> _formAuthCollection, MongoUnitOfWork _mongoUnitOfWork) : IFormAuthRepository, IFormAuthByUserIdFinder
     {
         public async Task<Boolean> ExistsAsync(Login login, CancellationToken cancellationToken)
             => await _formAuthCollection.Find(_mongoUnitOfWork.Session, eFormAuth => eFormAuth.Login == login.Value).AnyAsync(cancellationToken);
@@ -13,6 +15,14 @@ namespace Gym.Infrastructure.Entities.Repositories.FormAuths
         public async Task<FormAuth?> GetByLoginAsync(Login login, CancellationToken cancellationToken)
         {
             var foundedEntity = await _formAuthCollection.Find(_mongoUnitOfWork.Session, eFormAuth => eFormAuth.Login == login.Value)
+                .FirstOrDefaultAsync(cancellationToken);
+
+            return foundedEntity?.ToDomain();
+        }
+
+        public async Task<FormAuth?> GetFormAuthByUserIdAsync(UserId userId, CancellationToken cancellationToken)
+        {
+            var foundedEntity = await _formAuthCollection.Find(_mongoUnitOfWork.Session, eFormAuth => eFormAuth.UserId == userId.Value.ToObjectId())
                 .FirstOrDefaultAsync(cancellationToken);
 
             return foundedEntity?.ToDomain();

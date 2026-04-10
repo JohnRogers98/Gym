@@ -43,7 +43,8 @@ namespace Gym.WebApi.Controllers.Api.Users.Anonymous
 
             return authenticatedUserDetailsResult.Error switch
             {
-                LoginValidationError or SuchLoginNotExistsError => this.BadRequestProblem(authenticatedUserDetailsResult.Error!.GetErrorMessage()),
+                LoginValidationError or SuchLoginNotExistsError or PasswordValidationError => this.BadRequestProblem(authenticatedUserDetailsResult.Error!.GetErrorMessage()),
+                PasswordHashMatchError => this.ConflictProblem(authenticatedUserDetailsResult.Error!.GetErrorMessage()),
                 _ => this.InternalErrorProblem(authenticatedUserDetailsResult.Error!.GetErrorMessage())
             };
         }

@@ -11,7 +11,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Gym.WebApi.Controllers.Api.Users.Admin
+namespace Gym.WebApi.Controllers.Api.Users.AdminOnly
 {
     [ApiController]
     [Authorize(Policy = nameof(SecurityPolicy.AdminOnly))]

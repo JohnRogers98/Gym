@@ -1,4 +1,5 @@
-﻿using Gym.WebApplication.Features.Account.Details.Servises;
+﻿using Gym.WebApplication.Features.Account.ChangePassword.Services;
+using Gym.WebApplication.Features.Account.Details.Servises;
 using Gym.WebApplication.Features.Account.History.Services;
 using Gym.WebApplication.Features.Admin.CalendarEvents.Creation.Services;
 using Gym.WebApplication.Features.Admin.CalendarEvents.States;
@@ -87,6 +88,7 @@ namespace Gym.WebApplication.Extensions
         {
             services.AddScoped<AccountHistoryViewModelMapper>();
             services.AddScoped<IGetAllAccountHistoryItemsService, GetAllAccountHistoryItemsService>();
+            services.AddScoped<IChangePasswordService, ChangePasswordService>();
 
             return services;
         }

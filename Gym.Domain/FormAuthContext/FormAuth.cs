@@ -7,7 +7,7 @@ namespace Gym.Domain.FormAuthContext
     public class FormAuth : AggregateRoot
     {
         public Login Login { get; }
-        public HashedPassword Password { get; }
+        public HashedPassword Password { get; private set; }
         public UserId UserId { get; }
 
         private FormAuth(Login id, HashedPassword password, UserId userId)
@@ -22,6 +22,9 @@ namespace Gym.Domain.FormAuthContext
 
         public static FormAuth Restore(Login id, HashedPassword password, UserId userId)
             => new(id, password, userId);
+
+        public void ChangePassword(HashedPassword newPassword)
+            => this.Password = newPassword;
 
         public override String ToString()
             => $"{nameof(UserId)}: {UserId} \t {nameof(Login)}: {Login.Value}";

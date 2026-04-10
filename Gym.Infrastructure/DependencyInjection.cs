@@ -192,6 +192,7 @@ namespace Gym.Infrastructure
         private static IServiceCollection AddFinderServices(this IServiceCollection services)
         {
             services.TryAddScoped<ITelegramAuthByUserIdFinder, TelegramAuthRepository>();
+            services.TryAddScoped<IFormAuthByUserIdFinder, FormAuthRepository>();
             services.TryAddScoped<IClientByUserIdFinder, ClientRepository>();
             services.TryAddScoped<IClientByUserIdFinder, ClientRepository>();
             services.TryAddScoped<IPastCalendarEventsFinder, CalendarEventRepository>();
