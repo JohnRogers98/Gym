@@ -3,6 +3,7 @@ using Gym.WebApplication.Features.Account.History.Services;
 using Gym.WebApplication.Features.Admin.CalendarEvents.Creation.Services;
 using Gym.WebApplication.Features.Admin.CalendarEvents.States;
 using Gym.WebApplication.Features.Admin.CalendarEvents.TableView.Services;
+using Gym.WebApplication.Features.Admin.Clients.Creation.Services;
 using Gym.WebApplication.Features.Admin.Clients.TableView.Services;
 using Gym.WebApplication.Features.Admin.Instructors.Registration.Services;
 using Gym.WebApplication.Features.Admin.Instructors.States;
@@ -123,6 +124,7 @@ namespace Gym.WebApplication.Extensions
             services.AddScoped<IGetAllClientsService, GetAllClientsService>();
             services.AddScoped<IGetClientDetailsService, GetClientDetailsService>();
             services.AddScoped<IChargeClientService, ChargeClientService>();
+            services.AddScoped<ICreateClientService, CreateClientService>();
 
             return services;
         }
