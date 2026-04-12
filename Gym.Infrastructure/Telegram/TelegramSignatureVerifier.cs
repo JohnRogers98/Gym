@@ -1,9 +1,9 @@
 ﻿using Gym.Application.Extensions;
 using Gym.Domain._Common;
 using Gym.Domain._Shared;
-using Gym.Domain.UserContext.Authentication;
-using Gym.Domain.UserContext.Errors;
-using Gym.Domain.UserContext.ValueObjects;
+using Gym.Domain.TelegramAuthContext;
+using Gym.Domain.TelegramAuthContext.Errors;
+using Gym.Domain.TelegramAuthContext.ValueObjects;
 using System.Collections.Specialized;
 using System.Security.Cryptography;
 using System.Text;

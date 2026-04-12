@@ -1,0 +1,44 @@
+﻿@using Gym.WebApplication.Features.Admin.Clients.Creation.Models.Forms
+@using Gym.WebApplication.Features.Admin.Clients.Creation.Models.Results
+@using Gym.WebApplication.Features.Admin.Clients.Creation.Services
+
+@inject ICreateClientService CreateClientService
+@inject IDialogService DialogService
+
+<EditForm Model="@_formModel" OnValidSubmit="@OnValidSubmit">
+    <DataAnnotationsValidator />
+    <MudGrid>
+        <MudItem xs="12" sm="12">
+            <MudCard Elevation="0">
+                <MudCardContent>
+                    <MudTextField HelperText="Client login" @bind-Value="@_formModel.Login" For="@(() => _formModel.Login)" />
+                    <MudTextField HelperText="First name" Class="mt-3" @bind-Value="_formModel.FirstName" For="@(() => _formModel.FirstName)" />
+                    <MudTextField HelperText="Last name" Class="mt-3" @bind-Value="_formModel.LastName" For="@(() => _formModel.LastName)" />
+                </MudCardContent>
+                <MudCardActions>
+                    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Register</MudButton>
+                </MudCardActions>
+            </MudCard>
+        </MudItem>
+    </MudGrid>
+</EditForm>
+
+@code {
+    private CreateClientFormModel _formModel = new();
+
+    private async void OnValidSubmit(EditContext context)
+    {
+        CreateClientResult createClientResult = await CreateClientService.HandleAsync(_formModel);
+
+        var parameters = new DialogParameters<ShowCreatedClientCredentialsDialog> { { x => x.CreateClientResult, createClientResult } };
+        var dialog = await DialogService.ShowAsync<ShowCreatedClientCredentialsDialog>("Client credentials", parameters);
+
+        this.ClearForm();
+    }
+
+    private void ClearForm()
+    {
+        _formModel = new();
+        base.StateHasChanged();
+    }
+}

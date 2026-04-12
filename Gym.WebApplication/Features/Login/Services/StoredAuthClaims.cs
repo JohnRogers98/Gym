@@ -1,4 +1,5 @@
-﻿using System.Security.Claims;
+﻿using Gym.WebApplication.JSAdapters;
+using System.Security.Claims;
 
 namespace Gym.WebApplication.Features.Login.Services
 {

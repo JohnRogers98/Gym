@@ -1,0 +1,67 @@
+﻿@page "/form-auth"
+
+@using Gym.WebApplication.Features.Login.FormAuth.Models.Forms
+@using Gym.WebApplication.Features.Login.Services
+
+@inject IBasicAuthService BasicAuthService
+@inject NavigationManager NavManager
+
+<MudContainer>
+
+    <EditForm Model="@_formModel" OnValidSubmit="@OnValidSubmit">
+        <DataAnnotationsValidator />
+        <MudGrid>
+            <MudItem xs="12" sm="12">
+                <MudCard Elevation="3">
+                    <MudCardHeader>
+                        <MudText Typo="Typo.h6" Align="Align.Center">Authentication</MudText>
+                    </MudCardHeader>
+                    <MudCardContent>
+                    
+                        <MudTextField @bind-Value="_formModel.Login" Label="Login" Variant="Variant.Outlined" For="@(() => _formModel.Login)" />
+
+                        <MudTextField @bind-Value="_formModel.Password" Label="Password" Variant="Variant.Outlined" InputType="@_passwordInput"
+                                      Adornment="Adornment.End" AdornmentIcon="@_passwordInputIcon" OnAdornmentClick="@OnPasswordVisibilityClick" AdornmentAriaLabel="Show" 
+                                      For="@(() => _formModel.Password)" />
+
+                    </MudCardContent>
+                    <MudCardActions>
+                        <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Send</MudButton>
+                    </MudCardActions>
+                </MudCard>
+            </MudItem>
+        </MudGrid>
+    </EditForm>
+
+</MudContainer>
+
+
+@code {
+    private AuthFormModel _formModel = new(); 
+
+    Boolean _isPasswordShown = false;
+    String _passwordInputIcon = Icons.Material.Filled.VisibilityOff;
+    InputType _passwordInput = InputType.Password;
+
+    void OnPasswordVisibilityClick()
+    {
+        @if (_isPasswordShown)
+        {
+            _isPasswordShown = false;
+            _passwordInputIcon = Icons.Material.Filled.VisibilityOff;
+            _passwordInput = InputType.Password;
+        }
+        else
+        {
+            _isPasswordShown = true;
+            _passwordInputIcon = Icons.Material.Filled.Visibility;
+            _passwordInput = InputType.Text;
+        }
+    }
+
+    private async void OnValidSubmit(EditContext context)
+    {
+        await BasicAuthService.HandleAsync(_formModel);
+        NavManager.NavigateTo("/");
+    }
+}
