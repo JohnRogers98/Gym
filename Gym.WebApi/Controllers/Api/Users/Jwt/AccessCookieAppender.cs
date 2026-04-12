@@ -14,7 +14,7 @@
                 HttpOnly = true,
                 IsEssential = true,
                 Secure = this.IsRequestHttps(httpContext),
-                SameSite = SameSiteMode.Unspecified
+                SameSite = SameSiteMode.Lax
             });
         }
 
