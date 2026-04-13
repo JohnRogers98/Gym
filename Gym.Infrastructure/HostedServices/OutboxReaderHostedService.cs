@@ -3,12 +3,14 @@ using Gym.Domain._Common;
 using Gym.Infrastructure.Entities.EventStores;
 using Gym.Infrastructure.Entities.EventStores.Deserializers;
 using Gym.Infrastructure.Entities.EventStores.Readers;
+using Gym.Infrastructure.Entities.Extensions;
 using Gym.Infrastructure.Entities.Outbox;
 using Gym.Infrastructure.Entities.Outbox.Readers;
 using Gym.Infrastructure.Entities.Outbox.Updaters;
 using Gym.Infrastructure.Entities.Projections;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using MongoDB.Bson;
 using MongoDB.Driver;
 
 namespace Gym.Infrastructure.HostedServices
@@ -51,9 +53,7 @@ namespace Gym.Infrastructure.HostedServices
             ResumeToken? resumeToken = await _outboxResumeTokenStore.GetAsync(cancellationToken);
 
             var pipeline = new EmptyPipelineDefinition<ChangeStreamDocument<MessageEntity>>()
-                .Match(change => 
-                    (change.OperationType == ChangeStreamOperationType.Insert && change.FullDocument.Status == nameof(ProcessingStatus.Created))
-                    || (change.OperationType == ChangeStreamOperationType.Update && change.FullDocument.Status == nameof(ProcessingStatus.PendingRecovery)));
+                .Match(change => change.OperationType == ChangeStreamOperationType.Insert || change.OperationType == ChangeStreamOperationType.Update);
 
             var options = new ChangeStreamOptions
             {
@@ -68,14 +68,51 @@ namespace Gym.Infrastructure.HostedServices
             {
                 foreach (var aChange in cursor.Current)
                 {
-                    await this.HandleMessageAsync(aChange.FullDocument, cancellationToken);
-                    await _outboxResumeTokenStore.SaveAsync(ResumeToken.From(aChange.ResumeToken), cancellationToken);
+                    try
+                    {
+                        var aFullDocument = await this.GetFullDocumentSafelyAsync(aChange, cancellationToken);
+                        if(IsDocumentForProcessing(aFullDocument))
+                            await this.HandleMessageAsync(aFullDocument!, cancellationToken);
+                    }
+                    finally
+                    {
+                        await _outboxResumeTokenStore.SaveAsync(ResumeToken.From(aChange.ResumeToken), cancellationToken);
+                    }
                 }
             }
         }
 
+        private async Task<MessageEntity?> GetFullDocumentSafelyAsync(ChangeStreamDocument<MessageEntity> aChange, CancellationToken cancellationToken)
+        {
+            if (aChange.FullDocument is not null && aChange.FullDocument.Status != null)
+                return aChange.FullDocument;
+
+            if (aChange.DocumentKey is not null && aChange.DocumentKey.TryGetValue("_id", out BsonValue? idValue))
+            {
+                var document = await _messageCollection
+                    .Find(x => x.Id == idValue.ToString()!.ToObjectId())
+                    .FirstOrDefaultAsync(cancellationToken);
+
+                if (document is not null)
+                    return document;
+            }
+
+            return null;
+        }
+
+        private Boolean IsDocumentForProcessing(MessageEntity? aMessageEntity)
+        {
+            if (aMessageEntity is null)
+                return false;
+
+            return aMessageEntity.Status == nameof(ProcessingStatus.Created) || aMessageEntity.Status == nameof(ProcessingStatus.PendingRecovery);
+        }
+
         private async Task HandleMessageAsync(MessageEntity outboxMessage, CancellationToken cancellationToken)
         {
+            if (outboxMessage.Status == nameof(ProcessingStatus.Processed))
+                return;
+
             await using var scope = _serviceLocator.CreateAsyncScope();
             IServiceProvider serviceProvider = scope.ServiceProvider;
 

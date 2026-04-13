@@ -1,5 +1,4 @@
-﻿using Gym.Infrastructure.Entities.Outbox;
-using MongoDB.Driver;
+﻿using MongoDB.Driver;
 
 namespace Gym.Infrastructure.Entities.Outbox.Readers
 {
