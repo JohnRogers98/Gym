@@ -4,8 +4,8 @@ using Gym.Domain.AccountContext;
 using Gym.Domain.AccountContext.ValueObjects;
 using Gym.Domain.ClientContext;
 using Gym.Domain.ClientContext.Errors;
+using Gym.Domain.TelegramAuthContext;
 using Gym.Domain.UserContext;
-using Gym.Domain.UserContext.Authentication;
 using Gym.Domain.UserContext.ValueObjects;
 using MediatR;
 
@@ -14,7 +14,7 @@ namespace Gym.Application.Services.UserApi.TelegramAuthentication
     internal class AuthenticateUserHandler(
         ITelegramSignatureVerifier _telegramSignatureVerifier,
         IUserRepository _userRepository,
-        IUserByTelegramIdFinder _userByTelegramIdFinder,
+        ITelegramAuthRepository _telegramAuthRepository,
         IClientByUserIdFinder _clientByUserIdFinder,
         IClientRepository _clientRepository,
         IAccountRepository _accountRepository) : IRequestHandler<AuthenticateUser, Result<AuthenticatedUserDetails>>
@@ -25,47 +25,59 @@ namespace Gym.Application.Services.UserApi.TelegramAuthentication
             if (verificationResult.Success is false)
                 return Result<AuthenticatedUserDetails>.Fail(verificationResult.Error!);
 
-            User? user = await _userByTelegramIdFinder.GetByTelegramIdAsync(verificationResult.Data!.Id, cancellationToken);
-            if (user is null)
+            Boolean wasRegistered = await _telegramAuthRepository.ExistsAsync(verificationResult.Data!.Id, cancellationToken);
+            if(wasRegistered is false)
             {
-                user = await this.RegisterUser(verificationResult.Data, cancellationToken);
+                await RegisterUser(verificationResult.Data!, cancellationToken);
             }
 
-            Client? client = await _clientByUserIdFinder.GetByUserIdAsync(user.Id, cancellationToken);
-            if (client is null)
-                return Result<AuthenticatedUserDetails>.Fail(ClientNotFoundByUserIdError.Create(user.Id));
+            TelegramAuth? telegramAuth = await _telegramAuthRepository.GetByIdAsync(verificationResult.Data!.Id, cancellationToken);
 
-            return Result<AuthenticatedUserDetails>.Ok(new AuthenticatedUserDetails(user.Id.Value, client.Id.Value, user.Role.ToString(), user.TelegramId?.Value));
+            Client? client = await _clientByUserIdFinder.GetByUserIdAsync(telegramAuth!.UserId, cancellationToken);
+            if (client is null)
+                return Result<AuthenticatedUserDetails>.Fail(ClientNotFoundByUserIdError.Create(telegramAuth.UserId));
+
+            User? user = await _userRepository.GetByIdAsync(telegramAuth.UserId, cancellationToken);
+
+            return Result<AuthenticatedUserDetails>.Ok(new AuthenticatedUserDetails(telegramAuth.UserId.Value, user!.Role.ToString()));
         }
 
-        private async Task<User> RegisterUser(ValidatedTelegramUserInfo validatedTelegramUserInfo, CancellationToken cancellationToken)
+        private async Task RegisterUser(ValidatedTelegramUserInfo validatedTelegramUserInfo, CancellationToken cancellationToken)
         {
             UserId userId = _userRepository.NextIdentity();
             User newUser = User.Create(
                 userId,
                 UserRole.Client,
-                validatedTelegramUserInfo.Id,
-                validatedTelegramUserInfo.Username,
                 validatedTelegramUserInfo.FirstName,
                 validatedTelegramUserInfo.LastName
             );
 
             await _userRepository.SaveAsync(newUser, cancellationToken);
 
-            await this.CreateClientFromRegisteredUser(userId, cancellationToken);
-            await this.CreateAccountFromRegisteredUser(userId, cancellationToken);
-
-            return newUser;
+            await this.CreateTelegramAuthForRegisteredUser(userId, validatedTelegramUserInfo, cancellationToken);
+            await this.CreateClientForRegisteredUser(userId, cancellationToken);
+            await this.CreateAccountForRegisteredUser(userId, cancellationToken);
         }
 
-        private async Task<Client> CreateClientFromRegisteredUser(UserId registeredUserId, CancellationToken cancellationToken)
+        private async Task<TelegramAuth> CreateTelegramAuthForRegisteredUser(UserId registeredUserId, ValidatedTelegramUserInfo validatedTelegramUserInfo, CancellationToken cancellationToken)
+        {
+            TelegramAuth telegramAuth = TelegramAuth.Create(
+                validatedTelegramUserInfo.Id,
+                registeredUserId,
+                validatedTelegramUserInfo.Username);
+            
+            await _telegramAuthRepository.SaveAsync(telegramAuth, cancellationToken);
+            return telegramAuth;
+        }
+
+        private async Task<Client> CreateClientForRegisteredUser(UserId registeredUserId, CancellationToken cancellationToken)
         {
             Client client = Client.Create(_clientRepository.NextIdentity(), registeredUserId);
             await _clientRepository.SaveAsync(client, cancellationToken);
             return client;
         }
 
-        private async Task<Account> CreateAccountFromRegisteredUser(UserId registeredUserId, CancellationToken cancellationToken)
+        private async Task<Account> CreateAccountForRegisteredUser(UserId registeredUserId, CancellationToken cancellationToken)
         {
             Account account = Account.Create(AccountId.From(registeredUserId), registeredUserId);
             await _accountRepository.SaveAsync(account, cancellationToken);

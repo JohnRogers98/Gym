@@ -1,4 +1,5 @@
 ﻿@page "/account"
+@using Gym.WebApplication.Features.Account.ChangePassword
 @using Gym.WebApplication.Features.Account.Details
 @using Gym.WebApplication.Features.Account.History
 
@@ -6,7 +7,7 @@
 
 <MudHidden Breakpoint="Breakpoint.MdAndUp" Invert="false">
     <div class="d-flex flex-column align-center gap-3">
-        <MudTabs Rounded="true" ActiveTabClass="border-solid border-2 mud-border-primary" PanelClass="pt-10">
+        <MudTabs Class="mx-4" Rounded="true" ActiveTabClass="border-solid border-2 mud-border-primary" PanelClass="pt-10 px-4">
 
             <MudTabPanel Text="Details">
                 <AccountDetails></AccountDetails>
@@ -16,12 +17,16 @@
                 <AccountHistory></AccountHistory>
             </MudTabPanel>
 
+            <MudTabPanel Text="Password">
+                <ChangePassword></ChangePassword>
+            </MudTabPanel>
+
         </MudTabs>
     </div>
 </MudHidden>
 
 <MudHidden Breakpoint="Breakpoint.MdAndUp" Invert="true">
-    <MudTabs Rounded="true" ActiveTabClass="border-solid border-2 mud-border-primary" PanelClass="pt-10">
+    <MudTabs Class="mx-4" Rounded="true" ActiveTabClass="border-solid border-2 mud-border-primary" PanelClass="pt-10">
 
         <MudTabPanel Text="Details">
             <AccountDetails></AccountDetails>
@@ -29,6 +34,10 @@
 
         <MudTabPanel Text="History">
             <AccountHistory></AccountHistory>
+        </MudTabPanel>
+
+        <MudTabPanel Text="Password">
+            <ChangePassword></ChangePassword>
         </MudTabPanel>
 
     </MudTabs>

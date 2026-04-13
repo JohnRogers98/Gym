@@ -16,5 +16,11 @@ namespace Gym.Infrastructure.Entities.Projections.Clients
             return await _projectionCollection.Find(projection => projection.Id == clientId)
              .FirstOrDefaultAsync(cancellationToken);
         }
+
+        public async Task<ClientProjection?> GetByUserIdAsync(String userId, CancellationToken cancellationToken)
+        {
+            return await _projectionCollection.Find(projection => projection.UserId == userId)
+              .FirstOrDefaultAsync(cancellationToken);
+        }
     }
 }

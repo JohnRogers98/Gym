@@ -6,8 +6,6 @@ namespace Gym.Infrastructure.Entities.Repositories.Users
     {
         public ObjectId Id { get; set; }
 
-        public Int64? TelegramId { get; set; }
-        public String? TelegramUsername {  get; set; }
         public String? FirstName {  get; set; }
         public String? LastName {  get; set; }
 

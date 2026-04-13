@@ -1,4 +1,4 @@
-﻿using Gym.Application.Services.UserApi.TelegramAuthentication;
+﻿using Gym.Application.Services.UserApi;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
@@ -21,8 +21,7 @@ namespace Gym.WebApi.Controllers.Api.Users.Jwt
                 new Claim(ClaimTypes.NameIdentifier, authenticatedUserDetails.UserId),
                 new Claim(JwtRegisteredClaimNames.Sub, authenticatedUserDetails.UserId),
                 new Claim(ClaimTypes.Role, authenticatedUserDetails.Role),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new Claim("ClientId", authenticatedUserDetails.ClientId)
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
                 ]);
 
             var tokenDescriptor = new SecurityTokenDescriptor

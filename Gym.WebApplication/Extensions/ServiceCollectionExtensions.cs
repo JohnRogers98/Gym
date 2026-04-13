@@ -1,8 +1,10 @@
-﻿using Gym.WebApplication.Features.Account.Details.Servises;
+﻿using Gym.WebApplication.Features.Account.ChangePassword.Services;
+using Gym.WebApplication.Features.Account.Details.Servises;
 using Gym.WebApplication.Features.Account.History.Services;
 using Gym.WebApplication.Features.Admin.CalendarEvents.Creation.Services;
 using Gym.WebApplication.Features.Admin.CalendarEvents.States;
 using Gym.WebApplication.Features.Admin.CalendarEvents.TableView.Services;
+using Gym.WebApplication.Features.Admin.Clients.Creation.Services;
 using Gym.WebApplication.Features.Admin.Clients.TableView.Services;
 using Gym.WebApplication.Features.Admin.Instructors.Registration.Services;
 using Gym.WebApplication.Features.Admin.Instructors.States;
@@ -48,7 +50,10 @@ namespace Gym.WebApplication.Extensions
         public static IServiceCollection AddAuthenticationServices(this IServiceCollection services)
         {
             services.AddScoped<IWebAppAuthService, WebAppAuthService>();
-            services.AddScoped<AuthenticationStateProvider, WebAppAuthStateProvider>();
+            services.AddScoped<IBasicAuthService, BasicAuthService>();
+            services.AddScoped<IMockedAdminAuthService, MockedAdminAuthService>();
+            services.AddScoped<UserAuthState>();
+            services.AddScoped<AuthenticationStateProvider, AuthStateProvider>();
 
             return services;
         }
@@ -84,6 +89,7 @@ namespace Gym.WebApplication.Extensions
         {
             services.AddScoped<AccountHistoryViewModelMapper>();
             services.AddScoped<IGetAllAccountHistoryItemsService, GetAllAccountHistoryItemsService>();
+            services.AddScoped<IChangePasswordService, ChangePasswordService>();
 
             return services;
         }
@@ -121,6 +127,7 @@ namespace Gym.WebApplication.Extensions
             services.AddScoped<IGetAllClientsService, GetAllClientsService>();
             services.AddScoped<IGetClientDetailsService, GetClientDetailsService>();
             services.AddScoped<IChargeClientService, ChargeClientService>();
+            services.AddScoped<ICreateClientService, CreateClientService>();
 
             return services;
         }

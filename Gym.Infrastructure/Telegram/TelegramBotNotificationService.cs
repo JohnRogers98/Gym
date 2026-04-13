@@ -1,10 +1,11 @@
 ﻿using Gym.Domain._Shared;
+using Gym.Domain.TelegramAuthContext;
 using Gym.Domain.UserContext;
 using Telegram.Bot;
 
 namespace Gym.Infrastructure.Telegram
 {
-    internal class TelegramBotNotificationService(ITelegramBotClient _botClient, IUserRepository _userRepository) : INotificationService
+    internal class TelegramBotNotificationService(ITelegramBotClient _botClient, ITelegramAuthByUserIdFinder _telegramAuthByUserIdFinder) : INotificationService
     {
         /// <summary>
         /// Send message to bot. In telegram private chat ChatId is the same as TelegramId
@@ -14,10 +15,10 @@ namespace Gym.Infrastructure.Telegram
         /// <returns></returns>
         public async Task SendMessageAsync(UserId userId, String message, CancellationToken cancellationToken)
         {
-            User? user = await _userRepository.GetByIdAsync(userId, cancellationToken);
-            if (user?.TelegramId is not null)
+            TelegramAuth? telegramAuth = await _telegramAuthByUserIdFinder.GetTelegramAuthByUserIdAsync(userId, cancellationToken);
+            if (telegramAuth is not null)
             {
-                await _botClient.SendMessage(user.TelegramId.Value, message);
+                await _botClient.SendMessage(telegramAuth.Id.Value, message);
             } 
         }
     }

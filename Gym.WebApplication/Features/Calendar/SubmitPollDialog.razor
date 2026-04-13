@@ -5,7 +5,7 @@
      
     <DialogContent>
         
-        <MudText Typo="Typo.body1" Align="Align.Center" Class="mb-4">@PollViewModel.Title</MudText>
+        <MudText Typo="Typo.h6" Align="Align.Center" Class="mb-4">@PollViewModel.Title</MudText>
 
            
         @if (PollViewModel.CanSelectMany is false)
@@ -14,11 +14,8 @@
             
                 <MudStack Spacing="3">
                 @foreach (ChoiceViewModel choice in PollViewModel.Choices)
-                {
-                    <MudStack Row="true" Spacing="1">
-                        <MudRadio Value="@(choice)"></MudRadio>
-                        <MudText Typo="Typo.h6">@choice.Text</MudText>
-                    </MudStack>
+                {        
+                    <MudRadio Value="@(choice)" Label="@choice.Text"></MudRadio>
                 }
                 </MudStack>
 
@@ -28,11 +25,8 @@
         {
             <MudStack Spacing="3">
             @foreach (ChoiceViewModel choice in PollViewModel.Choices)
-            {    
-                <MudStack Row="true" Spacing="1">
-                    <MudCheckBox Value="@GetCheckedValue(choice)" ValueChanged="@((Boolean value) => OnCheckedChanged(choice, value))" />
-                    <MudText Typo="Typo.h6">@choice.Text</MudText>
-                </MudStack>
+            {        
+                <MudCheckBox Value="@GetCheckedValue(choice)" ValueChanged="@((Boolean value) => OnCheckedChanged(choice, value))" Label="@choice.Text" />
             }
             </MudStack>
         }
