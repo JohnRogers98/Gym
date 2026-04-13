@@ -15,5 +15,10 @@ namespace Gym.Infrastructure.Configurations
 
         [ConfigurationKeyName("PROXY_PASSWORD")]
         public String Password { get; set; } = default!;
+
+        public override String ToString()
+        {
+            return $"Host: {Host}, Port: {Port}, Login: {Login}, Password: {Password}";
+        }
     }
 }
