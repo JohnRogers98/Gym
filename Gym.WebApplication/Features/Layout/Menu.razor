@@ -11,12 +11,15 @@
                          Label="Home"
                          OnClick="@ToggleDrawer"/>
 
-            <MudMenuItem Href="/form-auth"
-                         Icon="@Icons.Material.Filled.Login"
-                         IconColor="Color.Primary"
-                         Label="Authorization"
-                         OnClick="@ToggleDrawer" />
-
+            <AuthorizeView>
+                <NotAuthorized>
+                    <MudMenuItem Href="/form-auth"
+                                 Icon="@Icons.Material.Filled.Login"
+                                 IconColor="Color.Primary"
+                                 Label="Authorization"
+                                 OnClick="@ToggleDrawer" />
+                </NotAuthorized>
+            </AuthorizeView>
 
             <AuthorizeView Roles="Client">
 

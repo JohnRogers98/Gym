@@ -47,6 +47,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
+using System.Net;
 using System.Runtime.CompilerServices;
 using Telegram.Bot;
 
@@ -66,6 +67,10 @@ namespace Gym.Infrastructure
         {
             MongoDbOptions mongoDbOptions = configuration.GetSection("MongodDb").Get<MongoDbOptions>() ?? MongoDbOptions.Default;
             services.TryAddSingleton<MongoDbOptions>(_ => mongoDbOptions);
+
+            ProxyOptions proxyOptions = configuration.Get<ProxyOptions>()
+                ?? throw new ArgumentNullException("No configuration provided for proxy setup.");
+            services.TryAddSingleton<ProxyOptions>(_ => proxyOptions);
 
             services.AddMongoInfrastructure(mongoDbOptions ?? MongoDbOptions.Default);
             services.AddMessagePublisher();
@@ -224,7 +229,23 @@ namespace Gym.Infrastructure
             services.TryAddSingleton<ITelegramSignatureVerifier, TelegramSignatureVerifier>();
             services.TryAddScoped<INotificationService, TelegramBotNotificationService>();
 
-            services.TryAddSingleton<ITelegramBotClient>(_ => new TelegramBotClient(botToken, cancellationToken: CancellationToken.None));
+            services.TryAddSingleton<ITelegramBotClient>(sp => 
+            {
+                ProxyOptions proxyOptions = sp.GetRequiredService<ProxyOptions>();
+
+                WebProxy proxy = new WebProxy(proxyOptions.Host, Int32.Parse(proxyOptions.Port));
+                proxy.Credentials = new NetworkCredential(proxyOptions.Login, proxyOptions.Password);
+                var httpHandler = new SocketsHttpHandler
+                {
+                    Proxy = proxy,
+                    UseProxy = true,
+                    PooledConnectionLifetime = TimeSpan.FromMinutes(5)
+                };
+
+                var httpProxyClient = new HttpClient(httpHandler);
+
+                return new TelegramBotClient(botToken, httpClient: httpProxyClient, cancellationToken: CancellationToken.None);
+            });
 
             return services;
         }
