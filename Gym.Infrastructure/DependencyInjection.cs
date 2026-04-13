@@ -82,6 +82,7 @@ namespace Gym.Infrastructure
             services.AddPasswordServices();
 
             services.AddBackgroundWorkers();
+            services.AddHostedServices();
 
             if (configuration["TG_BOT_TOKEN"] is not null)
             {
@@ -273,6 +274,12 @@ namespace Gym.Infrastructure
                 (_, _) => new PeriodicTimer(TimeSpan.FromMinutes(5), TimeProvider.System)
             );
             services.AddHostedService<CalendarEventCompletionChecker>();
+            return services;
+        }
+
+        private static IServiceCollection AddHostedServices(this IServiceCollection services)
+        {
+            services.AddHostedService<ConfigurationLogger>();
             return services;
         }
     }

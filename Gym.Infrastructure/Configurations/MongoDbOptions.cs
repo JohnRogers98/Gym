@@ -3,6 +3,11 @@
     public sealed record MongoDbOptions(String ConnectionString, String DatabaseName, CollectionOptions CollectionOptions)
     {
         public static MongoDbOptions Default => new MongoDbOptions(String.Empty, "test", CollectionOptions.Default);
+
+        public override string ToString()
+        {
+            return $"MongoDbOptions: ConnectionString={ConnectionString}, DatabaseName={DatabaseName}";
+        }
     }
 
     public sealed record CollectionOptions(
