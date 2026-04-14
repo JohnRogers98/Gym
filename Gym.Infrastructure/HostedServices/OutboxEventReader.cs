@@ -5,7 +5,6 @@ using Gym.Infrastructure.Entities.EventStores.Deserializers;
 using Gym.Infrastructure.Entities.EventStores.Readers;
 using Gym.Infrastructure.Entities.Extensions;
 using Gym.Infrastructure.Entities.Outbox;
-using Gym.Infrastructure.Entities.Outbox.Readers;
 using Gym.Infrastructure.Entities.Outbox.Updaters;
 using Gym.Infrastructure.Entities.Projections;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,37 +14,15 @@ using MongoDB.Driver;
 
 namespace Gym.Infrastructure.HostedServices
 {
-    internal class OutboxReaderHostedService(
+    internal class OutboxEventReader(
         IOutboxResumeTokenStore _outboxResumeTokenStore,
-        IOutboxReader _outboxReader,
         IMongoCollection<MessageEntity> _messageCollection,
         IServiceScopeFactory _serviceLocator) : BackgroundService
     {
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            while (stoppingToken.IsCancellationRequested is false)
-            {
-                try
-                {
-                    await RecoverStalledOutboxMessagesAsync(stoppingToken);
-                    await WatchIncomingOutboxMessagesAsync(stoppingToken);
-                }
-                catch (OperationCanceledException)
-                {
-                    break;
-                }
-            }
-        }
-
-        private async Task RecoverStalledOutboxMessagesAsync(CancellationToken cancellationToken)
-        {
-            var stalledMessages = await _outboxReader.GetStalledMessagesAsync(cancellationToken);
-
-            foreach(var aStalledMessage in stalledMessages)
-            {
-                await this.HandleMessageAsync(aStalledMessage, cancellationToken);
-            };
+            await WatchIncomingOutboxMessagesAsync(stoppingToken);
         }
 
         private async Task WatchIncomingOutboxMessagesAsync(CancellationToken cancellationToken)
@@ -64,6 +41,9 @@ namespace Gym.Infrastructure.HostedServices
 
             using var cursor = await _messageCollection.WatchAsync(pipeline, options, cancellationToken);
 
+            if (resumeToken is null)
+                await this.RevokeMissedMessages(cancellationToken);
+
             while (await cursor.MoveNextAsync(cancellationToken))
             {
                 foreach (var aChange in cursor.Current)
@@ -80,6 +60,21 @@ namespace Gym.Infrastructure.HostedServices
                     }
                 }
             }
+        }
+
+        private async Task RevokeMissedMessages(CancellationToken cancellationToken)
+        {
+            await using var scope = _serviceLocator.CreateAsyncScope();
+            IServiceProvider serviceProvider = scope.ServiceProvider;
+
+            var outboxMessageStatusUpdater = serviceProvider.GetRequiredService<IOutboxMessageStatusUpdater>();
+
+            await _messageCollection.UpdateManyAsync(
+                x => x.Status == nameof(ProcessingStatus.Created) ||
+                     x.Status == nameof(ProcessingStatus.PendingRecovery),
+                Builders<MessageEntity>.Update.Set(x => x.Status, nameof(ProcessingStatus.Missed)),
+                cancellationToken: cancellationToken
+            );
         }
 
         private async Task<MessageEntity?> GetFullDocumentSafelyAsync(ChangeStreamDocument<MessageEntity> aChange, CancellationToken cancellationToken)
@@ -105,7 +100,9 @@ namespace Gym.Infrastructure.HostedServices
             if (aMessageEntity is null)
                 return false;
 
-            return aMessageEntity.Status == nameof(ProcessingStatus.Created) || aMessageEntity.Status == nameof(ProcessingStatus.PendingRecovery);
+            return aMessageEntity.Status == nameof(ProcessingStatus.Created)
+                || aMessageEntity.Status == nameof(ProcessingStatus.PendingRecovery)
+                || aMessageEntity.Status == nameof(ProcessingStatus.Missed);
         }
 
         private async Task HandleMessageAsync(MessageEntity outboxMessage, CancellationToken cancellationToken)
@@ -125,14 +122,14 @@ namespace Gym.Infrastructure.HostedServices
                 EventEntity eventEntity = await this.GetEventEntityAsync(serviceProvider, outboxMessage, cancellationToken);
                 await this.RunProjectionAsync(serviceProvider, eventEntity, cancellationToken);
                 await this.PublishToMessageBus(serviceProvider, eventEntity, cancellationToken);
-                await outboxMessageStatusUpdater.UpdateMessageStatus(outboxMessage.Id, ProcessingStatus.Processed, cancellationToken);
+                await outboxMessageStatusUpdater.UpdateMessageStatusAsync(outboxMessage.Id, ProcessingStatus.Processed, cancellationToken);
 
                 await mongoUnitOfWork.CommitAsync(cancellationToken);
             }
             catch (Exception)
             {
                 await mongoUnitOfWork.RollbackAsync(cancellationToken);
-                await outboxMessageStatusUpdater.UpdateMessageStatus(outboxMessage.Id, ProcessingStatus.Failed, cancellationToken);
+                await outboxMessageStatusUpdater.UpdateMessageStatusAsync(outboxMessage.Id, ProcessingStatus.Failed, cancellationToken);
             }
         }
         private async Task<EventEntity> GetEventEntityAsync(IServiceProvider services, MessageEntity outboxMessage, CancellationToken cancellationToken)

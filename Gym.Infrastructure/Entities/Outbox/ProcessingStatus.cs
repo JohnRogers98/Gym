@@ -6,6 +6,7 @@
         Processed,
         Failed,
         PendingRecovery,
-        DeadLetter
+        DeadLetter,
+        Missed
     }
 }

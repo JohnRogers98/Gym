@@ -267,13 +267,20 @@ namespace Gym.Infrastructure
 
         private static IServiceCollection AddBackgroundWorkers(this IServiceCollection services)
         {
-            services.AddHostedService<OutboxReaderHostedService>();
+            services.AddHostedService<OutboxEventReader>();
 
             services.TryAddKeyedSingleton<PeriodicTimer>(
                 nameof(CalendarEventCompletionChecker),
                 (_, _) => new PeriodicTimer(TimeSpan.FromMinutes(5), TimeProvider.System)
             );
             services.AddHostedService<CalendarEventCompletionChecker>();
+
+            services.TryAddKeyedSingleton<PeriodicTimer>(
+                nameof(OutboxDeadLetterRevoker),
+                (_, _) => new PeriodicTimer(TimeSpan.FromMinutes(1), TimeProvider.System)
+            );
+            services.AddHostedService<OutboxDeadLetterRevoker>();
+
             return services;
         }
 
