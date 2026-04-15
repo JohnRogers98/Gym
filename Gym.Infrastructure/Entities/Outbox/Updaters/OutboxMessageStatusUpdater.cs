@@ -1,17 +1,16 @@
-﻿using Gym.Infrastructure.Entities.Outbox;
-using MongoDB.Bson;
+﻿using MongoDB.Bson;
 using MongoDB.Driver;
 
 namespace Gym.Infrastructure.Entities.Outbox.Updaters
 {
     internal interface IOutboxMessageStatusUpdater
     {
-        Task UpdateMessageStatus(ObjectId messageId, ProcessingStatus status, CancellationToken cancellationToken);
+        Task UpdateMessageStatusAsync(ObjectId messageId, ProcessingStatus status, CancellationToken cancellationToken);
     }
 
     internal class OutboxMessageStatusUpdater(IMongoCollection<MessageEntity> _messageCollection, MongoUnitOfWork _mongoUnitOfWork) : IOutboxMessageStatusUpdater
     {
-        public async Task UpdateMessageStatus(ObjectId messageId, ProcessingStatus status, CancellationToken cancellationToken)
+        public async Task UpdateMessageStatusAsync(ObjectId messageId, ProcessingStatus status, CancellationToken cancellationToken)
         {
             await _messageCollection.UpdateOneAsync(
                 _mongoUnitOfWork.Session,
