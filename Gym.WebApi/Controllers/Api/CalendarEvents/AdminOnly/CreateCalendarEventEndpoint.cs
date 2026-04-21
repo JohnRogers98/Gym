@@ -2,6 +2,7 @@
 using AutoMapper;
 using Gym.Application.Services.CalendarEventApi.CreateCalendarEvent;
 using Gym.Domain._Common;
+using Gym.Domain._Shared.Errors;
 using Gym.Domain.CalendarEventContext.Errors;
 using Gym.Domain.TrainingContext.Errors;
 using Gym.WebApi.Extensions;

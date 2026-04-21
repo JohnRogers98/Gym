@@ -9,6 +9,7 @@ using Gym.Domain.CalendarEventContext;
 using Gym.Domain.ClientContext;
 using Gym.Domain.FormAuthContext;
 using Gym.Domain.InstructorContext;
+using Gym.Domain.PersonalTrainingContext;
 using Gym.Domain.PollContext;
 using Gym.Domain.PollResponseContext;
 using Gym.Domain.TelegramAuthContext;
@@ -34,6 +35,7 @@ using Gym.Infrastructure.Entities.Repositories.CalendarEvents;
 using Gym.Infrastructure.Entities.Repositories.Clients;
 using Gym.Infrastructure.Entities.Repositories.FormAuths;
 using Gym.Infrastructure.Entities.Repositories.Instructors;
+using Gym.Infrastructure.Entities.Repositories.PersonalTrainings;
 using Gym.Infrastructure.Entities.Repositories.PollResponses;
 using Gym.Infrastructure.Entities.Repositories.Polls;
 using Gym.Infrastructure.Entities.Repositories.TelgramAuths;
@@ -126,6 +128,8 @@ namespace Gym.Infrastructure
             services.AddMongoCollection<PollEntity>(mongoDbOptions.CollectionOptions.Polls);
             services.AddMongoCollection<PollResponseEntity>(mongoDbOptions.CollectionOptions.PollResponses);
 
+            services.AddMongoCollection<PersonalTrainingEntity>(mongoDbOptions.CollectionOptions.PersonalTrainings);
+
             return services;
         }
 
@@ -176,6 +180,8 @@ namespace Gym.Infrastructure
 
             services.TryAddScoped<IPollResponseRepository, PollResponseRepository>();
             services.TryDecorate<IPollResponseRepository, PollResponseEventStoreAspect>();
+
+            services.TryAddScoped<IPersonalTrainingRepository, PersonalTrainingRepository>();
 
             return services;
         }

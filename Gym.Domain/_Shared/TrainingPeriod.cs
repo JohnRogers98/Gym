@@ -1,7 +1,7 @@
 ﻿using Gym.Domain._Common;
-using Gym.Domain.CalendarEventContext.Errors;
+using Gym.Domain._Shared.Errors;
 
-namespace Gym.Domain.CalendarEventContext.ValueObjects
+namespace Gym.Domain._Shared
 {
     public record TrainingPeriod
     {

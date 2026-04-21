@@ -1,6 +1,6 @@
 ﻿using Gym.Domain._Common;
 
-namespace Gym.Domain.CalendarEventContext.Errors
+namespace Gym.Domain._Shared.Errors
 {
     public class TrainingPeriodValidationError : DomainError
     {

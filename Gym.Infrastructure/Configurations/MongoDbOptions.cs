@@ -27,7 +27,8 @@
         String Messages,
         String OutboxChangeStreams,
         String Polls,
-        String PollResponses)
+        String PollResponses,
+        String PersonalTrainings)
     {
         public static CollectionOptions Default => new CollectionOptions(
             "instructors",
@@ -46,6 +47,7 @@
             "messages",
             "outbox-changes-streams",
             "polls",
-            "poll-responses");
+            "poll-responses",
+            "personal-trainings");
     }
 }

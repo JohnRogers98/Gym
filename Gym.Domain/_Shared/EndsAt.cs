@@ -1,6 +1,6 @@
 ﻿using Gym.Domain._Common;
 
-namespace Gym.Domain.CalendarEventContext.ValueObjects
+namespace Gym.Domain._Shared
 {
     public record EndsAt
     {
