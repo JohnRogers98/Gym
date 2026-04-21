@@ -79,8 +79,7 @@ namespace Gym.Application.Services.UserApi.CreateUser
 
         private async Task<Client> CreateClientAsync(UserId userId, CancellationToken cancellationToken)
         {
-            ClientId clientId = _clientRepository.NextIdentity();
-            Client client = Client.Create(clientId, userId);
+            Client client = Client.Create(ClientId.From(userId), userId);
             await _clientRepository.SaveAsync(client, cancellationToken);
             return client;
         }

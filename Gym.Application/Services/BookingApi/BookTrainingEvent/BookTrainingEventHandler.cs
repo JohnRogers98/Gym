@@ -1,5 +1,4 @@
-﻿using Gym.Application.Extensions;
-using Gym.Domain._Common;
+﻿using Gym.Domain._Common;
 using Gym.Domain._Shared;
 using Gym.Domain._Shared.Services;
 using Gym.Domain.AccountContext;
@@ -9,6 +8,7 @@ using Gym.Domain.CalendarEventContext.Errors;
 using Gym.Domain.CalendarEventContext.ValueObjects;
 using Gym.Domain.ClientContext;
 using Gym.Domain.ClientContext.Errors;
+using Gym.Domain.ClientContext.ValueObjects;
 using Gym.Domain.InstructorContext.Errors;
 using Gym.Domain.PollContext;
 using Gym.Domain.PollContext.Errors;
@@ -23,30 +23,30 @@ namespace Gym.Application.Services.BookingApi.BookTrainingEvent
         ITrainingBookingService _trainingBookingService,
         ISubmitPollResponseService _submitPollResponseService,
         ICalendarEventRepository _calendarEventRepository,
-        IClientByUserIdFinder _clientByUserIdFinder,
+        IClientRepository _clientRepository,
         IPollRepository _pollRepository,
         IPollResponseRepository _pollResponseRepository,
         IAccountRepository _accountRepository) : IRequestHandler<BookTrainingEvent, Result<BookTrainingEventResult>>
     {
         public async Task<Result<BookTrainingEventResult>> Handle(BookTrainingEvent request, CancellationToken cancellationToken)
         {
-            var userIdResult = UserId.From(request.UserId);
-            if (userIdResult.Success is false)
-                return Result<BookTrainingEventResult>.Fail(userIdResult.Error!);
+            var clientIdResult = ClientId.From(request.ClientId);
+            if (clientIdResult.Success is false)
+                return Result<BookTrainingEventResult>.Fail(clientIdResult.Error!);
 
             var calendarEventIdResult = CalendarEventId.From(request.CalendarEventId);
             if (calendarEventIdResult.Success is false)
                 return Result<BookTrainingEventResult>.Fail(calendarEventIdResult.Error!);
 
-            Client? client = await _clientByUserIdFinder.GetByUserIdAsync(userIdResult.Data!, cancellationToken);
+            Client? client = await _clientRepository.GetByIdAsync(clientIdResult.Data!, cancellationToken);
             if (client is null)
-                return Result<BookTrainingEventResult>.Fail(ClientNotFoundByUserIdError.Create(userIdResult.Data!));
+                return Result<BookTrainingEventResult>.Fail(ClientNotFoundError.Create(clientIdResult.Data!));
 
             CalendarEvent? calendarEvent = await _calendarEventRepository.GetByIdAsync(calendarEventIdResult.Data!, cancellationToken);
             if(calendarEvent is null)
                 return Result<BookTrainingEventResult>.Fail(CalendarEventNotFoundError.Create(calendarEventIdResult.Data!));
 
-            AccountId accountId = AccountId.From(userIdResult.Data!);
+            AccountId accountId = AccountId.From(client.UserId);
             Account account = await _accountRepository.GetByIdAsync(accountId, cancellationToken);
 
             var bookingResult = _trainingBookingService.MakeEventBooking(account, calendarEvent);
@@ -65,7 +65,7 @@ namespace Gym.Application.Services.BookingApi.BookTrainingEvent
                 if(poll is null)
                     return Result<BookTrainingEventResult>.Fail(PollNotFoundError.Create(calendarEvent.PollId));
 
-                var submitPollResponseResult = await this.SubmitPollResponseAsync(poll, request.PollResponse, userIdResult.Data!, cancellationToken);
+                var submitPollResponseResult = await this.SubmitPollResponseAsync(poll, request.PollResponse, client.UserId, cancellationToken);
                 if(submitPollResponseResult.Success is false)
                     return Result<BookTrainingEventResult>.Fail(submitPollResponseResult.Error!);
             }

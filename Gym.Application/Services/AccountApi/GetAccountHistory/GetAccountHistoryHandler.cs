@@ -5,13 +5,13 @@ using Gym.Domain.ClientContext;
 using Gym.Domain.ClientContext.ValueObjects;
 using MediatR;
 
-namespace Gym.Application.Services.AccountApi.GetAccountHistoryByUserId
+namespace Gym.Application.Services.AccountApi.GetAccountHistory
 {
-    internal class GetAccountHistoryByClientIdHandler(
+    internal class GetAccountHistoryHandler(
         IClientRepository _clientRepository,
-        IEventProjectionQueryService _eventProjectionQueryService) : IRequestHandler<GetAccountHistoryByClientId, IEnumerable<EventProjection>>
+        IEventProjectionQueryService _eventProjectionQueryService) : IRequestHandler<GetAccountHistory, IEnumerable<EventProjection>>
     {
-        public async Task<IEnumerable<EventProjection>> Handle(GetAccountHistoryByClientId request, CancellationToken cancellationToken)
+        public async Task<IEnumerable<EventProjection>> Handle(GetAccountHistory request, CancellationToken cancellationToken)
         {
             ClientId clientId = ClientId.From(request.ClientId).Unwrap();
 

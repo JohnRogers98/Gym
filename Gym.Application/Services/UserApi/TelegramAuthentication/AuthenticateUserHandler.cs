@@ -4,6 +4,7 @@ using Gym.Domain.AccountContext;
 using Gym.Domain.AccountContext.ValueObjects;
 using Gym.Domain.ClientContext;
 using Gym.Domain.ClientContext.Errors;
+using Gym.Domain.ClientContext.ValueObjects;
 using Gym.Domain.TelegramAuthContext;
 using Gym.Domain.UserContext;
 using Gym.Domain.UserContext.ValueObjects;
@@ -72,7 +73,7 @@ namespace Gym.Application.Services.UserApi.TelegramAuthentication
 
         private async Task<Client> CreateClientForRegisteredUser(UserId registeredUserId, CancellationToken cancellationToken)
         {
-            Client client = Client.Create(_clientRepository.NextIdentity(), registeredUserId);
+            Client client = Client.Create(ClientId.From(registeredUserId), registeredUserId);
             await _clientRepository.SaveAsync(client, cancellationToken);
             return client;
         }

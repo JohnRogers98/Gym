@@ -1,7 +1,7 @@
 ﻿using Ardalis.ApiEndpoints;
 using AutoMapper;
 using Gym.Abstractions.Query.EventStore;
-using Gym.Application.Services.AccountApi.GetAccountHistoryByUserId;
+using Gym.Application.Services.AccountApi.GetAccountHistory;
 using Gym.WebApi.Extensions;
 using Gym.WebDto.Requests.Account;
 using Gym.WebDto.Responses;
@@ -22,7 +22,7 @@ namespace Gym.WebApi.Controllers.Api.Accounts.AdminOnly
         [HttpPost("api/clients/{clientId}/account/actions/get-history")]
         public override async Task<ActionResult<ListResponse<AccountHistoryDto>>> HandleAsync(GetAccountHistoryContainer request, CancellationToken cancellationToken = default)
         {
-            GetAccountHistoryByClientId getAccountHistoryByClientId = new(request.ClientId);
+            GetAccountHistory getAccountHistoryByClientId = new(request.ClientId);
 
             IEnumerable<EventProjection> eventProjections = await _mediator.Send(getAccountHistoryByClientId, cancellationToken);
 

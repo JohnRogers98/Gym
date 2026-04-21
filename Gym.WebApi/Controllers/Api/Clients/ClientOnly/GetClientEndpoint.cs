@@ -1,7 +1,7 @@
 ﻿using Ardalis.ApiEndpoints;
 using AutoMapper;
 using Gym.Abstractions.Query.Clients;
-using Gym.Application.Services.ClientApi.GetClientByUserId;
+using Gym.Application.Services.ClientApi.GetClientById;
 using Gym.WebApi.Extensions;
 using Gym.WebDto.Responses;
 using Gym.WebDto.Responses.Clients;
@@ -20,12 +20,12 @@ namespace Gym.WebApi.Controllers.Api.Clients.ClientOnly
         [HttpGet("api/clients")]
         public override async Task<ActionResult<Response<ClientDto>>> HandleAsync(CancellationToken cancellationToken = default)
         {
-            GetClientByUserId getClientByUserId = new(User.GetRequiredUserId());
-            ClientProjection? clientProjection = await _mediator.Send(getClientByUserId, cancellationToken);
+            GetClientById getClientById = new(User.GetRequiredUserId());
+            ClientProjection? clientProjection = await _mediator.Send(getClientById, cancellationToken);
 
             if(clientProjection is null)
             {
-                return this.InternalErrorProblem($"Client with id - {getClientByUserId.UserId} not fount.");
+                return this.InternalErrorProblem($"Client with id - {getClientById.ClientId} not fount.");
             }
 
             var response = new Response<ClientDto>(_mapper.Map<ClientDto>(clientProjection));
