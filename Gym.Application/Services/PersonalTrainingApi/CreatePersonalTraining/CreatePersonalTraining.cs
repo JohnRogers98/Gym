@@ -8,7 +8,7 @@ namespace Gym.Application.Services.PersonalTrainingApi.CreatePersonalTraining
         String InstructorId,
         String ClientId,
         DateTime Start,
-        DateTime? End,
-        String InstructorComment, 
-        Boolean IsPaid) : IRequest<Result<CreatePersonalTrainingResult>>, ITransactionalRequest;
+        DateTime? End,        
+        Boolean IsPaid,
+        String InstructorComment) : IRequest<Result<CreatePersonalTrainingResult>>, ITransactionalRequest;
 }

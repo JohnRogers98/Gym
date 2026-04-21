@@ -52,7 +52,8 @@ namespace Gym.WebApi.Extensions
             services.AddAuthorizationBuilder()
                 .AddPolicy(nameof(SecurityPolicy.AuthenticatedOnly), policy => policy.RequireAuthenticatedUser())
                 .AddPolicy(nameof(SecurityPolicy.AdminOnly), policy => policy.RequireRole("Admin"))
-                .AddPolicy(nameof(SecurityPolicy.ClientOnly), policy => policy.RequireRole("Client"));
+                .AddPolicy(nameof(SecurityPolicy.ClientOnly), policy => policy.RequireRole("Client"))
+                .AddPolicy(nameof(SecurityPolicy.InstructorOnly), policy => policy.RequireRole("Instructor"));
 
             return services;
         }

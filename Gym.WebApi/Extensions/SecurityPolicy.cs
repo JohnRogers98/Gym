@@ -11,6 +11,9 @@ namespace Gym.WebApi.Extensions
         AdminOnly,
 
         [Description("Requires Client role")]
-        ClientOnly
+        ClientOnly,
+
+        [Description("Requires Instructor role")]
+        InstructorOnly
     }
 }

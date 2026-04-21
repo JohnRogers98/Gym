@@ -54,7 +54,7 @@ namespace Gym.Application.Services.PersonalTrainingApi.CreatePersonalTraining
 
             await _personalTrainingRepository.SaveAsync(personalTraining, cancellationToken);
 
-            return Result<CreatePersonalTrainingResult>.Ok(new CreatePersonalTrainingResult());
+            return Result<CreatePersonalTrainingResult>.Ok(new CreatePersonalTrainingResult(personalTraining.Id.Value));
         }
     }
 }
