@@ -11,7 +11,7 @@ using MongoDB.Driver;
 namespace Gym.Infrastructure.Entities.Projections.Instructors
 {
     internal class CreatedInstructorProjectionHandler(
-        IMongoCollection<InstructorEntity> _instructorColletion,
+        IMongoCollection<InstructorEntity> _instructorCollection,
         IMongoCollection<InstructorProjection> _projectionCollection,
         MongoUnitOfWork _mongoUnitOfWork,
         IEventDtoDeserializer _eventDtoDeserializer) : IProjectionHandler
@@ -25,7 +25,7 @@ namespace Gym.Infrastructure.Entities.Projections.Instructors
         {
             var instructorCreatedDto = _eventDtoDeserializer.Deserialize<InstructorCreatedDto>(eventEntity);
 
-            var instructorEntity = await _instructorColletion
+            var instructorEntity = await _instructorCollection
                 .Find(instructor => instructor.Id == instructorCreatedDto.InstructorId.ToObjectId())
                 .FirstAsync(cancellationToken);
 

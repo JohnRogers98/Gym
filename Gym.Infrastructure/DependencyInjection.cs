@@ -2,6 +2,7 @@
 using Gym.Abstractions.Query.Clients;
 using Gym.Abstractions.Query.EventStore;
 using Gym.Abstractions.Query.Instructors;
+using Gym.Abstractions.Query.PersonalTrainings;
 using Gym.Abstractions.Query.Trainings;
 using Gym.Domain._Common;
 using Gym.Domain.AccountContext;
@@ -29,6 +30,7 @@ using Gym.Infrastructure.Entities.Projections.CalendarEvents;
 using Gym.Infrastructure.Entities.Projections.Clients;
 using Gym.Infrastructure.Entities.Projections.Events;
 using Gym.Infrastructure.Entities.Projections.Instructors;
+using Gym.Infrastructure.Entities.Projections.PersonalTrainings;
 using Gym.Infrastructure.Entities.Projections.Trainings;
 using Gym.Infrastructure.Entities.Repositories.Accounts;
 using Gym.Infrastructure.Entities.Repositories.CalendarEvents;
@@ -129,6 +131,7 @@ namespace Gym.Infrastructure
             services.AddMongoCollection<PollResponseEntity>(mongoDbOptions.CollectionOptions.PollResponses);
 
             services.AddMongoCollection<PersonalTrainingEntity>(mongoDbOptions.CollectionOptions.PersonalTrainings);
+            services.AddMongoCollection<PersonalTrainingProjection>(mongoDbOptions.CollectionOptions.PersonalTrainingProjections);
 
             return services;
         }
@@ -182,6 +185,7 @@ namespace Gym.Infrastructure
             services.TryDecorate<IPollResponseRepository, PollResponseEventStoreAspect>();
 
             services.TryAddScoped<IPersonalTrainingRepository, PersonalTrainingRepository>();
+            services.TryDecorate<IPersonalTrainingRepository, PersonalTrainingEventStoreAspect>();
 
             return services;
         }
@@ -197,6 +201,7 @@ namespace Gym.Infrastructure
             services.TryAddScoped<IInstructorProjectionQueryService, InstructorProjectionQueryService>();
             services.TryAddScoped<ITrainingProjectionQueryService, TrainingProjectionQueryService>();
             services.TryAddScoped<IClientProjectionQueryService, ClientProjectionQueryService>();
+            services.TryAddScoped<IPersonalTrainingProjectionQueryService, PersonalTrainingProjectionQueryService>();
 
             return services;
         }

@@ -1,4 +1,6 @@
-﻿namespace Gym.Infrastructure.Configurations
+﻿using Gym.Abstractions.Query.PersonalTrainings;
+
+namespace Gym.Infrastructure.Configurations
 {
     public sealed record MongoDbOptions(String ConnectionString, String DatabaseName, CollectionOptions CollectionOptions)
     {
@@ -28,7 +30,8 @@
         String OutboxChangeStreams,
         String Polls,
         String PollResponses,
-        String PersonalTrainings)
+        String PersonalTrainings,
+        String PersonalTrainingProjections)
     {
         public static CollectionOptions Default => new CollectionOptions(
             "instructors",
@@ -48,6 +51,7 @@
             "outbox-changes-streams",
             "polls",
             "poll-responses",
-            "personal-trainings");
+            "personal-trainings",
+            "personal-training-projections");
     }
 }
