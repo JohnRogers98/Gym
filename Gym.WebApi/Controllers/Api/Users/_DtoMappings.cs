@@ -1,8 +1,9 @@
 ﻿using AutoMapper;
+using Gym.Application.Services.ClientApi.CreateClient;
 using Gym.Application.Services.UserApi;
 using Gym.Application.Services.UserApi.ChangePassword;
-using Gym.Application.Services.UserApi.CreateUser;
-using Gym.WebDto.Requests.Users;
+using Gym.WebDto.Requests.Client;
+using Gym.WebDto.Responses.Clients;
 using Gym.WebDto.Responses.Users;
 
 namespace Gym.WebApi.Controllers.Api.Users
@@ -13,8 +14,8 @@ namespace Gym.WebApi.Controllers.Api.Users
         {
             CreateMap<AuthenticatedUserDetails, AuthResponse>();
 
-            CreateMap<CreateUserRequest, CreateUser>();
-            CreateMap<CreateUserResult, CreateUserResponse>();
+            CreateMap<CreateClientRequest, CreateClient>();
+            CreateMap<CreateClientResult, CreateClientResponse>();
         }
     }
 }

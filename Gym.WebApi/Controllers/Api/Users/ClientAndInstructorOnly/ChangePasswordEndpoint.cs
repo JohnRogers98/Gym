@@ -9,10 +9,11 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Gym.WebApi.Controllers.Api.Users.ClientOnly
+namespace Gym.WebApi.Controllers.Api.Users.ClientAndInstructorOnly
 {
     [ApiController]
     [Authorize(Policy = nameof(SecurityPolicy.ClientOnly))]
+    [Authorize(Policy = nameof(SecurityPolicy.InstructorOnly))]
     public class ChangePasswordEndpoint(IMediator _mediator) : EndpointBaseAsync
         .WithRequest<ChangePasswordRequest>
         .WithActionResult

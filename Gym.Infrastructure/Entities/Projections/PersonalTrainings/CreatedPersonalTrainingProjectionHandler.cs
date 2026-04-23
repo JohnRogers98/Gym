@@ -5,7 +5,6 @@ using Gym.Domain.PersonalTrainingContext.Events;
 using Gym.Infrastructure.Entities.EventStores;
 using Gym.Infrastructure.Entities.EventStores.DtoDeserializers;
 using Gym.Infrastructure.Entities.Extensions;
-using Gym.Infrastructure.Entities.Repositories.Instructors;
 using Gym.Infrastructure.Entities.Repositories.PersonalTrainings;
 using Gym.Infrastructure.Entities.Repositories.PersonalTrainings.EventsDto;
 using Gym.Infrastructure.Entities.Repositories.Users;
@@ -16,7 +15,6 @@ namespace Gym.Infrastructure.Entities.Projections.PersonalTrainings
     internal class CreatedPersonalTrainingProjectionHandler(
         IMongoCollection<PersonalTrainingEntity> _personalTrainingCollection,
         IMongoCollection<PersonalTrainingProjection> _projectionCollection,
-        IMongoCollection<InstructorEntity> _instructorCollection,
         IMongoCollection<UserEntity> _userCollection,
         MongoUnitOfWork _mongoUnitOfWork,
         IEventDtoDeserializer _eventDtoDeserializer) : IProjectionHandler
@@ -30,8 +28,8 @@ namespace Gym.Infrastructure.Entities.Projections.PersonalTrainings
         {
             var personalTrainingCreatedDto = _eventDtoDeserializer.Deserialize<PersonalTrainingCreatedDto>(eventEntity);
 
-            var instructorEntity = await _instructorCollection
-                .Find(instructor => instructor.Id == personalTrainingCreatedDto.InstructorId.ToObjectId())
+            var instructorUserEntity = await _userCollection
+                .Find(user => user.Id == personalTrainingCreatedDto.InstructorId.ToObjectId())
                 .FirstAsync(cancellationToken);
 
             var clientUserEntity = await _userCollection
@@ -44,7 +42,7 @@ namespace Gym.Infrastructure.Entities.Projections.PersonalTrainings
 
             var projection = new PersonalTrainingProjection(
                 Id: personalTrainingEntity.Id.ToString(),
-                Instructor: new InstructorInfo(instructorEntity.Id.ToString(), String.Concat(instructorEntity.FirstName, " ", instructorEntity.LastName)),
+                Instructor: new InstructorInfo(instructorUserEntity.Id.ToString(), String.Concat(instructorUserEntity.FirstName, " ", instructorUserEntity.LastName)),
                 Client: new ClientInfo(clientUserEntity.Id.ToString(), String.Concat(clientUserEntity.FirstName, " ", clientUserEntity.LastName)),
                 Status: personalTrainingEntity.Status,
                 Start: personalTrainingEntity.Start,

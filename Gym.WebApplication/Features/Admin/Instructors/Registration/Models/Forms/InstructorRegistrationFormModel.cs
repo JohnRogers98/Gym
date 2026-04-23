@@ -5,6 +5,9 @@ namespace Gym.WebApplication.Features.Admin.Instructors.Registration.Models.Form
     public class InstructorRegistrationFormModel
     {
         [Required]
+        public String? Login { get; set; }
+
+        [Required]
         public String? FirstName { get; set; }
 
         [Required]

@@ -8,55 +8,48 @@ using Gym.Domain.FormAuthContext;
 using Gym.Domain.FormAuthContext.Errors;
 using Gym.Domain.FormAuthContext.ValueObjects;
 using Gym.Domain.UserContext;
-using Gym.Domain.UserContext.Errors;
 using Gym.Domain.UserContext.ValueObjects;
 using MediatR;
 
-namespace Gym.Application.Services.UserApi.CreateUser
+namespace Gym.Application.Services.ClientApi.CreateClient
 {
-    internal class CreateUserHandler(
-        IPasswordHasher _passwordHasher,
-        IPasswordGenerator _passwordGenerator,
-        IFormAuthRepository _formAuthRepository,
+    internal class CreateClientHandler(
         IUserRepository _userRepository,
         IClientRepository _clientRepository,
-        IAccountRepository _accountRepository) : IRequestHandler<CreateUser, Result<CreateUserResult>>
+        IAccountRepository _accountRepository,
+        IPasswordGenerator _passwordGenerator,
+        IPasswordHasher _passwordHasher,
+        IFormAuthRepository _formAuthRepository) : IRequestHandler<CreateClient, Result<CreateClientResult>>
     {
-        public async Task<Result<CreateUserResult>> Handle(CreateUser request, CancellationToken cancellationToken)
-        {
+        public async Task<Result<CreateClientResult>> Handle(CreateClient request, CancellationToken cancellationToken)
+        {  
+            var userResult = await this.CreateUserAsync(request, cancellationToken);
+            if(userResult.Success is false)
+                return Result<CreateClientResult>.Fail(userResult.Error!);
+
+            await CreateClientAsync(userResult.Data!.Id, cancellationToken);
+            await CreateAccountAsync(userResult.Data!.Id, cancellationToken);
+
             var loginResult = Login.From(request.Login);
             if (loginResult.Success is false)
-                return Result<CreateUserResult>.Fail(loginResult.Error!);
+                return Result<CreateClientResult>.Fail(loginResult.Error!);
 
             var loginExists = await _formAuthRepository.ExistsAsync(loginResult.Data!, cancellationToken);
             if (loginExists)
-                return Result<CreateUserResult>.Fail(LoginAlreadyExistsError.Create());
+                return Result<CreateClientResult>.Fail(LoginAlreadyExistsError.Create());
 
-            var password = _passwordGenerator.Generate();
+            Password password = _passwordGenerator.Generate();
             var hashedPassword = _passwordHasher.HashPassword(password);
-
-            var userResult = await this.CreateUserAsync(request, cancellationToken);
-            if(userResult.Success is false)
-                return Result<CreateUserResult>.Fail(userResult.Error!);
-
-            if(userResult.Data!.Role == UserRole.Client)
-            {
-                await CreateClientAsync(userResult.Data!.Id, cancellationToken);
-                await CreateAccountAsync(userResult.Data!.Id, cancellationToken);
-            }
 
             var formAuth = FormAuth.Create(loginResult.Data!, hashedPassword, userResult.Data!.Id);
             await _formAuthRepository.SaveAsync(formAuth, cancellationToken);
 
-            return Result<CreateUserResult>.Ok(new CreateUserResult(userResult.Data!.Id.Value, loginResult.Data!.Value, password.Value));
+            return Result<CreateClientResult>.Ok(new CreateClientResult(userResult.Data!.Id.Value, loginResult.Data!.Value, password.Value));
         }
 
-        private async Task<Result<User>> CreateUserAsync(CreateUser request, CancellationToken cancellationToken)
+        private async Task<Result<User>> CreateUserAsync(CreateClient request, CancellationToken cancellationToken)
         {
             var userId = _userRepository.NextIdentity();
-           
-            if (!Enum.TryParse<UserRole>(request.Role, true, out UserRole userRole) || !Enum.IsDefined(typeof(UserRole), userRole))
-                return Result<User>.Fail(UserRoleParseError.Create());
 
             var firstNameResult = FirstName.From(request.FirstName);
             if (firstNameResult.Success is false)
@@ -71,7 +64,7 @@ namespace Gym.Application.Services.UserApi.CreateUser
                 lastName = lastNameResult.Data!;
             }
 
-            User user = User.Create(userId, userRole, firstNameResult.Data!, lastName);
+            User user = User.Create(userId, UserRole.Client, firstNameResult.Data!, lastName);
             await _userRepository.SaveAsync(user, cancellationToken);
 
             return Result<User>.Ok(user);

@@ -6,12 +6,15 @@
 @inject ICreateInstructorService CreateInstructorService
 @inject IInstructorRegisteredSharedState InstructorRegisteredSharedState
 
+@inject IDialogService DialogService
+
 <EditForm Model="@_formModel" OnValidSubmit="@OnValidSubmit">
     <DataAnnotationsValidator />
     <MudGrid>
         <MudItem xs="12" sm="12">
             <MudCard Elevation="0">
                 <MudCardContent>
+                    <MudTextField HelperText="Enter login" Class="mt-3" @bind-Value="_formModel.Login" For="@(() => _formModel.Login)" />
                     <MudTextField HelperText="Enter first name" @bind-Value="@_formModel.FirstName" For="@(() => _formModel.FirstName)" />
                     <MudTextField HelperText="Enter last name" Class="mt-3" @bind-Value="_formModel.LastName" For="@(() => _formModel.LastName)" />
                 </MudCardContent>
@@ -30,8 +33,11 @@
 
     private async void OnValidSubmit(EditContext context)
     {
-        CreateInstructorResult createdInstructorViewModel = await CreateInstructorService.HandleAsync(_formModel);
-        InstructorRegisteredSharedState.Notify(createdInstructorViewModel);
+        CreateInstructorResult createInstructorResult = await CreateInstructorService.HandleAsync(_formModel);
+        InstructorRegisteredSharedState.Notify(createInstructorResult);
+
+        var parameters = new DialogParameters<ShowCreatedInstructorCredentialsDialog> { { x => x.CreateInstructorResult, createInstructorResult } };
+        var dialog = await DialogService.ShowAsync<ShowCreatedInstructorCredentialsDialog>("Instructor credentials", parameters);
 
         this.ClearForm();
     }

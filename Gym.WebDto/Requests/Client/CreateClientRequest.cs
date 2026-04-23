@@ -1,9 +1,8 @@
-﻿namespace Gym.WebDto.Requests.Users
+﻿namespace Gym.WebDto.Requests.Client
 {
-    public record CreateUserRequest
+    public record CreateClientRequest
     {
         public required String Login { get; init; }
-        public required String Role { get; init; }
         public required String FirstName { get; init; }
         public String? LastName { get; init; }
     }

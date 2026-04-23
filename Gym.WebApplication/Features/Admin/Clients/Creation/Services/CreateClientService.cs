@@ -1,7 +1,7 @@
 ﻿using Gym.WebApplication.Features.Admin.Clients.Creation.Models.Forms;
 using Gym.WebApplication.Features.Admin.Clients.Creation.Models.Results;
-using Gym.WebDto.Requests.Users;
-using Gym.WebDto.Responses.Users;
+using Gym.WebDto.Requests.Client;
+using Gym.WebDto.Responses.Clients;
 using System.Net.Http.Json;
 
 namespace Gym.WebApplication.Features.Admin.Clients.Creation.Services
@@ -15,20 +15,19 @@ namespace Gym.WebApplication.Features.Admin.Clients.Creation.Services
     {
         public async Task<CreateClientResult> HandleAsync(CreateClientFormModel createClientFormModel, CancellationToken cancellationToken = default)
         {
-            CreateUserRequest createUserRequest = new()
+            CreateClientRequest createUserRequest = new()
             {
                 Login = createClientFormModel.Login!,
-                Role = "Client",
                 FirstName = createClientFormModel.FirstName!,
                 LastName = createClientFormModel.LastName,
             };
 
-            var response = await _httpClient.PostAsJsonAsync("api/users", createUserRequest, cancellationToken);
-            var createUserResponse = await response.Content.ReadFromJsonAsync<CreateUserResponse>();
+            var response = await _httpClient.PostAsJsonAsync("api/clients", createUserRequest, cancellationToken);
+            var createUserResponse = await response.Content.ReadFromJsonAsync<CreateClientResponse>();
 
             return new CreateClientResult()
             {
-                UserId = createUserResponse!.UserId,
+                UserId = createUserResponse!.ClientId,
                 Login = createUserResponse.Login,
                 Password = createUserResponse.Password
             };
