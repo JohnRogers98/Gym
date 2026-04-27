@@ -8,12 +8,12 @@ namespace Gym.WebApplication.Features.Admin.Clients.TableView.Services
 {
     public interface IGetAllClientsService
     {
-        Task<IEnumerable<ClientViewModel>> ExecuteAsync(CancellationToken cancellationToken = default);
+        Task<IEnumerable<ClientViewModel>> HandleAsync(CancellationToken cancellationToken = default);
     }
 
     public class GetAllClientsService(HttpClient _httpClient, IMapper _mapper) : IGetAllClientsService
     {
-        public async Task<IEnumerable<ClientViewModel>> ExecuteAsync(CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<ClientViewModel>> HandleAsync(CancellationToken cancellationToken = default)
         {
             var response = await _httpClient.GetFromJsonAsync<ListResponse<ClientDto>>("api/admin-clients", cancellationToken: cancellationToken);
             IEnumerable<ClientDto> dtos = response!.Data;

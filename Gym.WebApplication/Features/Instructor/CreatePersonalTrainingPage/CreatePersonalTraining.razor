@@ -1,0 +1,86 @@
+﻿@page "/create-personal-training"
+@using Gym.WebApplication.Features.Admin.Clients.TableView.Services
+@using Gym.WebApplication.Features.Instructor.CreatePersonalTrainingPage.Models.Forms
+@using Gym.WebApplication.Features.Instructor.CreatePersonalTrainingPage.Models.Results
+@using Gym.WebApplication.Features.Instructor.CreatePersonalTrainingPage.Services
+
+@inject IGetAllClientsService GetAllClientsService
+@inject ICreatePersonalTrainingService CreatePersonalTrainingService
+
+@inject ISnackbar Snackbar
+
+<MudContainer>
+
+    <EditForm Model="@_formModel" OnValidSubmit="@OnValidSubmit">
+    
+        <DataAnnotationsValidator />
+
+        <MudCard Elevation="3">
+
+            <MudCardHeader Class="d-flex justify-center align-center">
+                <MudText Typo="Typo.h5">Create personal training</MudText>
+            </MudCardHeader>
+
+            <MudCardContent>
+                <MudStack Spacing="3">
+
+                    <MudSelect T="String" @bind-Value="@_formModel.ClientId" Variant="Variant.Outlined" Clearable="true" Label="Choose client" For="@(() => _formModel.ClientId)">
+                        @foreach (var client in _clients)
+                        {
+                            <MudSelectItem T="String" Value="@client.Id">
+                                @client.FullName
+                            </MudSelectItem>
+                        }
+                    </MudSelect>
+
+                    <MudDatePicker PickerVariant="PickerVariant.Dialog" Variant="Variant.Outlined" Label="Choose day" AutoClose="true"
+                                   MinDate="@DateTime.Today" @bind-Date="@_formModel.LocalStartDateTime" For="@(() => _formModel.LocalStartDateTime)" />
+
+                    <MudTimePicker PickerVariant="PickerVariant.Dialog" Variant="Variant.Outlined" Label="Choose time" AutoClose="true"
+                                   @bind-Time="@_formModel.StartTimeSpan" For="@(() => _formModel.StartTimeSpan)" />
+                    
+                    <MudNumericField @bind-Value="@_formModel.DurationInMinutes" Label="Choose duration in minutes" Variant="Variant.Outlined"
+                                     Step="15" For="@(() => _formModel.DurationInMinutes)" />
+
+                    <MudTextField @bind-Value="@_formModel.InstructorComment" Label="Your comment" Variant="Variant.Outlined" For="@(() => _formModel.InstructorComment)" />
+
+                    <MudCheckBox @bind-Value="@_formModel.IsPaid" Label="Is payed?" Color="Color.Primary"></MudCheckBox>
+
+                </MudStack>
+            </MudCardContent>
+
+            <MudCardActions>
+                <MudStack Row="true" Class="ml-auto">
+                    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Create</MudButton>
+                </MudStack>
+                  
+            </MudCardActions>
+        </MudCard>
+
+    </EditForm>
+
+</MudContainer>
+
+@code {
+    private CreatePersonalTrainingFormModel _formModel = new();
+
+    private IList<ClientViewModel> _clients = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        _clients = [.. await GetAllClientsService.HandleAsync()];
+    }
+
+    private async void OnValidSubmit(EditContext context)
+    {
+        CreatePersonalTrainingResult createPersonalTrainingResult = await CreatePersonalTrainingService.HandleAsync(_formModel);
+        Snackbar.Add($"Personal training - {createPersonalTrainingResult.PersonalTrainingId} created", Severity.Success);
+        this.ClearForm();
+    }
+
+    private void ClearForm()
+    {
+        _formModel = new();
+        base.StateHasChanged();
+    }
+}

@@ -27,7 +27,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        _clients = [.. await GetAllClientsService.ExecuteAsync()];
+        _clients = [.. await GetAllClientsService.HandleAsync()];
     }
 
     private async void ChargeClient(ClientViewModel clientViewModel)

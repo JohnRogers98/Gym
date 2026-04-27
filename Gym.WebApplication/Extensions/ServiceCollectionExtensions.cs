@@ -12,6 +12,7 @@ using Gym.WebApplication.Features.Admin.Shared.Services;
 using Gym.WebApplication.Features.Admin.Trainings.Creation.Services;
 using Gym.WebApplication.Features.Admin.Trainings.States;
 using Gym.WebApplication.Features.Calendar.Services;
+using Gym.WebApplication.Features.Instructor.CreatePersonalTrainingPage.Services;
 using Gym.WebApplication.Features.Login.Services;
 using Gym.WebApplication.JSAdapters;
 using Gym.WebApplication.Providers;
@@ -127,6 +128,13 @@ namespace Gym.WebApplication.Extensions
             services.AddScoped<IGetClientDetailsService, GetClientDetailsService>();
             services.AddScoped<IChargeClientService, ChargeClientService>();
             services.AddScoped<ICreateClientService, CreateClientService>();
+
+            return services;
+        }
+
+        public static IServiceCollection AddPersonalTrainingServices(this IServiceCollection services)
+        {
+            services.AddScoped<ICreatePersonalTrainingService, CreatePersonalTrainingService>();
 
             return services;
         }

@@ -46,6 +46,16 @@
                              OnClick="@ToggleDrawer" />
 
             </AuthorizeView>
+
+            <AuthorizeView Roles="Instructor">
+
+                <MudMenuItem Href="/create-personal-training"
+                             Icon="@Icons.Material.Filled.PersonAdd"
+                             IconColor="Color.Primary"
+                             Label="Create personal training"
+                             OnClick="@ToggleDrawer" />
+
+            </AuthorizeView>
            
         </MudNavMenu>
       

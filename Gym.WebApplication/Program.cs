@@ -48,4 +48,6 @@ builder.Services.AddTrainingServices();
 
 builder.Services.AddClientServices();
 
+builder.Services.AddPersonalTrainingServices();
+
 await builder.Build().RunAsync();
