@@ -124,7 +124,8 @@ namespace Gym.WebApplication.Extensions
 
         public static IServiceCollection AddClientServices(this IServiceCollection services)
         {
-            services.AddScoped<IGetAllClientsService, GetAllClientsService>();
+            services.AddScoped<Features.Admin.Clients.TableView.Services.IGetAllClientsService, Features.Admin.Clients.TableView.Services.GetAllClientsService>();
+            services.AddScoped<Features.Instructor.CreatePersonalTrainingPage.Services.IGetAllClientsService, Features.Instructor.CreatePersonalTrainingPage.Services.GetAllClientsService>();
             services.AddScoped<IGetClientDetailsService, GetClientDetailsService>();
             services.AddScoped<IChargeClientService, ChargeClientService>();
             services.AddScoped<ICreateClientService, CreateClientService>();

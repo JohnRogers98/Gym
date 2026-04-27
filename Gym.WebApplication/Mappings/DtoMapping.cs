@@ -7,14 +7,18 @@ using Gym.WebApplication.Features.Admin.Instructors.Registration.Models.Results;
 using Gym.WebApplication.Features.Admin.Trainings.Creation.Models.Forms;
 using Gym.WebApplication.Features.Admin.Trainings.Creation.Models.Results;
 using Gym.WebApplication.Features.Calendar.Models;
+using Gym.WebApplication.Features.Instructor.CreatePersonalTrainingPage.Models.Forms;
+using Gym.WebApplication.Features.Instructor.CreatePersonalTrainingPage.Models.Results;
 using Gym.WebApplication.ViewModels;
 using Gym.WebDto.Requests.CalendarEvent;
 using Gym.WebDto.Requests.Instructor;
+using Gym.WebDto.Requests.PersonalTraining;
 using Gym.WebDto.Requests.Training;
 using Gym.WebDto.Responses.Account;
 using Gym.WebDto.Responses.CalendarEvent;
 using Gym.WebDto.Responses.Clients;
 using Gym.WebDto.Responses.Instructor;
+using Gym.WebDto.Responses.PersonalTraining;
 using Gym.WebDto.Responses.Training;
 
 namespace Gym.WebApplication.Mappings
@@ -33,7 +37,7 @@ namespace Gym.WebApplication.Mappings
 
             #region Instructor
             base.CreateMap<InstructorDto, InstructorViewModel>();
-            base.CreateMap<InstructorInfo, InstructorViewModel>();
+            base.CreateMap<WebDto.Responses.Instructor.InstructorInfo, InstructorViewModel>();
 
             base.CreateMap<InstructorRegistrationFormModel, CreateInstructorRequest>();
             base.CreateMap<CreateInstructorResponse, CreateInstructorResult>();
@@ -128,6 +132,22 @@ namespace Gym.WebApplication.Mappings
                 }));
 
             base.CreateMap<PollResponse, CalendarEventPollResponseDto>();
+            #endregion
+
+            #region PersonalTraining
+            base.CreateMap<CreatePersonalTrainingFormModel, CreatePersonalTrainingRequest>()
+                .ForMember(dest => dest.Start,
+                opt => opt.MapFrom((src, dest, _, context) =>
+                {
+                    return src.UtcStart;
+                }))
+                .ForMember(dest => dest.End,
+                opt => opt.MapFrom((src, dest, _, context) =>
+                {
+                    return src.UtcEnd;
+                }));
+
+            base.CreateMap<CreatePersonalTrainingResponse, CreatePersonalTrainingResult>();
             #endregion
         }
     }
