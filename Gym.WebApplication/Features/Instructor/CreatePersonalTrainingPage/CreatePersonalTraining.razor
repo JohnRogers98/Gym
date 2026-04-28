@@ -2,9 +2,10 @@
 @using Gym.WebApplication.Features.Instructor.CreatePersonalTrainingPage.Models.Forms
 @using Gym.WebApplication.Features.Instructor.CreatePersonalTrainingPage.Models.Results
 @using Gym.WebApplication.Features.Instructor.CreatePersonalTrainingPage.Services
+@using Gym.WebApplication.Features._Common.Services
 
 @inject IGetAllClientsService GetAllClientsService
-@inject ICreatePersonalTrainingService CreatePersonalTrainingService
+@inject IRequestHandler<CreatePersonalTrainingFormModel, CreatePersonalTrainingResult> CreatePersonalTrainingService
 
 @inject ISnackbar Snackbar
 
@@ -72,9 +73,12 @@
 
     private async void OnValidSubmit(EditContext context)
     {
-        CreatePersonalTrainingResult createPersonalTrainingResult = await CreatePersonalTrainingService.HandleAsync(_formModel);
-        Snackbar.Add($"Personal training - {createPersonalTrainingResult.PersonalTrainingId} created", Severity.Success);
-        this.ClearForm();
+        var createPersonalTrainingResult = await CreatePersonalTrainingService.HandleAsync(_formModel);
+        if (createPersonalTrainingResult.Succeeded)
+        {
+            Snackbar.Add($"Personal training - {createPersonalTrainingResult.Data!.PersonalTrainingId} created", Severity.Success);
+            this.ClearForm();
+        }
     }
 
     private void ClearForm()

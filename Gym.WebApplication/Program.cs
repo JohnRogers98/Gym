@@ -1,5 +1,6 @@
 using Gym.WebApplication;
 using Gym.WebApplication.Extensions;
+using Gym.WebApplication.Features._Common.States;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using MudBlazor;
@@ -26,6 +27,8 @@ builder.Services.AddMudServices(config =>
     config.SnackbarConfiguration.ShowTransitionDuration = 500;
     config.SnackbarConfiguration.SnackbarVariant = Variant.Filled;
 });
+
+builder.Services.AddScoped<IAppSnackbarNotifier, AppSnackbarNotifier>();
 
 builder.Services.AddResiliencePipelines();
 

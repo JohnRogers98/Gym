@@ -12,9 +12,12 @@ using Gym.WebApplication.Features.Admin.Shared.Services;
 using Gym.WebApplication.Features.Admin.Trainings.Creation.Services;
 using Gym.WebApplication.Features.Admin.Trainings.States;
 using Gym.WebApplication.Features.Calendar.Services;
+using Gym.WebApplication.Features.Instructor.CreatePersonalTrainingPage.Models.Forms;
+using Gym.WebApplication.Features.Instructor.CreatePersonalTrainingPage.Models.Results;
 using Gym.WebApplication.Features.Instructor.CreatePersonalTrainingPage.Services;
 using Gym.WebApplication.Features.Login.Services;
 using Gym.WebApplication.JSAdapters;
+using Gym.WebApplication.Operations;
 using Gym.WebApplication.Providers;
 using Gym.WebApplication.ViewModels;
 using Microsoft.AspNetCore.Components.Authorization;
@@ -135,7 +138,13 @@ namespace Gym.WebApplication.Extensions
 
         public static IServiceCollection AddPersonalTrainingServices(this IServiceCollection services)
         {
-            services.AddScoped<ICreatePersonalTrainingService, CreatePersonalTrainingService>();
+            RequestHandlerRegistration
+                .WithRequest<CreatePersonalTrainingFormModel>
+                .WithResponse<CreatePersonalTrainingResult>
+                .For<CreatePersonalTrainingService>
+                .In(services)
+                .DecorateWithHttpExceptionCatcher()
+                .DecorateWithFailSnackbar();
 
             return services;
         }

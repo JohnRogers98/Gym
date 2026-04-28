@@ -8,11 +8,11 @@ namespace Gym.WebApi.Extensions
         {
             var problemDetails = new ProblemDetails
             {
+                Type = "about:blank",
                 Status = StatusCodes.Status500InternalServerError,
                 Title = "Internal error",
                 Detail = detail,
                 Instance = controller.HttpContext.Request.Path,
-                Type = "https://tools.ietf.org/html/rfc7231#section-6.6.1"
             };
 
             return controller.StatusCode(StatusCodes.Status500InternalServerError, problemDetails);
@@ -22,11 +22,11 @@ namespace Gym.WebApi.Extensions
         {
             var problemDetails = new ProblemDetails
             {
+                Type = "about:blank",
                 Status = StatusCodes.Status400BadRequest,
-                Title = "Bad request",
+                Title = "Validation error",
                 Detail = detail,
                 Instance = controller.HttpContext.Request.Path,
-                Type = "https://tools.ietf.org/html/rfc7231#section-6.6.1"
             };
 
             return controller.BadRequest(problemDetails);
@@ -36,11 +36,11 @@ namespace Gym.WebApi.Extensions
         {
             var problemDetails = new ProblemDetails
             {
+                Type = "about:blank",
                 Status = StatusCodes.Status409Conflict,
                 Title = "Conflict",
                 Detail = detail,
                 Instance = controller.HttpContext.Request.Path,
-                Type = "https://tools.ietf.org/html/rfc7231#section-6.6.1"
             };
 
             return controller.Conflict(problemDetails);

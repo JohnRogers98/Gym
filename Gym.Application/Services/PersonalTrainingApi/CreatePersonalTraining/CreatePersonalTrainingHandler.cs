@@ -37,9 +37,15 @@ namespace Gym.Application.Services.PersonalTrainingApi.CreatePersonalTraining
             if (periodResult.Success is false)
                 return Result<CreatePersonalTrainingResult>.Fail(periodResult.Error!);
 
-            var instructorCommentResult = Comment.From(request.InstructorComment);
-            if (instructorCommentResult.Success is false)
-                return Result<CreatePersonalTrainingResult>.Fail(instructorCommentResult.Error!);
+            Comment? instructorComment = null;
+            if(request.InstructorComment is not null)
+            {
+                var instructorCommentResult = Comment.From(request.InstructorComment);
+                if (instructorCommentResult.Success is false)
+                    return Result<CreatePersonalTrainingResult>.Fail(instructorCommentResult.Error!);
+
+                instructorComment = instructorCommentResult.Data!;
+            }
 
             var paymentStatus = request.IsPaid ? PaymentStatus.Paid : PaymentStatus.Unpaid;
 
@@ -49,7 +55,7 @@ namespace Gym.Application.Services.PersonalTrainingApi.CreatePersonalTraining
                 clientIdResult.Data!,
                 periodResult.Data!,
                 paymentStatus,
-                instructorComment: instructorCommentResult.Data
+                instructorComment: instructorComment
             );
 
             await _personalTrainingRepository.SaveAsync(personalTraining, cancellationToken);

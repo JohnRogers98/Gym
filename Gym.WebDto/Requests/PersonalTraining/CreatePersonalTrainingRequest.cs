@@ -6,6 +6,6 @@
         public required DateTime Start { get; init; }
         public required DateTime? End { get; init; }
         public required Boolean IsPaid { get; init; }
-        public required String InstructorComment { get; init; }
+        public String? InstructorComment { get; init; }
     }
 }
