@@ -1,6 +1,8 @@
-﻿using Gym.WebApplication.Features.Account.ChangePassword.Services;
+﻿using Gym.WebApplication.Features.Account.ChangePassword.Models.Forms;
+using Gym.WebApplication.Features.Account.ChangePassword.Services;
 using Gym.WebApplication.Features.Account.Details.Servises;
 using Gym.WebApplication.Features.Account.History.Services;
+using Gym.WebApplication.Features.Account.History.ViewModels;
 using Gym.WebApplication.Features.Admin.CalendarEvents.Creation.Services;
 using Gym.WebApplication.Features.Admin.CalendarEvents.States;
 using Gym.WebApplication.Features.Admin.CalendarEvents.TableView.Services;
@@ -12,6 +14,10 @@ using Gym.WebApplication.Features.Admin.Shared.Services;
 using Gym.WebApplication.Features.Admin.Trainings.Creation.Services;
 using Gym.WebApplication.Features.Admin.Trainings.States;
 using Gym.WebApplication.Features.Calendar.Services;
+using Gym.WebApplication.Features.Client.Account.ChangePassword.Models.Results;
+using Gym.WebApplication.Features.Client.Account.Details.Models;
+using Gym.WebApplication.Features.Client.Account.History.Models;
+using Gym.WebApplication.Features.Client.Calendar.Models;
 using Gym.WebApplication.Features.Instructor.CreatePersonalTrainingPage.Models.Forms;
 using Gym.WebApplication.Features.Instructor.CreatePersonalTrainingPage.Models.Results;
 using Gym.WebApplication.Features.Instructor.CreatePersonalTrainingPage.Services;
@@ -70,8 +76,21 @@ namespace Gym.WebApplication.Extensions
 
         public static IServiceCollection AddCalendarEventServices(this IServiceCollection services)
         {
-            services.AddScoped<IGetAllCalendarItemsService, GetAllCalendarItemsService>();
-            services.AddScoped<IBookCalendarItemService, BookCalendarItemService>();
+            RequestHandlerRegistration
+               .WithRequest<GetAllCalendarItems>
+               .WithResponse<IEnumerable<ClientCalendarItemViewModel>>
+               .For<GetAllCalendarItemsService>
+               .In(services)
+               .DecorateWithHttpExceptionCatcher()
+               .DecorateWithFailSnackbar();
+
+            RequestHandlerRegistration
+               .WithRequest<BookCalendarItem>
+               .WithResponse<BookCalendarItemResult>
+               .For<BookCalendarItemService>
+               .In(services)
+               .DecorateWithHttpExceptionCatcher()
+               .DecorateWithFailSnackbar();
 
             services.AddScoped<IGetAllAdminCalendarEventsService, GetAllAdminCalendarEventsService>();
             services.Decorate<IGetAllAdminCalendarEventsService, CachableGetAllAdminCalendarEventsSetvice>();
@@ -91,8 +110,22 @@ namespace Gym.WebApplication.Extensions
         public static IServiceCollection AddAccountServices(this IServiceCollection services)
         {
             services.AddScoped<AccountHistoryViewModelMapper>();
-            services.AddScoped<IGetAllAccountHistoryItemsService, GetAllAccountHistoryItemsService>();
-            services.AddScoped<IChangePasswordService, ChangePasswordService>();
+
+            RequestHandlerRegistration
+                .WithRequest<GetAllAccountHistoryItems>
+                .WithResponse<IEnumerable<AccountHistoryItemViewModel>>
+                .For<GetAllAccountHistoryItemsService>
+                .In(services)
+                .DecorateWithHttpExceptionCatcher()
+                .DecorateWithFailSnackbar();
+
+            RequestHandlerRegistration
+               .WithRequest<ChangePasswordFormModel>
+               .WithResponse<ChangePasswordResult>
+               .For<ChangePasswordService>
+               .In(services)
+               .DecorateWithHttpExceptionCatcher()
+               .DecorateWithFailSnackbar();
 
             return services;
         }
@@ -129,7 +162,15 @@ namespace Gym.WebApplication.Extensions
         {
             services.AddScoped<Features.Admin.Clients.TableView.Services.IGetAllClientsService, Features.Admin.Clients.TableView.Services.GetAllClientsService>();
             services.AddScoped<Features.Instructor.CreatePersonalTrainingPage.Services.IGetAllClientsService, Features.Instructor.CreatePersonalTrainingPage.Services.GetAllClientsService>();
-            services.AddScoped<IGetClientDetailsService, GetClientDetailsService>();
+            
+            RequestHandlerRegistration
+                .WithRequest<GetClientDetails>
+                .WithResponse<ClientViewModel>
+                .For<GetClientDetailsService>
+                .In(services)
+                .DecorateWithHttpExceptionCatcher()
+                .DecorateWithFailSnackbar();
+
             services.AddScoped<IChargeClientService, ChargeClientService>();
             services.AddScoped<ICreateClientService, CreateClientService>();
 

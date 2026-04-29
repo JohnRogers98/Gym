@@ -3,12 +3,14 @@
 @using Gym.WebApplication.Features.Calendar.Services
 @using System.Collections.ObjectModel
 @using System.Collections.Specialized
+@using Gym.WebApplication.Features.Client.Calendar.Models
+@using Gym.WebApplication.Features._Common.Services
 
 @attribute [Authorize(Roles = "Client")]
 
-@inject IGetAllCalendarItemsService GetAllCalendarItemsService
-@inject IBookCalendarItemService BookCalendarItemService
-@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IRequestHandler<GetAllCalendarItems, IEnumerable<ClientCalendarItemViewModel>> GetAllCalendarItemsService
+@inject IRequestHandler<BookCalendarItem, BookCalendarItemResult> BookCalendarItemService
+
 @inject IDialogService DialogService
 
 @if (_calendarItems is null)
@@ -32,8 +34,9 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        var loadedCalendarEvents = await GetAllCalendarItemsService.HandleAsync();
-        _calendarItems = new List<ClientCalendarItemViewModel>(loadedCalendarEvents);
+        var loadedCalendarEvents = await GetAllCalendarItemsService.HandleAsync(new GetAllCalendarItems());
+        if (loadedCalendarEvents.Succeeded)
+            _calendarItems = new List<ClientCalendarItemViewModel>(loadedCalendarEvents.Data!);
 
         _pickedDate = DateTime.Now.ToDateOnly();
         this.RefreshSelectedItems();
@@ -65,8 +68,8 @@ else
                 pollResponse = shapedResponse;
         }
 
-        Boolean bookingSuccessful = await BookCalendarItemService.HandleAsync(selectdCalendarEvent, pollResponse);
-        if (bookingSuccessful)
+        var bookingResult = await BookCalendarItemService.HandleAsync(new BookCalendarItem { CalendarItem = selectdCalendarEvent, PollResponse = pollResponse });
+        if (bookingResult.Succeeded)
         {
             var indexOfEvent = _calendarItems.IndexOf(selectdCalendarEvent);
             if (indexOfEvent >= 0)
@@ -82,10 +85,6 @@ else
             }
 
             base.StateHasChanged();
-        }
-        else
-        {
-            Console.WriteLine("Booking status error.");
         }
     }
 
