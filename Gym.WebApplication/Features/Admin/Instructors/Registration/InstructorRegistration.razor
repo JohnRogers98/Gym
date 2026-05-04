@@ -1,15 +1,17 @@
 ﻿@using Gym.WebApplication.Features.Admin.Instructors.Registration.Models.Forms
 @using Gym.WebApplication.Features.Admin.Instructors.Registration.Models.Results
 @using Gym.WebApplication.Features.Admin.Instructors.Registration.Services
-@using Gym.WebApplication.Features.Admin.Instructors.States
+@using Gym.WebApplication.Features._Common.Services
+@using Gym.WebApplication.Operations
 
-@inject ICreateInstructorService CreateInstructorService
-@inject IInstructorRegisteredSharedState InstructorRegisteredSharedState
+@inject IRequestHandler<InstructorRegistrationFormModel, CreateInstructorResult> CreateInstructorService
 
 @inject IDialogService DialogService
 
 <EditForm Model="@_formModel" OnValidSubmit="@OnValidSubmit">
+   
     <DataAnnotationsValidator />
+    
     <MudGrid>
         <MudItem xs="12" sm="12">
             <MudCard Elevation="0">
@@ -33,13 +35,15 @@
 
     private async void OnValidSubmit(EditContext context)
     {
-        CreateInstructorResult createInstructorResult = await CreateInstructorService.HandleAsync(_formModel);
-        InstructorRegisteredSharedState.Notify(createInstructorResult);
+        var createInstructorResult = await CreateInstructorService.HandleAsync(_formModel);
 
-        var parameters = new DialogParameters<ShowCreatedInstructorCredentialsDialog> { { x => x.CreateInstructorResult, createInstructorResult } };
-        var dialog = await DialogService.ShowAsync<ShowCreatedInstructorCredentialsDialog>("Instructor credentials", parameters);
+        if (createInstructorResult.Succeeded)
+        {
+            var parameters = new DialogParameters<ShowCreatedInstructorCredentialsDialog> { { x => x.CreateInstructorResult, createInstructorResult.Data } };
+            var dialog = await DialogService.ShowAsync<ShowCreatedInstructorCredentialsDialog>("Instructor credentials", parameters);
 
-        this.ClearForm();
+            this.ClearForm();
+        }
     }
 
     private void ClearForm()

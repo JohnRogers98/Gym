@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
-using Gym.WebApplication.Features.Admin.Instructors.States;
+using Gym.WebApplication.Features._Common.Services;
+using Gym.WebApplication.Features.Admin.Shared.Models;
+using Gym.WebApplication.Operations;
 using Gym.WebApplication.ViewModels;
 using Gym.WebDto.Responses;
 using Gym.WebDto.Responses.Instructor;
@@ -7,45 +9,14 @@ using System.Net.Http.Json;
 
 namespace Gym.WebApplication.Features.Admin.Shared.Services
 {
-    public interface IGetAllInstructorsService
+    public class GetAllInstructorsService(HttpClient _httpClient, IMapper _mapper) : IRequestHandler<GetAllInstructors, IEnumerable<InstructorViewModel>>
     {
-        Task<IEnumerable<InstructorViewModel>> HandleAsync(CancellationToken cancellationToken = default);
-    }
-
-    public class CachableGetAllInstructosSetvice : IGetAllInstructorsService
-    {
-        private readonly IGetAllInstructorsService _decoratee;
-        private readonly IInstructorRegisteredSharedState _instructorRegisteredSharedState;
-
-        private IEnumerable<InstructorViewModel>? _cache;
-
-        public CachableGetAllInstructosSetvice(IGetAllInstructorsService decoratee, IInstructorRegisteredSharedState instructorRegisteredSharedState)
-        {
-            _decoratee = decoratee;
-            _instructorRegisteredSharedState = instructorRegisteredSharedState;
-
-            _instructorRegisteredSharedState.InstructorCreated += _ => _cache = null;
-        }
-
-        public async Task<IEnumerable<InstructorViewModel>> HandleAsync(CancellationToken cancellationToken = default)
-        {
-            if (_cache is not null)
-            {
-                return _cache;
-            }
-
-            _cache = [.. await _decoratee.HandleAsync(cancellationToken)];
-            return _cache;
-        }
-    }
-
-    public class GetAllInstructorsService(HttpClient _httpClient, IMapper _mapper) : IGetAllInstructorsService
-    {
-        public async Task<IEnumerable<InstructorViewModel>> HandleAsync(CancellationToken cancellationToken = default)
+        public async Task<AsyncOperation<IEnumerable<InstructorViewModel>>> HandleAsync(GetAllInstructors request, CancellationToken cancellationToken = default)
         {
             var response = await _httpClient.GetFromJsonAsync<ListResponse<InstructorDto>>("api/instructors", cancellationToken: cancellationToken);
-            IEnumerable<InstructorDto> dtos = response!.Data;
-            return dtos.Select(_mapper.Map<InstructorViewModel>).ToList();
+
+            var responseData = response!.Data.Select(_mapper.Map<InstructorViewModel>).ToList();
+            return AsyncOperation<IEnumerable<InstructorViewModel>>.Success(responseData);
         }
     }
 }

@@ -4,7 +4,7 @@ using Gym.WebDto.Responses.Training;
 
 namespace Gym.WebApplication.ViewModels
 {
-    public record AdminCalendarItemViewModel
+    public record CalendarEventForAdminViewModel
     {
         public required String Id { get; init; }
 

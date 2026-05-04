@@ -1,19 +1,25 @@
 ﻿@using Gym.WebApplication.Features.Admin.CalendarEvents.Creation.Models.Results
-@using Gym.WebApplication.Features.Admin.CalendarEvents.States
+@using Gym.WebApplication.Features.Admin.CalendarEvents.TableView.Models
 @using Gym.WebApplication.Features.Admin.CalendarEvents.TableView.Services
+@using Gym.WebApplication.Features.Admin.Shared.Models
 @using Gym.WebApplication.Features.Admin.Shared.Services
 @using Gym.WebApplication.Features.Admin.Shared.ValueObjects
+@using Gym.WebApplication.Features._Common.Services
 
-@inject IGetAllAdminCalendarEventsService GetAllAdminCalendarEventsService
-@inject IGetAdminCalendarEventByIdService GetAdminCalendarEventByIdService
-@inject ICalendarEventCreationState CalendarEventCreationState
-@inject ICancelCalendarEventService CancelCalendarEventService
-@inject ICalendarEventCancellationState CalendarEventCancellationState
+@inject IRequestHandler<GetAllCalendarEventsForAdmin, IEnumerable<CalendarEventForAdminViewModel>> GetAllCalendarEventsService
+@inject IRequestHandler<CancelCalendarEvent, CancelCalendarEventResult> CancelCalendarEventService
 
 @inject IDialogService DialogService
-@inject ISnackbar Snackbar
 
 <MudDataGrid Items="@_calendarEvents" Striped="true" Elevation="0">
+
+    <ToolBarContent>
+        <MudSpacer />
+        <MudIconButton Icon="@Icons.Material.Filled.Refresh"
+                       OnClick="@RefreshDataAsync"
+                       Size="Size.Small" />
+    </ToolBarContent>
+
     <Columns>
         <PropertyColumn Property="x => x.Id" Title="Id" />
         <PropertyColumn Property="x => x.LocalStart" Title="Beginning" />
@@ -29,29 +35,14 @@
 </MudDataGrid>
 
 @code {
-    private List<AdminCalendarItemViewModel> _calendarEvents = new List<AdminCalendarItemViewModel>();
+    private List<CalendarEventForAdminViewModel> _calendarEvents = new();
 
     protected override async Task OnInitializedAsync()
     {
-        CalendarEventCreationState.CalendarEventCreated += AddCreatedCalendarEvent;
-        _calendarEvents = [.. await GetAllAdminCalendarEventsService.HandleAsync()];
+        await this.LoadDataAsync();
     }
 
-    private async void AddCreatedCalendarEvent(CreateCalendarEventResult createCalendarEventResult)
-    {
-        CalendarEventId calendarEventId = new CalendarEventId(createCalendarEventResult.CalendarEventId);
-
-        AdminCalendarItemViewModel? adminCalendarItemViewModel = await GetAdminCalendarEventByIdService.HandleAsync(calendarEventId);
-
-        if (adminCalendarItemViewModel is null)
-            return;
-
-        _calendarEvents.Add(adminCalendarItemViewModel);
-        _calendarEvents = [.. _calendarEvents];
-        base.StateHasChanged();
-    }
-
-    private async void CancelCalendarEvent(AdminCalendarItemViewModel adminCalendarItemViewModel)
+    private async void CancelCalendarEvent(CalendarEventForAdminViewModel adminCalendarItemViewModel)
     {
         var parameters = new DialogParameters<CalendarEventCancelDialog> { { x => x.CalendarEventItem, adminCalendarItemViewModel } };
 
@@ -63,22 +54,23 @@
             if (result.Data is String idValue)
             {
                 CalendarEventId calendarEventId = new(idValue);
-                Boolean isCancelled = await CancelCalendarEventService.HandleAsync(calendarEventId);
-
-                if (isCancelled)
-                {
-                    Snackbar.Add($"Calendar event - {calendarEventId.Value} cancelled", Severity.Error);
-                }
-
-                CalendarEventCancellationState.Notify(calendarEventId);
-
-                _calendarEvents = _calendarEvents
-                    .Select(aCalendarEvent => aCalendarEvent.Id == calendarEventId.Value ? aCalendarEvent with { Status = "Cancelled" } : aCalendarEvent)
-                    .ToList();
-
-                base.StateHasChanged();
+                var cancelCalendarEventResult = await CancelCalendarEventService.HandleAsync(new CancelCalendarEvent { CalendarEventId = calendarEventId });
+                if (cancelCalendarEventResult.Succeeded)
+                    await this.RefreshDataAsync();
             }
 
         }
     }
+
+    private async Task RefreshDataAsync() => await LoadDataAsync();
+
+    private async Task LoadDataAsync()
+    {
+        var getAllCalendarEventsResult = await GetAllCalendarEventsService.HandleAsync(new GetAllCalendarEventsForAdmin());
+        if (getAllCalendarEventsResult.Succeeded)
+        {
+            _calendarEvents = [.. getAllCalendarEventsResult.Data!];
+        }
+    }
+
 }

@@ -19,6 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Providers\" />
     <Folder Include="wwwroot\lib\" />
     <Folder Include="wwwroot\sample-data\" />
   </ItemGroup>

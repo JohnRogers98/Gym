@@ -1,10 +1,15 @@
 ﻿@using Gym.WebApplication.Features.Admin.CalendarEvents.Creation
+@using Gym.WebApplication.Features.Admin.CalendarEvents.Creation.Models.Forms
 @using Gym.WebApplication.Features.Admin.CalendarEvents.Creation.Models.Results
-@using Gym.WebApplication.Features.Admin.CalendarEvents.States
 @using Gym.WebApplication.Features.Admin.CalendarEvents.TableView
+@using Gym.WebApplication.Features.Admin.CalendarEvents.TableView.Models
+@using Gym.WebApplication.Features._Common.States
+@using Gym.WebApplication.Operations
 
-@inject ISnackbar Snackbar
-@inject ICalendarEventCreationState CalendarEventCreationState
+@inject IAppSnackbarNotifier SnackbarNotifier
+@inject AsyncOperationStateNotifier<CreateCalendarEventFormModel, CreateCalendarEventResult> CreateCalendarEventState
+@inject AsyncOperationStateNotifier<CancelCalendarEvent, CancelCalendarEventResult> CancelCalendarEventState
+
 
 @implements IDisposable
 
@@ -19,13 +24,23 @@
 @code {
     protected override async Task OnInitializedAsync()
     {
-        CalendarEventCreationState.CalendarEventCreated += ShowCreatedCalendarEventInSnackbar;
+        CreateCalendarEventState.Executed += ShowCreatedCalendarEventInSnackbar;
+        CancelCalendarEventState.Executed += ShowCancelledCalendarEventInSnackbar;
     }
 
-    private void ShowCreatedCalendarEventInSnackbar(CreateCalendarEventResult createCalendarEventResult)
+    private void ShowCreatedCalendarEventInSnackbar(AsyncOperation<CreateCalendarEventResult> createCalendarEventResult)
     {
-        Snackbar.Add($"Calendar event - {createCalendarEventResult.CalendarEventId} created", Severity.Success);
+        SnackbarNotifier.ShowMessage($"Calendar event - {createCalendarEventResult.Data!.CalendarEventId} created.", MessageSeverity.Success);
     }
 
-    public void Dispose() => CalendarEventCreationState.CalendarEventCreated -= ShowCreatedCalendarEventInSnackbar;
+    private void ShowCancelledCalendarEventInSnackbar(AsyncOperation<CancelCalendarEventResult> cancelCalendarEventResult)
+    {
+        SnackbarNotifier.ShowMessage($"Calendar event was cancelled.", MessageSeverity.Success);
+    }
+
+    public void Dispose()
+    {
+        CreateCalendarEventState.Executed -= ShowCreatedCalendarEventInSnackbar;
+        CancelCalendarEventState.Executed -= ShowCancelledCalendarEventInSnackbar;
+    }
 }

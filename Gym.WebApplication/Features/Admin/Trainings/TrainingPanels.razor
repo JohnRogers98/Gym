@@ -1,10 +1,12 @@
 ﻿@using Gym.WebApplication.Features.Admin.Trainings.Creation
+@using Gym.WebApplication.Features.Admin.Trainings.Creation.Models.Forms
 @using Gym.WebApplication.Features.Admin.Trainings.Creation.Models.Results
-@using Gym.WebApplication.Features.Admin.Trainings.States
 @using Gym.WebApplication.Features.Admin.Trainings.TableView
+@using Gym.WebApplication.Features._Common.States
+@using Gym.WebApplication.Operations
 
-@inject ISnackbar Snackbar
-@inject ITrainingCreationSharedState TrainingCreationSharedState
+@inject IAppSnackbarNotifier SnackbarNotifier
+@inject AsyncOperationStateNotifier<CreateTrainingFormModel ,CreateTrainingResult> CreateTrainingState
 
 @implements IDisposable
 
@@ -20,13 +22,16 @@
 
     protected override async Task OnInitializedAsync()
     {
-        TrainingCreationSharedState.TrainingCreated += ShowRegisteredTrainingInSnackbar;
+        CreateTrainingState.Executed += ShowRegisteredTrainingInSnackbar;
     }
 
-    private void ShowRegisteredTrainingInSnackbar(CreateTrainingResult createTrainingResult)
+    private void ShowRegisteredTrainingInSnackbar(AsyncOperation<CreateTrainingResult> createTrainingResult)
     {
-        Snackbar.Add($"Training - {createTrainingResult.TrainingId} created", Severity.Success);
+        if (createTrainingResult.Succeeded)
+        {
+            SnackbarNotifier.ShowMessage($"Training - {createTrainingResult.Data!.TrainingId} created", MessageSeverity.Success);
+        }
     }
 
-    public void Dispose() => TrainingCreationSharedState.TrainingCreated -= ShowRegisteredTrainingInSnackbar;
+    public void Dispose() => CreateTrainingState.Executed -= ShowRegisteredTrainingInSnackbar;
 }

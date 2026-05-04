@@ -1,17 +1,19 @@
 ﻿@using Gym.WebApplication.Features.Admin.CalendarEvents.Creation.Models.Forms
 @using Gym.WebApplication.Features.Admin.CalendarEvents.Creation.Models.Results
 @using Gym.WebApplication.Features.Admin.CalendarEvents.Creation.Services
-@using Gym.WebApplication.Features.Admin.CalendarEvents.States
+@using Gym.WebApplication.Features.Admin.Shared.Models
 @using Gym.WebApplication.Features.Admin.Shared.Services
+@using Gym.WebApplication.Features._Common.Services
 
-@inject ICreateCalendarEventService CreateCalendarEventService
-@inject ICalendarEventCreationState CalendarEventCreationState
-@inject IGetAllTrainingsService GetAllTrainingsService
-@inject IGetAllInstructorsService GetAllInstructorsService
+@inject IRequestHandler<CreateCalendarEventFormModel, CreateCalendarEventResult> CreateCalendarEventService
+@inject IRequestHandler<GetAllInstructors, IEnumerable<InstructorViewModel>> GetAllInstructorsService
+@inject IRequestHandler<GetAllTrainings, IEnumerable<TrainingViewModel>> GetAllTrainingsService
 @inject IDialogService DialogService
 
 <EditForm Model="@_formModel" OnValidSubmit="@OnValidSubmit">
+    
     <DataAnnotationsValidator />
+    
     <MudGrid>
         <MudItem xs="12" sm="12">
             <MudCard Elevation="0">
@@ -70,7 +72,7 @@
 </EditForm>
 
 @code {
-    private CreateCalendarEventFormModel _formModel = new CreateCalendarEventFormModel();
+    private CreateCalendarEventFormModel _formModel = new();
 
     private Boolean _pollAdded = false;
 
@@ -79,8 +81,18 @@
 
     protected override async Task OnInitializedAsync()
     {
-        _trainings = [.. await GetAllTrainingsService.HandleAsync()];
-        _instructors = [.. await GetAllInstructorsService.HandleAsync()];
+        await this.LoadDataAsync();
+    }
+
+    private async Task LoadDataAsync()
+    {
+        var getAllTrainingsResult = await GetAllTrainingsService.HandleAsync(new GetAllTrainings());
+        if (getAllTrainingsResult.Succeeded)
+            _trainings = [.. getAllTrainingsResult.Data!];
+
+        var getAllInstructorsResult = await GetAllInstructorsService.HandleAsync(new GetAllInstructors());
+        if (getAllInstructorsResult.Succeeded)
+            _instructors = [.. getAllInstructorsResult.Data!];
     }
 
     private String GetMultiSelectionText(IReadOnlyList<String> selectedValues)
@@ -123,14 +135,17 @@
 
     private async void OnValidSubmit(EditContext context)
     {
-        CreateCalendarEventResult createCalendarEventResult = await CreateCalendarEventService.HandleAsync(_formModel);
-        CalendarEventCreationState.Notify(createCalendarEventResult);
-        this.ClearForm();
+        var createCalendarEventResult = await CreateCalendarEventService.HandleAsync(_formModel);
+        if (createCalendarEventResult.Succeeded)
+        {
+            this.ClearForm();
+        }
+
     }
 
     private void ClearForm()
     {
-        _formModel = new CreateCalendarEventFormModel();
+        _formModel = new();
         base.StateHasChanged();
     }
 }

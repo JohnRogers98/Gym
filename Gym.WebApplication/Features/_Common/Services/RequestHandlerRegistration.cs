@@ -1,6 +1,4 @@
-﻿using Gym.WebApplication.Features._Common.Services;
-
-namespace Gym.WebApplication.Operations
+﻿namespace Gym.WebApplication.Features._Common.Services
 {
     public class RequestHandlerRegistration
     {
@@ -42,6 +40,12 @@ namespace Gym.WebApplication.Operations
                     public For<TService> DecorateWithResilience()
                     {
                         _services.Decorate<IRequestHandler<TRequest, TResponse>, ResilienceDecorator<TRequest, TResponse>>();
+                        return this;
+                    }
+
+                    public For<TService> DecorateWithNotifier()
+                    {
+                        _services.Decorate<IRequestHandler<TRequest, TResponse>, NotifyDecorator<TRequest, TResponse>>();
                         return this;
                     }
                 }

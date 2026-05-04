@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
-using Gym.WebApplication.Features.Admin.Shared.ValueObjects;
-using Gym.WebApplication.Providers;
+using Gym.WebApplication.Features._Common.Services;
+using Gym.WebApplication.Features.Admin.Shared.Models;
+using Gym.WebApplication.Operations;
 using Gym.WebApplication.ViewModels;
 using Gym.WebDto.Responses;
 using Gym.WebDto.Responses.Training;
@@ -8,31 +9,23 @@ using System.Net.Http.Json;
 
 namespace Gym.WebApplication.Features.Admin.Shared.Services
 {
-    public interface IGetTrainingByIdService
+    public class GetTrainingByIdService(HttpClient _httpClient, IMapper _mapper) : IRequestHandler<GetTrainingById, TrainingViewModel>
     {
-        Task<TrainingViewModel?> HandleAsync(TrainingId trainingId, CancellationToken cancellationToken = default);
-    }
-
-    public class RetryableGetTrainingByIdService(IGetTrainingByIdService _decoratee, IPipelineProvider _pipelineProvider) : IGetTrainingByIdService
-    {
-        public async Task<TrainingViewModel?> HandleAsync(TrainingId trainingId, CancellationToken cancellationToken = default)
+        public async Task<AsyncOperation<TrainingViewModel>> HandleAsync(GetTrainingById request, CancellationToken cancellationToken = default)
         {
-            return await _pipelineProvider.TrainingEventualConsistency.ExecuteAsync(async innerToken =>
+            var response = await _httpClient.GetAsync($"api/trainings/{request.TrainingId.Value}", cancellationToken);
+
+            if (response.IsSuccessStatusCode)
             {
-                return await _decoratee.HandleAsync(trainingId, innerToken);
-            }, cancellationToken);
-        }
-    }
+                var responseData = await response.Content.ReadFromJsonAsync<Response<TrainingDto>>(cancellationToken: cancellationToken);
+                return AsyncOperation<TrainingViewModel>.Success(_mapper.Map<TrainingViewModel>(responseData!.Data));
+            }
+            else if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+            {
+                return AsyncOperation<TrainingViewModel>.Failure("Training not found", ErrorType.NotFound);
+            }
 
-    public class GetTrainingByIdService(HttpClient _httpClient, IMapper _mapper) : IGetTrainingByIdService
-    {
-        public async Task<TrainingViewModel?> HandleAsync(TrainingId trainingId, CancellationToken cancellationToken = default)
-        {
-            var response = await _httpClient.GetFromJsonAsync<Response<TrainingDto>>($"api/trainings/{trainingId.Value}", cancellationToken: cancellationToken);
-
-            if (response is not null)
-                return _mapper.Map<TrainingViewModel>(response.Data);
-            return null;
+            return AsyncOperation<TrainingViewModel>.Failure($"Unknown response type.", ErrorType.Unknown, (Int32)response.StatusCode);
         }
     }
 }

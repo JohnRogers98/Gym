@@ -19,7 +19,7 @@
     [CascadingParameter]
     private IMudDialogInstance MudDialog { get; set; } = default!;
 
-    [Parameter] public AdminCalendarItemViewModel? CalendarEventItem { get; set; }
+    [Parameter] public CalendarEventForAdminViewModel? CalendarEventItem { get; set; }
 
     private void CancelAction() => MudDialog.Cancel();
 

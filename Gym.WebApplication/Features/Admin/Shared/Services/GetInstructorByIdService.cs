@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
-using Gym.WebApplication.Features.Admin.Shared.ValueObjects;
-using Gym.WebApplication.Providers;
+using Gym.WebApplication.Features._Common.Services;
+using Gym.WebApplication.Features.Admin.Shared.Models;
+using Gym.WebApplication.Operations;
 using Gym.WebApplication.ViewModels;
 using Gym.WebDto.Responses;
 using Gym.WebDto.Responses.Instructor;
@@ -8,31 +9,23 @@ using System.Net.Http.Json;
 
 namespace Gym.WebApplication.Features.Admin.Shared.Services
 {
-    public interface IGetInstructorByIdService
+    public class GetInstructorByIdService(HttpClient _httpClient, IMapper _mapper) : IRequestHandler<GetInstructorById, InstructorViewModel>
     {
-        Task<InstructorViewModel?> HandleAsync(InstructorId instructorId, CancellationToken cancellationToken = default);
-    }
-
-    public class RetryableGetInstructorByIdService(IGetInstructorByIdService _decoratee, IPipelineProvider _pipelineProvider) : IGetInstructorByIdService
-    {
-        public async Task<InstructorViewModel?> HandleAsync(InstructorId instructorId, CancellationToken cancellationToken = default)
+        public async Task<AsyncOperation<InstructorViewModel>> HandleAsync(GetInstructorById request, CancellationToken cancellationToken = default)
         {
-            return await _pipelineProvider.InstructorEventualConsistency.ExecuteAsync(async innerToken =>
+            var response = await _httpClient.GetAsync($"api/instructors/{request.InstructorId.Value}", cancellationToken);
+
+            if (response.IsSuccessStatusCode)
             {
-                return await _decoratee.HandleAsync(instructorId, innerToken);
-            }, cancellationToken);
-        }
-    }
+                var responseData = await response.Content.ReadFromJsonAsync<Response<InstructorDto>>(cancellationToken: cancellationToken);
+                return AsyncOperation<InstructorViewModel>.Success(_mapper.Map<InstructorViewModel>(responseData!.Data));
+            }
+            else if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+            {
+                return AsyncOperation<InstructorViewModel>.Failure("Instructor not found", ErrorType.NotFound);
+            }
 
-    public class GetInstructorByIdService(HttpClient _httpClient, IMapper _mapper) : IGetInstructorByIdService
-    {
-        public async Task<InstructorViewModel?> HandleAsync(InstructorId instructorId, CancellationToken cancellationToken = default)
-        {
-            var response = await _httpClient.GetFromJsonAsync<Response<InstructorDto>>($"api/instructors/{instructorId.Value}", cancellationToken: cancellationToken);
-
-            if(response is not null)
-                return _mapper.Map<InstructorViewModel>(response.Data);
-            return null;
+            return AsyncOperation<InstructorViewModel>.Failure($"Unknown response type.", ErrorType.Unknown, (Int32)response.StatusCode);
         }
     }
 }

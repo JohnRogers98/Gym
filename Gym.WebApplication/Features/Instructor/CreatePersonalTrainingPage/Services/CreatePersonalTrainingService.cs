@@ -18,7 +18,7 @@ namespace Gym.WebApplication.Features.Instructor.CreatePersonalTrainingPage.Serv
             var createPersonalTrainingRequest = _mapper.Map<CreatePersonalTrainingRequest>(createPersonalTrainingFormModel);
 
             var response = await _httpClient.PostAsJsonAsync("api/personal-trainings", createPersonalTrainingRequest, cancellationToken);
-            Console.WriteLine(await response.Content.ReadAsStringAsync());
+
             if (response.IsSuccessStatusCode)
             {
                 var createPersonalTrainingResponse = await response.Content.ReadFromJsonAsync<CreatePersonalTrainingResponse>(cancellationToken: cancellationToken);

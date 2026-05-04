@@ -1,12 +1,15 @@
 ﻿@using Gym.WebApplication.Features.Admin.Clients.Creation.Models.Forms
 @using Gym.WebApplication.Features.Admin.Clients.Creation.Models.Results
 @using Gym.WebApplication.Features.Admin.Clients.Creation.Services
+@using Gym.WebApplication.Features._Common.Services
 
-@inject ICreateClientService CreateClientService
+@inject IRequestHandler<CreateClientFormModel, CreateClientResult> CreateClientService
 @inject IDialogService DialogService
 
 <EditForm Model="@_formModel" OnValidSubmit="@OnValidSubmit">
+
     <DataAnnotationsValidator />
+    
     <MudGrid>
         <MudItem xs="12" sm="12">
             <MudCard Elevation="0">
@@ -28,12 +31,14 @@
 
     private async void OnValidSubmit(EditContext context)
     {
-        CreateClientResult createClientResult = await CreateClientService.HandleAsync(_formModel);
+        var createClientResult = await CreateClientService.HandleAsync(_formModel);
+        if (createClientResult.Succeeded)
+        {
+            var parameters = new DialogParameters<ShowCreatedClientCredentialsDialog> { { x => x.CreateClientResult, createClientResult.Data } };
+            var dialog = await DialogService.ShowAsync<ShowCreatedClientCredentialsDialog>("Client credentials", parameters);
 
-        var parameters = new DialogParameters<ShowCreatedClientCredentialsDialog> { { x => x.CreateClientResult, createClientResult } };
-        var dialog = await DialogService.ShowAsync<ShowCreatedClientCredentialsDialog>("Client credentials", parameters);
-
-        this.ClearForm();
+            this.ClearForm();
+        }
     }
 
     private void ClearForm()

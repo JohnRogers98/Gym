@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using MudBlazor;
 using MudBlazor.Services;
-using Polly;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -29,8 +28,6 @@ builder.Services.AddMudServices(config =>
 });
 
 builder.Services.AddScoped<IAppSnackbarNotifier, AppSnackbarNotifier>();
-
-builder.Services.AddResiliencePipelines();
 
 builder.Services.AddAuthorizationCore();
 builder.Services.AddCascadingAuthenticationState();

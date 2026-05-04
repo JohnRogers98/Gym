@@ -1,13 +1,14 @@
 ﻿@using Gym.WebApplication.Features.Admin.Trainings.Creation.Models.Forms
 @using Gym.WebApplication.Features.Admin.Trainings.Creation.Models.Results
 @using Gym.WebApplication.Features.Admin.Trainings.Creation.Services
-@using Gym.WebApplication.Features.Admin.Trainings.States
+@using Gym.WebApplication.Features._Common.Services
 
-@inject ICreateTrainingService CreateTrainingService
-@inject ITrainingCreationSharedState TrainingCreationSharedState
+@inject IRequestHandler<CreateTrainingFormModel, CreateTrainingResult> CreateTrainingService
 
 <EditForm Model="@_formModel" OnValidSubmit="@OnValidSubmit">
+    
     <DataAnnotationsValidator />
+    
     <MudGrid>
         <MudItem xs="12" sm="12">
             <MudCard Elevation="0">
@@ -29,10 +30,11 @@
 
     private async void OnValidSubmit(EditContext context)
     {
-        CreateTrainingResult createTrainingResult = await CreateTrainingService.HandleAsync(_formModel);
-        TrainingCreationSharedState.Notify(createTrainingResult);
-
-        this.ClearForm();
+        var createTrainingResult = await CreateTrainingService.HandleAsync(_formModel);
+        if (createTrainingResult.Succeeded)
+        {
+            this.ClearForm();
+        }
     }
 
     private void ClearForm()

@@ -1,10 +1,12 @@
 ﻿@using Gym.WebApplication.Features.Admin.Instructors.Registration
+@using Gym.WebApplication.Features.Admin.Instructors.Registration.Models.Forms
 @using Gym.WebApplication.Features.Admin.Instructors.Registration.Models.Results
-@using Gym.WebApplication.Features.Admin.Instructors.States
 @using Gym.WebApplication.Features.Admin.Instructors.TableView
+@using Gym.WebApplication.Features._Common.States
+@using Gym.WebApplication.Operations
 
-@inject ISnackbar Snackbar
-@inject IInstructorRegisteredSharedState InstructorRegisteredSharedState
+@inject IAppSnackbarNotifier SnackbarNotifier
+@inject AsyncOperationStateNotifier<InstructorRegistrationFormModel, CreateInstructorResult> InstructorRegistrationState
 
 @implements IDisposable
 
@@ -20,13 +22,16 @@
 
     protected override async Task OnInitializedAsync()
     {
-        InstructorRegisteredSharedState.InstructorCreated += ShowRegisteredInstructorInSnackbar;
+        InstructorRegistrationState.Executed += ShowRegisteredInstructorInSnackbar;
     }
 
-    private void ShowRegisteredInstructorInSnackbar(CreateInstructorResult createdInstructorViewModel)
+    private void ShowRegisteredInstructorInSnackbar(AsyncOperation<CreateInstructorResult> instructorRegistrationResult)
     {
-        Snackbar.Add($"Instructor - {createdInstructorViewModel.InstructorId} created", Severity.Success);
+        if (instructorRegistrationResult.Succeeded)
+        {
+            SnackbarNotifier.ShowMessage($"Instructor - {instructorRegistrationResult.Data!.InstructorId} created", MessageSeverity.Success);
+        }
     }
 
-    public void Dispose() => InstructorRegisteredSharedState.InstructorCreated -= ShowRegisteredInstructorInSnackbar;
+    public void Dispose() => InstructorRegistrationState.Executed -= ShowRegisteredInstructorInSnackbar;
 }

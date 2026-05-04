@@ -1,14 +1,25 @@
-﻿@using Gym.WebApplication.Features.Admin.Clients.TableView.Models.Forms
+﻿@using Gym.WebApplication.Features.Admin.Clients.TableView.Models
+@using Gym.WebApplication.Features.Admin.Clients.TableView.Models.Forms
+@using Gym.WebApplication.Features.Admin.Clients.TableView.Models.Results
 @using Gym.WebApplication.Features.Admin.Clients.TableView.Services
+@using Gym.WebApplication.Features._Common.Services
+@using Gym.WebApplication.Features._Common.States
 
 
-@inject IGetAllClientsService GetAllClientsService
-@inject IChargeClientService ChargeClientService
+@inject IRequestHandler<GetAllClientsForAdmin, IEnumerable<ClientViewModel>> GetAllClientsService
+@inject IRequestHandler<ChargeClientFormModel, ChargeClientResult> ChargeClientService
 
-@inject ISnackbar Snackbar
 @inject IDialogService DialogService
 
 <MudDataGrid T="ClientViewModel" Items="@_clients" Striped="true" Elevation="0">
+
+    <ToolBarContent>
+        <MudSpacer />
+        <MudIconButton Icon="@Icons.Material.Filled.Refresh"
+                       OnClick="@RefreshDataAsync"
+                       Size="Size.Small" />
+    </ToolBarContent>
+
     <Columns>
         <PropertyColumn Property="x => x.Id" Title="Id" />
         <PropertyColumn Property="x => x.FullName" Title="Full name" />
@@ -16,7 +27,7 @@
 
         <TemplateColumn Title="Actions" CellClass="d-flex justify-between">
             <CellTemplate>
-                <MudIconButton Size="@Size.Medium" Icon="@Icons.Material.Filled.AddCircle" Color="Color.Primary" OnClick="@(() => ChargeClient(context.Item))" />
+                <MudIconButton Size="@Size.Medium" Icon="@Icons.Material.Filled.AddCircle" Color="Color.Primary" OnClick="@(() => ChargeClientAsync(context.Item))" />
             </CellTemplate>
         </TemplateColumn>
     </Columns>
@@ -27,10 +38,10 @@
 
     protected override async Task OnInitializedAsync()
     {
-        _clients = [.. await GetAllClientsService.HandleAsync()];
+        await this.LoadDataAsync();
     }
 
-    private async void ChargeClient(ClientViewModel clientViewModel)
+    private async Task ChargeClientAsync(ClientViewModel clientViewModel)
     {
         var parameters = new DialogParameters<ClientChargingDialog> { { x => x.ClientViewModel, clientViewModel } };
 
@@ -42,16 +53,23 @@
             if (result.Data is ChargeClientFormModel chargeClientFormModel)
             {
                 var chargeClientResult = await ChargeClientService.HandleAsync(chargeClientFormModel);
-
-                Snackbar.Add($"Client account is {chargeClientResult.AvailableTrainingsCount}", Severity.Info);
-
-                _clients = _clients
-                    .Select(aClient => aClient.Id == chargeClientFormModel.ClientId ? aClient with { AvailableTrainingsCount = chargeClientResult.AvailableTrainingsCount } : aClient)
-                    .ToList();
-
-                base.StateHasChanged();
+                if (chargeClientResult.Succeeded)
+                {
+                    await this.RefreshDataAsync();
+                }
             }
-
         }
     }
+
+    private async Task RefreshDataAsync() => await LoadDataAsync();
+
+    private async Task LoadDataAsync()
+    {
+        var getAllClientsResult = await GetAllClientsService.HandleAsync(new GetAllClientsForAdmin());
+        if (getAllClientsResult.Succeeded)
+        {
+            _clients = getAllClientsResult.Data!.ToList();
+        }
+    }
+
 }

@@ -61,7 +61,7 @@ namespace Gym.WebApplication.Mappings
                     return src.PollInfo;
                 }));
 
-            base.CreateMap<AdminCalendarEventDto, AdminCalendarItemViewModel>()
+            base.CreateMap<AdminCalendarEventDto, CalendarEventForAdminViewModel>()
                 .ForMember(dest => dest.UtcStart,
                 opt => opt.MapFrom((src, dest, _, context) =>
                 {

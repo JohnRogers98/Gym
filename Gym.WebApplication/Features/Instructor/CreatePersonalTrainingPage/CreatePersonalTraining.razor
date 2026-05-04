@@ -1,13 +1,15 @@
 ﻿@page "/create-personal-training"
+@using Gym.WebApplication.Features.Instructor.CreatePersonalTrainingPage.Models
 @using Gym.WebApplication.Features.Instructor.CreatePersonalTrainingPage.Models.Forms
 @using Gym.WebApplication.Features.Instructor.CreatePersonalTrainingPage.Models.Results
 @using Gym.WebApplication.Features.Instructor.CreatePersonalTrainingPage.Services
 @using Gym.WebApplication.Features._Common.Services
+@using Gym.WebApplication.Features._Common.States
 
-@inject IGetAllClientsService GetAllClientsService
+@inject IRequestHandler<GetAllClientsForInstructor, IEnumerable<ClientViewModel>> GetAllClientsService
 @inject IRequestHandler<CreatePersonalTrainingFormModel, CreatePersonalTrainingResult> CreatePersonalTrainingService
 
-@inject ISnackbar Snackbar
+@inject IAppSnackbarNotifier SnackbarNotifier
 
 <MudContainer>
 
@@ -68,7 +70,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        _clients = [.. await GetAllClientsService.HandleAsync()];
+        await this.LoadDataAsyn();
     }
 
     private async void OnValidSubmit(EditContext context)
@@ -76,9 +78,16 @@
         var createPersonalTrainingResult = await CreatePersonalTrainingService.HandleAsync(_formModel);
         if (createPersonalTrainingResult.Succeeded)
         {
-            Snackbar.Add($"Personal training - {createPersonalTrainingResult.Data!.PersonalTrainingId} created", Severity.Success);
+            SnackbarNotifier.ShowMessage($"Personal training - {createPersonalTrainingResult.Data!.PersonalTrainingId} created.", MessageSeverity.Success);
             this.ClearForm();
         }
+    }
+
+    private async Task LoadDataAsyn()
+    {
+        var getAllClientsResult = await GetAllClientsService.HandleAsync(new GetAllClientsForInstructor());
+        if (getAllClientsResult.Succeeded)
+            _clients = [.. getAllClientsResult.Data!];
     }
 
     private void ClearForm()

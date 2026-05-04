@@ -1,13 +1,20 @@
-﻿@using Gym.WebApplication.Features.Admin.Shared.Services
+﻿@using Gym.WebApplication.Features.Admin.Shared.Models
+@using Gym.WebApplication.Features.Admin.Shared.Services
 @using Gym.WebApplication.Features.Admin.Shared.ValueObjects
 @using Gym.WebApplication.Features.Admin.Trainings.Creation.Models.Results
-@using Gym.WebApplication.Features.Admin.Trainings.States
+@using Gym.WebApplication.Features._Common.Services
 
-@inject ITrainingCreationSharedState TrainingCreationSharedState
-@inject IGetAllTrainingsService GetAllTrainingsService
-@inject IGetTrainingByIdService GetTrainingByIdService
+@inject IRequestHandler<GetAllTrainings, IEnumerable<TrainingViewModel>> GetAllTrainingsService
 
 <MudDataGrid Items="@_trainings" Striped="true" Elevation="0">
+
+    <ToolBarContent>
+        <MudSpacer />
+        <MudIconButton Icon="@Icons.Material.Filled.Refresh"
+                       OnClick="@RefreshDataAsync"
+                       Size="Size.Small" />
+    </ToolBarContent>
+
     <Columns>
         <PropertyColumn Property="x => x.Id" Title="Id" />
         <PropertyColumn Property="x => x.Name" Title="Name" />
@@ -20,19 +27,18 @@
 
     protected override async Task OnInitializedAsync()
     {
-        TrainingCreationSharedState.TrainingCreated += AddCreatedTraining;
-        _trainings = [.. await GetAllTrainingsService.HandleAsync()];
+        await LoadDataAsync();
     }
 
-    private async void AddCreatedTraining(CreateTrainingResult createTrainingResult)
+    private async Task RefreshDataAsync() => await LoadDataAsync();
+
+    private async Task LoadDataAsync()
     {
-        TrainingId trainingId = new TrainingId(createTrainingResult.TrainingId);
-        TrainingViewModel? trainingViewModel = await GetTrainingByIdService.HandleAsync(trainingId);
-
-        if (trainingViewModel is null)
-            return;
-
-        _trainings.Add(trainingViewModel);
-        base.StateHasChanged();
+        var getAllTrainingsResult = await GetAllTrainingsService.HandleAsync(new GetAllTrainings());
+        if (getAllTrainingsResult.Succeeded)
+        {
+            _trainings = getAllTrainingsResult.Data!.ToList();
+        }
     }
+
 }

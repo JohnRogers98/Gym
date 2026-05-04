@@ -25,6 +25,7 @@ namespace Gym.WebApplication.Features._Common.Services
                     MaxRetryAttempts = 3,
                     ShouldHandle = new PredicateBuilder<AsyncOperation<TResponse>>()
                         .Handle<HttpRequestException>()
+                        .HandleResult(result => result is null)
                 })
                 .Build();
         }
