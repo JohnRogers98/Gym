@@ -23,7 +23,7 @@
 
             <AuthorizeView Roles="Client">
 
-                <MudMenuItem Href="/calendar"
+                <MudMenuItem Href="/client-calendar"
                              Icon="@Icons.Material.Filled.DateRange"
                              IconColor="Color.Primary"
                              Label="Calendar"
@@ -48,6 +48,12 @@
             </AuthorizeView>
 
             <AuthorizeView Roles="Instructor">
+
+                <MudMenuItem Href="/instructor-calendar"
+                             Icon="@Icons.Material.Filled.DateRange"
+                             IconColor="Color.Primary"
+                             Label="Calendar"
+                             OnClick="@ToggleDrawer" />
 
                 <MudMenuItem Href="/create-personal-training"
                              Icon="@Icons.Material.Filled.PersonAdd"

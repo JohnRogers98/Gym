@@ -1,9 +1,10 @@
-﻿@page "/calendar"
+﻿@page "/client-calendar"
 @using Gym.WebApplication.Features.Calendar.Models
 @using Gym.WebApplication.Features.Calendar.Services
 @using System.Collections.ObjectModel
 @using System.Collections.Specialized
 @using Gym.WebApplication.Features.Client.Calendar.Models
+@using Gym.WebApplication.Features._Common.Components
 @using Gym.WebApplication.Features._Common.Services
 
 @attribute [Authorize(Roles = "Client")]
@@ -19,7 +20,7 @@
 }
 else
 {
-    <Picker OnDatePicked="@this.DatePicked"></Picker>
+    <DatePicker OnDatePicked="@this.DatePicked"></DatePicker>
     
     <ItemsContainer CalendarItems="@_selectedItems" OnSelectedCalendarItem="@this.BookEvent"></ItemsContainer>
 }

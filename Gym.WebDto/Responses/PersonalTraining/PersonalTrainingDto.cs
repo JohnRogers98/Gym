@@ -3,14 +3,14 @@
     public record PersonalTrainingDto
     {
         public required String Id { get; init; }
-        public required InstructorInfo Intructor { get; init; }
+        public required InstructorInfo Instructor { get; init; }
         public required ClientInfo Client { get; init; }
         public required String Status { get; init; }
         public required DateTime Start { get; init; }
-        public required DateTime? End { get; init; }
+        public DateTime? End { get; init; }
         public required String PaymentStatus { get; init; }
-        public required String InstructorComment { get; init; }
-        public required String ClientComment { get; init; } 
+        public String? InstructorComment { get; init; }
+        public String? ClientComment { get; init; } 
     }
 
     public record InstructorInfo

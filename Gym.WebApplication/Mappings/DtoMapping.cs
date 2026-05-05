@@ -148,6 +148,18 @@ namespace Gym.WebApplication.Mappings
                 }));
 
             base.CreateMap<CreatePersonalTrainingResponse, CreatePersonalTrainingResult>();
+
+            base.CreateMap<PersonalTrainingDto, PersonalTrainingViewModel>() 
+                .ForMember(dest => dest.UtcStart,
+                opt => opt.MapFrom((src, dest, _, context) =>
+                {
+                    return src.Start;
+                }))
+                .ForMember(dest => dest.UtcEnd,
+                opt => opt.MapFrom((src, dest, _, context) =>
+                {
+                    return src.End;
+                }));
             #endregion
         }
     }

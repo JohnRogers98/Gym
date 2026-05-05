@@ -1,0 +1,63 @@
+﻿@page "/instructor-calendar"
+@using Gym.WebApplication.Features.Instructor.Calendar.Services
+@using Gym.WebApplication.Features._Common.Components
+@using Gym.WebApplication.Features._Common.Services
+
+@inject IRequestHandler<GetInstructorCalendarEvents, IEnumerable<CalendarEventForAdminViewModel>> GetCalendarEventsService
+@inject IRequestHandler<GetInstructorPersonalTrainings, IEnumerable<PersonalTrainingViewModel>> GetPersonalTrainingsService
+
+<DatePicker OnDatePicked="@DatePicked"></DatePicker>
+
+<MudContainer>
+    <MudGrid Spacing="3">
+        <MudItem xs="12" sm="6" md="4" lg="3">
+            @foreach (var aCalendarEvent in _pickedCalendarEvents)
+            {
+                <CalendarEventCard CalendarEvent="@aCalendarEvent"></CalendarEventCard>
+            }
+            @foreach (var aPersonalTraining in _pickedPersonalTrainings)
+            {
+                <PersonalTrainingCard PersonalTraining="@aPersonalTraining"></PersonalTrainingCard>
+            }
+        </MudItem>
+       
+      
+    </MudGrid>
+</MudContainer>
+
+@code {
+    private List<CalendarEventForAdminViewModel> _calendarEvents = new();
+    private List<CalendarEventForAdminViewModel> _pickedCalendarEvents = new();
+
+    private List<PersonalTrainingViewModel> _personalTrainings = new();
+    private List<PersonalTrainingViewModel> _pickedPersonalTrainings = new();
+
+    private DateOnly? _pickedDate = default;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadDataAsync();
+    }
+
+    private void DatePicked(DateOnly pickedDate)
+    {
+        _pickedDate = pickedDate;
+
+        _pickedCalendarEvents = [.. _calendarEvents.Where(aCalendarEvent => aCalendarEvent.LocalStart.ToDateOnly() == pickedDate)];
+        _pickedPersonalTrainings = [.. _personalTrainings.Where(aPersonalTraining => aPersonalTraining.LocalStart.ToDateOnly() == pickedDate)];
+
+        base.StateHasChanged();
+    }
+
+    private async Task LoadDataAsync()
+    {
+        var getCalendarEventsResult = await GetCalendarEventsService.HandleAsync(new GetInstructorCalendarEvents());
+        if (getCalendarEventsResult.Succeeded)
+            _calendarEvents = [.. getCalendarEventsResult.Data!];
+
+        var getPersonalTrainingsResult = await GetPersonalTrainingsService.HandleAsync(new GetInstructorPersonalTrainings());
+        if (getPersonalTrainingsResult.Succeeded)
+            _personalTrainings = [.. getPersonalTrainingsResult.Data!];
+    }
+}

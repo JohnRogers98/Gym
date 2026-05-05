@@ -29,6 +29,7 @@ using Gym.WebApplication.Features.Client.Account.ChangePassword.Models.Results;
 using Gym.WebApplication.Features.Client.Account.Details.Models;
 using Gym.WebApplication.Features.Client.Account.History.Models;
 using Gym.WebApplication.Features.Client.Calendar.Models;
+using Gym.WebApplication.Features.Instructor.Calendar.Services;
 using Gym.WebApplication.Features.Instructor.CreatePersonalTrainingPage.Models;
 using Gym.WebApplication.Features.Instructor.CreatePersonalTrainingPage.Models.Forms;
 using Gym.WebApplication.Features.Instructor.CreatePersonalTrainingPage.Models.Results;
@@ -142,6 +143,24 @@ namespace Gym.WebApplication.Extensions
              .DecorateWithHttpExceptionCatcher()
              .DecorateWithFailSnackbar()
              .DecorateWithNotifier();
+
+            RequestHandlerRegistration
+               .WithRequest<GetInstructorCalendarEvents>
+               .WithResponse<IEnumerable<CalendarEventForAdminViewModel>>
+               .For<GetInstructorCalendarEventsService>
+               .In(services)
+               .DecorateWithResilience()
+               .DecorateWithHttpExceptionCatcher()
+               .DecorateWithFailSnackbar();
+
+            RequestHandlerRegistration
+               .WithRequest<GetInstructorPersonalTrainings>
+               .WithResponse<IEnumerable<PersonalTrainingViewModel>>
+               .For<GetInstructorPersonalTrainingsService>
+               .In(services)
+               .DecorateWithResilience()
+               .DecorateWithHttpExceptionCatcher()
+               .DecorateWithFailSnackbar();
 
             return services;
         }
