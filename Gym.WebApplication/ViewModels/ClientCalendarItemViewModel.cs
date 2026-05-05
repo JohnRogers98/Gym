@@ -1,14 +1,14 @@
-﻿namespace Gym.WebApplication.ViewModels
+﻿using Gym.WebApplication.Features._Common;
+
+namespace Gym.WebApplication.ViewModels
 {
-    public record ClientCalendarItemViewModel
+    public record ClientCalendarItemViewModel : ITimeBasedItem
     {
         public required String Id { get; init; }
 
         public DateTime UtcStart { get; init; }
-        public DateTime LocalStart => UtcStart.ToLocalTime();
 
         public DateTime? UtcEnd { get; init; }
-        public DateTime? LocalEnd => UtcEnd?.ToLocalTime();
 
         public required String Status { get; set; }
         public required TrainingViewModel Training { get; init; }
@@ -22,5 +22,9 @@
         public Boolean IsUpcoming => Status == "Upcoming";
 
         public PollViewModel? Poll { get; init; }
+
+        public DateTime Start => UtcStart.ToLocalTime();
+
+        public DateTime? End => UtcEnd?.ToLocalTime();
     }
 }

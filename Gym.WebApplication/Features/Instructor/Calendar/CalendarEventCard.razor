@@ -1,33 +1,11 @@
 ﻿@using System.Globalization
 @using Gym.WebApplication.Features._Common.Components
+@using Gym.WebApplication.Features._Common.Components.CalendarItemCard
 @using Gym.WebDto.Responses.Instructor
 
 <MudCard Outlined="false" Elevation="3">
 
-    <MudCardHeader>
-        <CardHeaderAvatar>
-            <div style="display: flex; flex-direction: column; align-items: center;">
-                <MudAvatar Size="Size.Large" Color="Color.Primary" Class="mb-1">
-                    @CalendarEvent.UtcStart.Day
-                </MudAvatar>
-                <MudText Color="Color.Primary" Typo="Typo.caption" Class="mt-1">
-                    @this.GetMonthText()
-                </MudText>
-            </div>
-        </CardHeaderAvatar>
-
-        <CardHeaderContent>
-            <MudStack Spacing="2">
-                <MudText Typo="Typo.h6" Class="text-truncate">
-                    @CalendarEvent.Training.Name
-                </MudText>
-                <MudText Color="Color.Default" Typo="Typo.body2">
-                    <MudIcon Icon="@Icons.Material.Filled.AccessTime" Color="Color.Primary" Size="Size.Small" />
-                    @CalendarEvent.LocalStart.ToString("HH:mm") - @CalendarEvent.LocalEnd?.ToString("HH:mm")
-                </MudText>
-            </MudStack>
-        </CardHeaderContent>
-    </MudCardHeader>
+    <CalendarItemCardHeader Title="@CalendarEvent.Training.Name" Start="@CalendarEvent.Start" End="@CalendarEvent.End" />
 
     <MudDivider />
 
@@ -37,16 +15,7 @@
 
             @if (CalendarEvent.Instructors?.Any() == true)
             {
-                <MudList T="InstructorDto" Dense="true" Gutters="false">
-                    @foreach (var instructor in CalendarEvent.Instructors)
-                    {
-                        <MudListItem>
-                            <MudIcon Icon="@Icons.Material.Filled.Person"
-                                     Size="Size.Small" />
-                            @instructor.FullName
-                        </MudListItem>
-                    }
-                </MudList>
+                <InstructorList Instructors="@CalendarEvent.Instructors" />
             }
         </MudStack>
     </MudCardContent>
@@ -56,6 +25,4 @@
 
 @code {
     [Parameter, EditorRequired] public CalendarEventForAdminViewModel CalendarEvent { get; set; } = default!;
-
-    private String GetMonthText() => CalendarEvent.UtcStart.ToString("MMM");
 }

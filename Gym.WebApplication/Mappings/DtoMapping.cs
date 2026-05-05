@@ -15,6 +15,7 @@ using Gym.WebDto.Requests.Instructor;
 using Gym.WebDto.Requests.PersonalTraining;
 using Gym.WebDto.Requests.Training;
 using Gym.WebDto.Responses.Account;
+using Gym.WebDto.Responses.Bookings;
 using Gym.WebDto.Responses.CalendarEvent;
 using Gym.WebDto.Responses.Clients;
 using Gym.WebDto.Responses.Instructor;
@@ -91,11 +92,14 @@ namespace Gym.WebApplication.Mappings
                 }));
 
             base.CreateMap<CreateCalendarEventResponse, CreateCalendarEventResult>();
+
+            base.CreateMap<BookingUserInfo, BookingUserViewModel>();
             #endregion
 
             #region Client
             base.CreateMap<ClientDto, ClientViewModel>();
             base.CreateMap<ChargeAccountResponse, ChargeClientResult>();
+            base.CreateMap<ClientInfo, ClientViewModel>();
             #endregion
 
             #region Poll

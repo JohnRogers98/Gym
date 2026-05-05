@@ -1,7 +1,10 @@
 ﻿@page "/instructor-calendar"
 @using Gym.WebApplication.Features.Instructor.Calendar.Services
+@using Gym.WebApplication.Features._Common
 @using Gym.WebApplication.Features._Common.Components
 @using Gym.WebApplication.Features._Common.Services
+
+@attribute [Authorize(Roles = "Instructor")]
 
 @inject IRequestHandler<GetInstructorCalendarEvents, IEnumerable<CalendarEventForAdminViewModel>> GetCalendarEventsService
 @inject IRequestHandler<GetInstructorPersonalTrainings, IEnumerable<PersonalTrainingViewModel>> GetPersonalTrainingsService
@@ -10,44 +13,53 @@
 
 <MudContainer>
     <MudGrid Spacing="3">
-        <MudItem xs="12" sm="6" md="4" lg="3">
-            @foreach (var aCalendarEvent in _pickedCalendarEvents)
-            {
-                <CalendarEventCard CalendarEvent="@aCalendarEvent"></CalendarEventCard>
-            }
-            @foreach (var aPersonalTraining in _pickedPersonalTrainings)
-            {
-                <PersonalTrainingCard PersonalTraining="@aPersonalTraining"></PersonalTrainingCard>
-            }
-        </MudItem>
-       
-      
+        @foreach (var aCalendarItem in _pickedCalendarItems)
+        {
+            <MudItem xs="12" sm="6" md="4" lg="3">
+                @if (aCalendarItem is CalendarEventForAdminViewModel calendarEvent)
+                {
+                <CalendarEventCard CalendarEvent="@calendarEvent"></CalendarEventCard>
+                }
+                else if (aCalendarItem is PersonalTrainingViewModel personalTraining)
+                {
+                <PersonalTrainingCard PersonalTraining="@personalTraining"></PersonalTrainingCard>
+                }
+            </MudItem>
+        }
     </MudGrid>
 </MudContainer>
 
 @code {
     private List<CalendarEventForAdminViewModel> _calendarEvents = new();
-    private List<CalendarEventForAdminViewModel> _pickedCalendarEvents = new();
-
     private List<PersonalTrainingViewModel> _personalTrainings = new();
-    private List<PersonalTrainingViewModel> _pickedPersonalTrainings = new();
 
-    private DateOnly? _pickedDate = default;
+    private List<ITimeBasedItem> _pickedCalendarItems = new();
 
+    private DateOnly _pickedDate = default;
 
     protected override async Task OnInitializedAsync()
     {
         await LoadDataAsync();
+
+        if (_calendarEvents.Any() || _personalTrainings.Any())
+        {
+            this.DatePicked(DateTime.Today.ToDateOnly());
+            _pickedDate = DateTime.Today.ToDateOnly();
+        }
     }
 
     private void DatePicked(DateOnly pickedDate)
     {
         _pickedDate = pickedDate;
 
-        _pickedCalendarEvents = [.. _calendarEvents.Where(aCalendarEvent => aCalendarEvent.LocalStart.ToDateOnly() == pickedDate)];
-        _pickedPersonalTrainings = [.. _personalTrainings.Where(aPersonalTraining => aPersonalTraining.LocalStart.ToDateOnly() == pickedDate)];
-
-        base.StateHasChanged();
+        _pickedCalendarItems = _calendarEvents
+            .Where(calendarEvent => calendarEvent.Start.ToDateOnly() == pickedDate)
+            .Cast<ITimeBasedItem>()
+            .Concat(_personalTrainings
+                .Where(personalTraining => personalTraining.Start.ToDateOnly() == pickedDate)
+                .Cast<ITimeBasedItem>())
+            .OrderBy(item => item.Start)
+            .ToList();
     }
 
     private async Task LoadDataAsync()

@@ -1,33 +1,11 @@
 ﻿@using System.Globalization
 @using Gym.WebApplication.Features._Common.Components
+@using Gym.WebApplication.Features._Common.Components.CalendarItemCard
 @using Gym.WebDto.Responses.Instructor
 
 <MudCard Outlined="false" Elevation="3">
 
-    <MudCardHeader>
-        <CardHeaderAvatar>
-            <div style="display: flex; flex-direction: column; align-items: center;">
-                <MudAvatar Size="Size.Large" Color="Color.Primary" Class="mb-1">
-                    @PersonalTraining.UtcStart.Day
-                </MudAvatar>
-                <MudText Color="Color.Primary" Typo="Typo.caption" Class="mt-1">
-                    @this.GetMonthText()
-                </MudText>
-            </div>
-        </CardHeaderAvatar>
-
-        <CardHeaderContent>
-            <MudStack Spacing="2">
-                <MudText Typo="Typo.h6" Class="text-truncate">
-                    Personal training
-                </MudText>
-                <MudText Color="Color.Default" Typo="Typo.body2">
-                    <MudIcon Icon="@Icons.Material.Filled.AccessTime" Color="Color.Primary" Size="Size.Small" />
-                    @PersonalTraining.LocalStart.ToString("HH:mm") - @PersonalTraining.LocalEnd?.ToString("HH:mm")
-                </MudText>
-            </MudStack>
-        </CardHeaderContent>
-    </MudCardHeader>
+    <CalendarItemCardHeader Title="@("Personal training")" Start="PersonalTraining.Start" End="@PersonalTraining.End" />
 
     <MudDivider />
 
@@ -42,6 +20,4 @@
 
 @code {
     [Parameter, EditorRequired] public PersonalTrainingViewModel PersonalTraining { get; set; } = default!;
-
-    private String GetMonthText() => PersonalTraining.UtcStart.ToString("MMM");
 }
