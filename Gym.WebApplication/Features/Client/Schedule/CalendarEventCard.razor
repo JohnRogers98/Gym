@@ -1,0 +1,41 @@
+﻿@using System.Globalization
+@using Gym.WebApplication.Features.Client.Calendar
+@using Gym.WebApplication.Features._Common.Components
+@using Gym.WebApplication.Features._Common.Components.CalendarItemCard
+@using Gym.WebDto.Responses.Instructor
+
+<MudCard Outlined="false" Elevation="3">
+
+    <CalendarItemCardHeader Title="@CalendarEvent.Training.Name" Start="@CalendarEvent.Start" End="@CalendarEvent.End" />
+
+    <MudDivider />
+
+    <MudCardContent>
+       <MudStack>
+            <MudText>@CalendarEvent.Training.Description</MudText>
+
+            @if (CalendarEvent.Instructors?.Any() == true)
+            {
+                <InstructorList Instructors="@CalendarEvent.Instructors" />
+            }
+
+            @if (CalendarEvent.MaxClientCount.HasValue)
+            {
+                <MudProgressLinear Color="Color.Tertiary" Size="Size.Medium" Min="0" Max="@CalendarEvent.MaxClientCount.Value" Value="@CalendarEvent.CurrentClientCount" />
+            }
+
+            @if (CalendarEvent.Poll is not null)
+            {
+                <Expander ExpandTitle="Show Poll" CollapseTitle="Hide Poll">
+                    <PollInfo PollViewModel="@CalendarEvent.Poll"></PollInfo>
+                </Expander>
+            }
+        </MudStack>
+    </MudCardContent>
+
+</MudCard>    
+    
+
+@code {
+    [Parameter, EditorRequired] public CalendarEventForClientViewModel CalendarEvent { get; set; } = default!;
+}

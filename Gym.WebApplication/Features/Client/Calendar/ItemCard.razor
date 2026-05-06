@@ -75,7 +75,7 @@
     
 
 @code {
-    [Parameter, EditorRequired] public ClientCalendarItemViewModel CalendarItem { get; set; } = default!;
+    [Parameter, EditorRequired] public CalendarEventForClientViewModel CalendarItem { get; set; } = default!;
     
-    [Parameter] public EventCallback<ClientCalendarItemViewModel> OnSelected { get; set; }
+    [Parameter] public EventCallback<CalendarEventForClientViewModel> OnSelected { get; set; }
 }

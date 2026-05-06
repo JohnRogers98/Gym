@@ -1,0 +1,75 @@
+﻿@page "/client-schedule"
+@using Gym.WebApplication.Features.Client.Schedule.Services
+@using Gym.WebApplication.Features._Common
+@using Gym.WebApplication.Features._Common.Components
+@using Gym.WebApplication.Features._Common.Services
+
+@attribute [Authorize(Roles = "Client")]
+
+@inject IRequestHandler<GetClientCalendarEvents, IEnumerable<CalendarEventForClientViewModel>> GetCalendarEventsService
+@inject IRequestHandler<GetClientPersonalTrainings, IEnumerable<PersonalTrainingViewModel>> GetPersonalTrainings
+
+<DatePicker OnDatePicked="@DatePicked"/>
+
+<MudContainer>
+    <MudGrid Spacing="3">
+        @foreach (var aCalendarItem in _pickedCalendarItems)
+        {
+            <MudItem xs="12" sm="6" md="4" lg="3">
+                @if (aCalendarItem is CalendarEventForClientViewModel calendarEvent)
+                {
+                <CalendarEventCard CalendarEvent="@calendarEvent"></CalendarEventCard>
+                }
+                else if (aCalendarItem is PersonalTrainingViewModel personalTraining)
+                {
+                <PersonalTrainingCard PersonalTraining="@personalTraining"></PersonalTrainingCard>
+                }
+            </MudItem>
+        }
+    </MudGrid>
+</MudContainer>
+
+@code {
+    private DateOnly _pickedDate = default;
+
+    private List<CalendarEventForClientViewModel> _calendarEvents = default!;
+    private List<PersonalTrainingViewModel> _personalTrainings = default!;
+
+    private List<ITimeBasedItem> _pickedCalendarItems = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await this.LoadDataAsync();
+
+        if (_calendarEvents.Any() || _personalTrainings.Any())
+        {
+            this.DatePicked(DateTime.Today.ToDateOnly());
+            _pickedDate = DateTime.Today.ToDateOnly();
+        }
+    }
+
+    private void DatePicked(DateOnly pickedDate)
+    {
+        _pickedDate = pickedDate;
+
+        _pickedCalendarItems = _calendarEvents
+            .Where(calendarEvent => calendarEvent.Start.ToDateOnly() == pickedDate)
+            .Cast<ITimeBasedItem>()
+            .Concat(_personalTrainings
+                .Where(personalTraining => personalTraining.Start.ToDateOnly() == pickedDate)
+                .Cast<ITimeBasedItem>())
+            .OrderBy(item => item.Start)
+            .ToList();
+    }
+
+    private async Task LoadDataAsync()
+    {
+        var loadedCalendarEvents = await GetCalendarEventsService.HandleAsync(new GetClientCalendarEvents());
+        if (loadedCalendarEvents.Succeeded)
+            _calendarEvents = new List<CalendarEventForClientViewModel>(loadedCalendarEvents.Data!);
+
+        var loadedPersonalTrainings = await GetPersonalTrainings.HandleAsync(new GetClientPersonalTrainings());
+        if (loadedPersonalTrainings.Succeeded)
+            _personalTrainings = new List<PersonalTrainingViewModel>(loadedPersonalTrainings.Data!);
+    }
+}

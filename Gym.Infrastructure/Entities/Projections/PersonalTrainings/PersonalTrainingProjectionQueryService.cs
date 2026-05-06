@@ -13,7 +13,7 @@ namespace Gym.Infrastructure.Entities.Projections.PersonalTrainings
 
         public async Task<IEnumerable<PersonalTrainingProjection>> GetAllByClientIdAsync(String clientId, CancellationToken cancellationToken)
         {
-            return await _projectionCollection.Find(projection => projection.Instructor.Id == clientId)
+            return await _projectionCollection.Find(projection => projection.Client.Id == clientId)
                  .ToListAsync(cancellationToken);
         }
 

@@ -11,6 +11,15 @@ namespace Gym.Infrastructure.Entities.Projections.CalendarEvents
                 .ToListAsync(cancellationToken);
         }
 
+        public async Task<IEnumerable<CalendarEventProjection>> GetAllByClientIdAsync(String clientId, CancellationToken cancellationToken)
+        {
+            var filter = Builders<CalendarEventProjection>.Filter
+                .ElemMatch(x => x.BookingUsers, i => i.Id == clientId);
+
+            return await _projectionCollection.Find(filter)
+                .ToListAsync(cancellationToken);
+        }
+
         public async Task<IEnumerable<CalendarEventProjection>> GetAllByInstructorIdAsync(String instructorId, CancellationToken cancellationToken)
         {
             var filter = Builders<CalendarEventProjection>.Filter

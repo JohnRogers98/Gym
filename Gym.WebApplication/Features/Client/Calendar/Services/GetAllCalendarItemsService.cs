@@ -9,14 +9,14 @@ using System.Net.Http.Json;
 
 namespace Gym.WebApplication.Features.Calendar.Services
 {
-    public class GetAllCalendarItemsService(HttpClient _httpClient, IMapper _mapper) : IRequestHandler<GetAllCalendarItems, IEnumerable<ClientCalendarItemViewModel>>
+    public class GetAllCalendarItemsService(HttpClient _httpClient, IMapper _mapper) : IRequestHandler<GetAllCalendarItems, IEnumerable<CalendarEventForClientViewModel>>
     {
-        public async Task<AsyncOperation<IEnumerable<ClientCalendarItemViewModel>>> HandleAsync(GetAllCalendarItems request, CancellationToken cancellationToken = default)
+        public async Task<AsyncOperation<IEnumerable<CalendarEventForClientViewModel>>> HandleAsync(GetAllCalendarItems request, CancellationToken cancellationToken = default)
         {
             var response = await _httpClient.GetFromJsonAsync<ListResponse<ClientCalendarEventDto>>("api/client-calendar-events", cancellationToken: cancellationToken);
 
-            return AsyncOperation<IEnumerable<ClientCalendarItemViewModel>>.Success( 
-                _mapper.Map<IEnumerable<ClientCalendarItemViewModel>>(response!.Data));
+            return AsyncOperation<IEnumerable<CalendarEventForClientViewModel>>.Success( 
+                _mapper.Map<IEnumerable<CalendarEventForClientViewModel>>(response!.Data));
         }
     }
 }

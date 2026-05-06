@@ -45,7 +45,7 @@ namespace Gym.WebApplication.Mappings
             #endregion
 
             #region CalendarEvent
-            base.CreateMap<ClientCalendarEventDto, ClientCalendarItemViewModel>()
+            base.CreateMap<ClientCalendarEventDto, CalendarEventForClientViewModel>()
                 .ForMember(dest => dest.UtcStart,
                 opt => opt.MapFrom((src, dest, _, context) =>
                 {

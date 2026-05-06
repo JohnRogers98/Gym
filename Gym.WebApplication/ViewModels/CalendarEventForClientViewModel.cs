@@ -2,7 +2,7 @@
 
 namespace Gym.WebApplication.ViewModels
 {
-    public record ClientCalendarItemViewModel : ITimeBasedItem
+    public record CalendarEventForClientViewModel : ITimeBasedItem
     {
         public required String Id { get; init; }
 

@@ -5,7 +5,7 @@ namespace Gym.WebApplication.Features.Client.Calendar.Models
 {
     public class BookCalendarItem
     {
-        public required ClientCalendarItemViewModel CalendarItem { get; set; }
+        public required CalendarEventForClientViewModel CalendarItem { get; set; }
         
         public PollResponse? PollResponse { get; set; }
     }

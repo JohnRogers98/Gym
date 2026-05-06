@@ -9,7 +9,7 @@
 
 @attribute [Authorize(Roles = "Client")]
 
-@inject IRequestHandler<GetAllCalendarItems, IEnumerable<ClientCalendarItemViewModel>> GetAllCalendarItemsService
+@inject IRequestHandler<GetAllCalendarItems, IEnumerable<CalendarEventForClientViewModel>> GetAllCalendarItemsService
 @inject IRequestHandler<BookCalendarItem, BookCalendarItemResult> BookCalendarItemService
 
 @inject IDialogService DialogService
@@ -27,17 +27,17 @@ else
 
 
 @code {
-    private List<ClientCalendarItemViewModel> _calendarItems = default!;
+    private List<CalendarEventForClientViewModel> _calendarItems = default!;
 
-    private List<ClientCalendarItemViewModel> _selectedItems = default!;
+    private List<CalendarEventForClientViewModel> _selectedItems = default!;
 
-    private DateOnly? _pickedDate = default; 
+    private DateOnly _pickedDate = default; 
 
     protected override async Task OnInitializedAsync()
     {
         var loadedCalendarEvents = await GetAllCalendarItemsService.HandleAsync(new GetAllCalendarItems());
         if (loadedCalendarEvents.Succeeded)
-            _calendarItems = new List<ClientCalendarItemViewModel>(loadedCalendarEvents.Data!);
+            _calendarItems = new List<CalendarEventForClientViewModel>(loadedCalendarEvents.Data!);
 
         _pickedDate = DateTime.Now.ToDateOnly();
         this.RefreshSelectedItems();
@@ -47,10 +47,9 @@ else
     {
         _pickedDate = pickedDate;
         this.RefreshSelectedItems();
-        base.StateHasChanged();
     }
 
-    private async void BookEvent(ClientCalendarItemViewModel selectdCalendarEvent)
+    private async void BookEvent(CalendarEventForClientViewModel selectdCalendarEvent)
     {
         PollResponse? pollResponse = null;
         if (selectdCalendarEvent.Poll is not null)

@@ -29,6 +29,7 @@ using Gym.WebApplication.Features.Client.Account.ChangePassword.Models.Results;
 using Gym.WebApplication.Features.Client.Account.Details.Models;
 using Gym.WebApplication.Features.Client.Account.History.Models;
 using Gym.WebApplication.Features.Client.Calendar.Models;
+using Gym.WebApplication.Features.Client.Schedule.Services;
 using Gym.WebApplication.Features.Instructor.Calendar.Services;
 using Gym.WebApplication.Features.Instructor.CreatePersonalTrainingPage.Models;
 using Gym.WebApplication.Features.Instructor.CreatePersonalTrainingPage.Models.Forms;
@@ -88,7 +89,7 @@ namespace Gym.WebApplication.Extensions
         {
             RequestHandlerRegistration
                .WithRequest<GetAllCalendarItems>
-               .WithResponse<IEnumerable<ClientCalendarItemViewModel>>
+               .WithResponse<IEnumerable<CalendarEventForClientViewModel>>
                .For<GetAllCalendarItemsService>
                .In(services)                
                .DecorateWithResilience()
@@ -154,9 +155,9 @@ namespace Gym.WebApplication.Extensions
                .DecorateWithFailSnackbar();
 
             RequestHandlerRegistration
-               .WithRequest<GetInstructorPersonalTrainings>
-               .WithResponse<IEnumerable<PersonalTrainingViewModel>>
-               .For<GetInstructorPersonalTrainingsService>
+               .WithRequest<GetClientCalendarEvents>
+               .WithResponse<IEnumerable<CalendarEventForClientViewModel>>
+               .For<GetClientCalendarEventsService>
                .In(services)
                .DecorateWithResilience()
                .DecorateWithHttpExceptionCatcher()
@@ -319,6 +320,24 @@ namespace Gym.WebApplication.Extensions
                 .DecorateWithResilience()
                 .DecorateWithHttpExceptionCatcher()
                 .DecorateWithFailSnackbar();
+
+            RequestHandlerRegistration
+                .WithRequest<GetInstructorPersonalTrainings>
+                .WithResponse<IEnumerable<PersonalTrainingViewModel>>
+                .For<GetInstructorPersonalTrainingsService>
+                .In(services)
+                .DecorateWithResilience()
+                .DecorateWithHttpExceptionCatcher()
+                .DecorateWithFailSnackbar();
+
+            RequestHandlerRegistration
+               .WithRequest<GetClientPersonalTrainings>
+               .WithResponse<IEnumerable<PersonalTrainingViewModel>>
+               .For<GetClientPersonalTrainingsService>
+               .In(services)
+               .DecorateWithResilience()
+               .DecorateWithHttpExceptionCatcher()
+               .DecorateWithFailSnackbar();
 
             return services;
         }

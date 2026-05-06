@@ -1,0 +1,23 @@
+﻿@using System.Globalization
+@using Gym.WebApplication.Features._Common.Components
+@using Gym.WebApplication.Features._Common.Components.CalendarItemCard
+@using Gym.WebDto.Responses.Instructor
+
+<MudCard Outlined="false" Elevation="3">
+
+    <CalendarItemCardHeader Title="@("Personal training")" Start="PersonalTraining.Start" End="@PersonalTraining.End" />
+
+    <MudDivider />
+
+    <MudCardContent>
+        <MudStack Spacing="3">
+            <MudText>Instructor: @PersonalTraining.Instructor.FullName</MudText>
+        </MudStack>
+    </MudCardContent>
+
+</MudCard>    
+    
+
+@code {
+    [Parameter, EditorRequired] public PersonalTrainingViewModel PersonalTraining { get; set; } = default!;
+}
