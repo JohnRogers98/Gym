@@ -37,6 +37,7 @@ namespace Gym.Domain.PersonalTrainingContext
             ClientId = clientId;
             Status = status;
             TrainingPeriod = trainingPeriod;
+            PaymentStatus = payment;
             ClientComment = clientComment;
             InstructorComment = instructorComment;
         }

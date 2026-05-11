@@ -11,9 +11,34 @@
 
     <MudCardContent>
         <MudStack>
-            <MudText>Client: @PersonalTraining.Client.FullName</MudText>
+
+            <MudStack Row="true" Spacing="3" AlignItems="AlignItems.Center">
+                <MudIcon Icon="@Icons.Material.Filled.PersonPin" Color="Color.Primary" Size="Size.Small" />
+                <MudText>@PersonalTraining.Client.FullName</MudText>
+            </MudStack>
+
+            <MudStack Row="true" Spacing="3" AlignItems="AlignItems.Center">
+                <MudIcon Icon="@Icons.Material.Filled.Payment" Color="Color.Primary" Size="Size.Small" />
+                @if (PersonalTraining.IsPaid)
+                {
+                    <MudChip T="String" Size="Size.Small" Color="Color.Success" Variant="Variant.Outlined" Text="Yes" />
+                }
+                else
+                {
+                    <MudChip T="String" Size="Size.Small" Color="Color.Warning" Variant="Variant.Outlined" Text="No" />
+                }
+            </MudStack>
+
         </MudStack>
     </MudCardContent>
+
+    <MudCardActions>
+        <MudButton FullWidth="true"
+                   Variant="Variant.Filled"
+                   Color="Color.Primary">
+            Редактировать
+        </MudButton>
+    </MudCardActions>
 
 </MudCard>    
     
