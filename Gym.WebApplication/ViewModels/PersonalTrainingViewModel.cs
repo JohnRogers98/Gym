@@ -20,5 +20,7 @@ namespace Gym.WebApplication.ViewModels
         public DateTime? End => UtcEnd?.ToLocalTime();
 
         public Boolean IsPaid => PaymentStatus == "Paid";
+
+        public Boolean IsCancelled => Status == "Cancelled";
     }
 }

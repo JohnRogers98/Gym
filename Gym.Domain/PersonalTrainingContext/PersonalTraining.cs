@@ -2,6 +2,7 @@
 using Gym.Domain._Shared;
 using Gym.Domain.ClientContext.ValueObjects;
 using Gym.Domain.InstructorContext.ValueObjects;
+using Gym.Domain.PersonalTrainingContext.Errors;
 using Gym.Domain.PersonalTrainingContext.Events;
 using Gym.Domain.PersonalTrainingContext.ValueObjects;
 
@@ -67,6 +68,17 @@ namespace Gym.Domain.PersonalTrainingContext
             Comment? clientComment = null,
             Comment? instructorComment = null)
             => new PersonalTraining(id, instructorId, clientId, status, trainingPeriod, payment, clientComment, instructorComment);
+
+        public Result Cancel()
+        {
+            if (Status != PersonalTrainingStatus.Upcoming)
+                return Result.Fail(CancelPersonalTrainingError.Create(Id));
+
+            base.AddDomainEvent(PersonalTrainingCancelledDomainEvent.Create(Id, InstructorId, ClientId));
+            Status = PersonalTrainingStatus.Cancelled;
+
+            return Result.Ok();
+        } 
 
         public override String ToString()
             => $"{nameof(Id)}: {Id} \t {nameof(InstructorId)}: {InstructorId} \t {nameof(ClientId)}: {ClientId}";

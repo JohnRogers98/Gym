@@ -3,9 +3,22 @@
 @using Gym.WebApplication.Features._Common.Components.CalendarItemCard
 @using Gym.WebDto.Responses.Instructor
 
+@inject IDialogService DialogService
+
 <MudCard Outlined="false" Elevation="3">
 
-    <CalendarItemCardHeader Title="@("Personal training")" Start="PersonalTraining.Start" End="@PersonalTraining.End" />
+    <CalendarItemCardHeader Title="@("Personal training")" Start="PersonalTraining.Start" End="@PersonalTraining.End">
+        
+        <MenuContent>
+            <MudMenu Icon="@Icons.Material.Filled.Settings"
+                     Color="Color.Primary"
+                     AriaLabel="Actions">
+                <MudDivider />
+                <MudMenuItem Disabled="@PersonalTraining.IsCancelled" Label="@(@PersonalTraining.IsCancelled ? "Cancelled" : "Cancel")" OnClick="@CancelTrainingAsync" />
+            </MudMenu>
+        </MenuContent>
+
+    </CalendarItemCardHeader>
 
     <MudDivider />
 
@@ -32,17 +45,24 @@
         </MudStack>
     </MudCardContent>
 
-    <MudCardActions>
-        <MudButton FullWidth="true"
-                   Variant="Variant.Filled"
-                   Color="Color.Primary">
-            Редактировать
-        </MudButton>
-    </MudCardActions>
-
 </MudCard>    
     
 
 @code {
     [Parameter, EditorRequired] public PersonalTrainingViewModel PersonalTraining { get; set; } = default!;
+
+    private async Task CancelTrainingAsync()
+    {
+        Console.WriteLine(PersonalTraining.Status);
+        var parameters = new DialogParameters<CancelPersonalTrainingDialog> { { x => x.PersonalTraining, PersonalTraining } };
+
+        var dialog = await DialogService.ShowAsync<CancelPersonalTrainingDialog>("Cancelling training", parameters);
+        var result = await dialog.Result;
+
+        if(result!.Canceled is false)
+        {
+            PersonalTraining = PersonalTraining with { Status = "Cancelled" };
+            base.StateHasChanged();
+        }
+    }
 }

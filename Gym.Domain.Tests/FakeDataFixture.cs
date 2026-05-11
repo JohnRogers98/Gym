@@ -5,6 +5,10 @@ using Gym.Domain.AccountContext.Entities;
 using Gym.Domain.AccountContext.ValueObjects;
 using Gym.Domain.CalendarEventContext;
 using Gym.Domain.CalendarEventContext.ValueObjects;
+using Gym.Domain.ClientContext.ValueObjects;
+using Gym.Domain.InstructorContext.ValueObjects;
+using Gym.Domain.PersonalTrainingContext;
+using Gym.Domain.PersonalTrainingContext.ValueObjects;
 using Gym.Domain.PollContext;
 using Gym.Domain.PollContext.ValueObjects;
 using Gym.Domain.TrainingContext.ValueObjects;
@@ -15,6 +19,8 @@ namespace Gym.Domain.Tests
     {
         public AccountId AccountId => field ??= AccountId.From(Guid.NewGuid().ToString()).Data!;
         public UserId UserId => field ??= UserId.From(Guid.NewGuid().ToString()).Data!;
+        public InstructorId InstructorId => field ??= InstructorId.From(Guid.NewGuid().ToString()).Data!;
+        public ClientId ClientId => field ??= ClientId.From(Guid.NewGuid().ToString()).Data!;
         public PollId PollId => field ??= PollId.From(Guid.NewGuid().ToString()).Data!;
         public CalendarEventId CalendarEventId => field ??= CalendarEventId.From(Guid.NewGuid().ToString()).Data!;
         public BookingId BookingId => field ??= BookingId.From(Guid.NewGuid().ToString());
@@ -78,6 +84,20 @@ namespace Gym.Domain.Tests
                 BookingId.From(Guid.NewGuid().ToString()),
                 UserId.From(Guid.NewGuid().ToString()).Data!,
                 CalendarEventId.From(Guid.NewGuid().ToString()).Data!
+                );
+        }
+
+        public PersonalTraining  CreatePersonalTraining(Boolean isExpired = false, PaymentStatus paymentStatus = PaymentStatus.Paid)
+        {
+            StartsAt startsAt = isExpired ? StartsAt.From(DateTime.MinValue).Data! : StartsAt.From(DateTime.MaxValue).Data!;
+            TrainingPeriod trainingPeriod = TrainingPeriod.From(startsAt).Data!;
+
+            return PersonalTraining.Create(
+                PersonalTrainingId.From(Guid.NewGuid().ToString()).Unwrap(),
+                InstructorId,
+                ClientId,
+                trainingPeriod,
+                paymentStatus
                 );
         }
 

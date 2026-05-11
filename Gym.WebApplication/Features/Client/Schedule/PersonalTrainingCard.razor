@@ -12,6 +12,10 @@
     <MudCardContent>
         <MudStack Spacing="3">
             <MudText>Instructor: @PersonalTraining.Instructor.FullName</MudText>
+            @if (PersonalTraining.IsCancelled)
+            {
+                <MudChip T="String" Color="Color.Error">Cancelled</MudChip>
+            }
         </MudStack>
     </MudCardContent>
 

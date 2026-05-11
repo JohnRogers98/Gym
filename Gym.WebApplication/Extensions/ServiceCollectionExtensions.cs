@@ -339,6 +339,17 @@ namespace Gym.WebApplication.Extensions
                .DecorateWithHttpExceptionCatcher()
                .DecorateWithFailSnackbar();
 
+            services.AddOperationStateNotifier<CancelPersonalTraining, CancelPersonalTrainingResult>();
+            RequestHandlerRegistration
+                .WithRequest<CancelPersonalTraining>
+                .WithResponse<CancelPersonalTrainingResult>
+                .For<CancelPersonalTrainingService>
+                .In(services)
+                .DecorateWithResilience()
+                .DecorateWithHttpExceptionCatcher()
+                .DecorateWithFailSnackbar()
+                .DecorateWithNotifier();
+
             return services;
         }
 

@@ -20,5 +20,16 @@ namespace Gym.Infrastructure.Entities.EventStores.Deserializers
                 ClientId.From(dto.ClientId).Unwrap()
             );
         }
+
+        private DomainEvent ToDomainEvent(PersonalTrainingCancelledDto dto)
+        {
+            return PersonalTrainingCancelledDomainEvent.Restore(
+                DomainEventId.From(Guid.Parse(dto.Id)),
+                dto.occurredOn,
+                PersonalTrainingId.From(dto.PersonalTrainingId).Unwrap(),
+                InstructorId.From(dto.InstructorId).Unwrap(),
+                ClientId.From(dto.ClientId).Unwrap()
+            );
+        }
     }
 }

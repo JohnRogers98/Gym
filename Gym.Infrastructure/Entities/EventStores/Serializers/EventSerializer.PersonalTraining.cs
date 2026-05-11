@@ -14,5 +14,15 @@ namespace Gym.Infrastructure.Entities.EventStores.Serializers
                 domainEvent.InstructorId.Value,
                 domainEvent.ClientId.Value);
         }
+
+        private PersonalTrainingCancelledDto ToDto(PersonalTrainingCancelledDomainEvent domainEvent)
+        {
+            return new PersonalTrainingCancelledDto(
+                domainEvent.Id.Value.ToString(),
+                domainEvent.OccurredOn,
+                domainEvent.PersonalTrainingId.Value,
+                domainEvent.InstructorId.Value,
+                domainEvent.ClientId.Value);
+        }
     }
 }

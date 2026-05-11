@@ -10,9 +10,18 @@
     <CardHeaderContent>
         <EventHeaderContent Title="@Title" Start="@Start" End="@End"></EventHeaderContent>
     </CardHeaderContent>
+
+    <CardHeaderActions>
+        @if (MenuContent is not null)
+        {
+            @MenuContent
+        }
+    </CardHeaderActions>
 </MudCardHeader>
 
 @code{
+    [Parameter] public RenderFragment? MenuContent { get; set; }
+
     [Parameter, EditorRequired] public String Title { get; set; } = default!;
     [Parameter, EditorRequired] public DateTime Start { get; set; } = default!;
     [Parameter] public DateTime? End { get; set; }
