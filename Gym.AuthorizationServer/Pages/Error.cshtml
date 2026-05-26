@@ -1,0 +1,19 @@
+﻿@page
+@model Gym.AuthorizationServer.Pages.ErrorModel
+@{
+    Layout = "_Layout";
+}
+@{
+    <div style="width: 100%; max-width: 500px; padding: 20px;">
+        <div class="card lighten-4">
+            <div class="card-content">
+                <h5 class="center-align red-text text-darken-2" style="margin-top: 10px;">@Model.Error</h5>
+               
+                @if (!String.IsNullOrWhiteSpace(Model.Description))
+                {
+                    <div class="red-text text-darken-1 center-align" style="margin: 20px 0;">@Model.Description</div>
+                }
+            </div>
+        </div>
+    </div>
+}
