@@ -5,22 +5,21 @@ namespace Gym.AuthorizationServer.Services
 {
     public interface ICodeChallangeVerifier
     {
-        Boolean Verify(String codeVerifier, String codeChallange, String? codeChallangeMethod);
+        Boolean Verify(String codeVerifier, String codeChallange, String codeChallangeMethod);
     }
 
     public class CodeChallangeVerifier : ICodeChallangeVerifier
     {
-        public Boolean Verify(String codeVerifier, String codeChallange, String? codeChallangeMethod)
+        public Boolean Verify(String codeVerifier, String codeChallange, String codeChallangeMethod)
         {
-            byte[] hash = SHA256.HashData(Encoding.UTF8.GetBytes(codeVerifier));
+            if(codeChallangeMethod == "S256")
+            {
+                byte[] computedCodeVerifierHash = SHA256.HashData(Encoding.UTF8.GetBytes(codeVerifier));
+                String recomputedCodeChallange = Convert.ToBase64String(computedCodeVerifierHash).ToUrlSafe();
+                return codeChallange == recomputedCodeChallange;
+            }
 
-            String base64CodeChallange = Convert.ToBase64String(hash);
-            String urlSafeCodeChallange = base64CodeChallange
-                .Replace('+', '-')
-                .Replace('/', '_')
-                .TrimEnd('=');
-
-            return codeChallange == urlSafeCodeChallange;
+            return false;
         }
     }
 }

@@ -2,12 +2,12 @@
 
 namespace Gym.AuthorizationServer.Services
 {
-    public interface IRandomStringGenerator
+    public interface IRandomBase64StringGenerator
     {
         String Generate(Int32 byteLength);
     }
 
-    public class RandomStringGenerator : IRandomStringGenerator
+    public class RandomBase64StringGenerator : IRandomBase64StringGenerator
     {
         public String Generate(Int32 byteLength)
         {
@@ -17,14 +17,7 @@ namespace Gym.AuthorizationServer.Services
                 rng.GetBytes(randomBytes);
             }
 
-            String base64 = Convert.ToBase64String(randomBytes);
-
-            String urlSafeBase64 = base64
-                .Replace('+', '-')
-                .Replace('/', '_')
-                .TrimEnd('=');
-
-            return urlSafeBase64;
+            return Convert.ToBase64String(randomBytes);
         }
     }
 }

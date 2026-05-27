@@ -5,8 +5,8 @@
         String GenerateGrantCode();
     }
 
-    public class GrantCodeGenerator(IRandomStringGenerator _randomStringGenerator) : IGrantCodeGenerator
+    public class GrantCodeGenerator(IRandomBase64StringGenerator _randomStringGenerator) : IGrantCodeGenerator
     {
-        public String GenerateGrantCode() => _randomStringGenerator.Generate(32);
+        public String GenerateGrantCode() => _randomStringGenerator.Generate(32).ToUrlSafe();
     }
 }

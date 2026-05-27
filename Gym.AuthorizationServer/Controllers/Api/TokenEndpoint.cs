@@ -2,6 +2,7 @@
 using Gym.AuthorizationServer.Entities.Clients;
 using Gym.AuthorizationServer.Extensions;
 using Gym.AuthorizationServer.Services;
+using Gym.AuthorizationServer.Services.Flows;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json.Serialization;
 

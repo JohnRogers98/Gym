@@ -25,7 +25,7 @@
         }
         private Boolean DifferenceExists(IEnumerable<String> sourceScopes, IEnumerable<String> targetScopes)
         {
-            var difference = sourceScopes.Except(targetScopes).ToArray();
+            var difference = targetScopes.Except(sourceScopes).ToArray();
             if (difference.Any())
                 return true;
             return false;

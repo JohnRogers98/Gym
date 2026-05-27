@@ -23,7 +23,9 @@ namespace Gym.AuthorizationServer.Integration.Tests.Flows
                 ResponseType = "code",
                 RedirectUri = TestServerFixture.DefaultClientRedirectUri,
                 Scope = "scope_2",
-                State = TestServerFixture.DefaultState
+                State = TestServerFixture.DefaultState,
+                CodeChallenge = TestServerFixture.DefaultCodeChallange,
+                CodeChallengeMethod = TestServerFixture.DefaultCodeChallangeMethod
             };
 
             var authorizeResponse = await client.GetAsync($"/authorize{authorizeQuery.ToQueryString()}", TestContext.Current.CancellationToken);
@@ -84,7 +86,8 @@ namespace Gym.AuthorizationServer.Integration.Tests.Flows
                 ClientSecret = TestServerFixture.DefaultClientSecret,
                 RedirectUri = TestServerFixture.DefaultClientRedirectUri,
                 GrantType = "authorization_code",
-                Code = code
+                Code = code,
+                CodeVerifier = TestServerFixture.DefaultCodeVerifier
             };
 
             var tokenPostResponse = await client.PostAsync("/token", tokenRequest.ToFormContent(), TestContext.Current.CancellationToken);

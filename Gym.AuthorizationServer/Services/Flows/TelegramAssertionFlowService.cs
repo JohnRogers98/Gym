@@ -8,7 +8,7 @@ using Gym.AuthorizationServer.Extensions;
 using Gym.AuthorizationServer.Shared.Abstractions;
 using Idp.Services;
 
-namespace Gym.AuthorizationServer.Services
+namespace Gym.AuthorizationServer.Services.Flows
 {
     public interface ITelegramAssertionFlowService
     {

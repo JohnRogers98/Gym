@@ -6,7 +6,7 @@ using Gym.AuthorizationServer.Extensions;
 using Gym.AuthorizationServer.Shared.Abstractions;
 using Idp.Services;
 
-namespace Gym.AuthorizationServer.Services
+namespace Gym.AuthorizationServer.Services.Flows
 {
     public interface IAuthorizationCodeFlowService
     {
@@ -33,7 +33,7 @@ namespace Gym.AuthorizationServer.Services
                 if (request.CodeVerifier is null)
                     return Result<AuthorizationCodeResponse>.Failure("invalid_grant", "Code requires verifier");
 
-                var pkceVerificationResult = _codeChallangeVerifier.Verify(request.CodeVerifier, grantCode.CodeChallenge, grantCode.CodeChallengeMethod);
+                var pkceVerificationResult = _codeChallangeVerifier.Verify(request.CodeVerifier, grantCode.CodeChallenge, grantCode.CodeChallengeMethod!);
                 if (pkceVerificationResult is false)
                     return Result<AuthorizationCodeResponse>.Failure("invalid_grant", "Code verification failed");
             }

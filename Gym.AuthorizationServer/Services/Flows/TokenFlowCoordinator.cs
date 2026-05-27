@@ -1,6 +1,6 @@
 ﻿using Gym.AuthorizationServer.Shared.Abstractions;
 
-namespace Gym.AuthorizationServer.Services
+namespace Gym.AuthorizationServer.Services.Flows
 {
     public interface ITokenFlowCoordinator
     {

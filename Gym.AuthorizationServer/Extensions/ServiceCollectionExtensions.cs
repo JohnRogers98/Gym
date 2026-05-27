@@ -7,6 +7,8 @@ using Gym.AuthorizationServer.Entities.Users;
 using Gym.AuthorizationServer.Entities.Users.FormCredentials;
 using Gym.AuthorizationServer.Entities.Users.TelegramCredentials;
 using Gym.AuthorizationServer.Services;
+using Gym.AuthorizationServer.Services.Flows;
+using Gym.AuthorizationServer.Services.Rsa;
 using Idp.Services;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using MongoDB.Driver;
@@ -36,7 +38,7 @@ namespace Gym.AuthorizationServer.Extensions
             public IServiceCollection AddServices()
             {
                 services.TryAddSingleton<IAccessTokenGenerator, AccessTokenGenerator>();
-                services.TryAddSingleton<IRandomStringGenerator, RandomStringGenerator>();
+                services.TryAddSingleton<IRandomBase64StringGenerator, RandomBase64StringGenerator>();
                 services.TryAddSingleton<IRefreshTokenGenerator, RefreshTokenGenerator>();
                 services.TryAddSingleton<IRequestIdGenerator, RequestIdGenerator>();
                 services.TryAddSingleton<IGrantCodeGenerator, GrantCodeGenerator>();
@@ -70,7 +72,9 @@ namespace Gym.AuthorizationServer.Extensions
 
             public IServiceCollection AddRsaSigningService(IConfiguration configuration)
             {
+                services.TryAddSingleton<IRsaKeyService, RsaKeyService>();
                 services.TryAddSingleton<IRsaSigningService, RsaSigningService>();
+                services.TryAddSingleton<IRsaJwkService, RsaJwkService>();
                 return services;
             }
 

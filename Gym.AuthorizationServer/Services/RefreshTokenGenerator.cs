@@ -7,8 +7,8 @@ namespace Idp.Services
         String GenerateToken();
     }
 
-    public class RefreshTokenGenerator(IRandomStringGenerator _randomStringGenerator) : IRefreshTokenGenerator
+    public class RefreshTokenGenerator(IRandomBase64StringGenerator _randomStringGenerator) : IRefreshTokenGenerator
     {
-        public String GenerateToken() => _randomStringGenerator.Generate(32);
+        public String GenerateToken() => _randomStringGenerator.Generate(32).ToUrlSafe();
     }
 }

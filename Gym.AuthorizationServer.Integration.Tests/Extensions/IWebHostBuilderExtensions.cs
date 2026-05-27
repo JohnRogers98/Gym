@@ -1,5 +1,7 @@
 ﻿using Gym.AuthorizationServer.Integration.Tests;
 using Gym.AuthorizationServer.Integration.Tests.Antiforgery;
+using Gym.AuthorizationServer.Integration.Tests.Fakes;
+using Gym.AuthorizationServer.Services.Rsa;
 using Microsoft.AspNetCore.Hosting;
 using MongoDB.Driver;
 using System.ComponentModel;
@@ -29,7 +31,8 @@ namespace Microsoft.Extensions.DependencyInjection
             builder.ConfigureServices(services =>
             {
                 services
-                    .ReplaceService<IMongoDatabase>(sp => sp.GetRequiredService<IMongoClient>().GetDatabase(TestServerFixture.DefaultTestDatabase));
+                    .ReplaceService<IMongoDatabase>(sp => sp.GetRequiredService<IMongoClient>().GetDatabase(TestServerFixture.DefaultTestDatabase))
+                    .ReplaceService<IRsaKeyService, FakeRsaKeyService>();
             }); 
 
             builder.UseEnvironment("Development");

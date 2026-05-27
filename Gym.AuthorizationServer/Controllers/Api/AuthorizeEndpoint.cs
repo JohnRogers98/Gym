@@ -33,6 +33,12 @@ namespace Gym.AuthorizationServer.Controllers.Api
             var checkResult = _scopeChecker.CheckScopes(client.ScopesAsString, request.Scope);
             if (checkResult is false)
                 return this.CallbackClientWithError(client.RedirectUri, error: "invalid_scope", state: request.State);
+
+            if(request.CodeChallengeMethod != "S256")
+            {
+                if (request.RedirectUri is null)
+                    return this.RedirectToErrorPage("invalid_request", "Unsupported code_challenge_method. Only 'S256' is supported");
+            }
             #endregion
 
             String requestId = _requestIdGenerator.Generate();
