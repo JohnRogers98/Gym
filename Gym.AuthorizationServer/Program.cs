@@ -1,5 +1,6 @@
 using Gym.AuthorizationServer.Extensions;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.HttpOverrides;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,9 +9,18 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie();
 
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = ForwardedHeaders.All;
+    //options.KnownProxies.Clear();
+    //options.KnownIPNetworks.Clear();
+});
+
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+
+builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddRazorPages();
 
@@ -35,6 +45,8 @@ builder.Services.AddServices();
 
 var app = builder.Build();
 
+app.UseForwardedHeaders();
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -53,6 +65,9 @@ app.UseSession();
 app.UseAuthorization();
 
 app.MapStaticAssets();
+
+app.UseCacheControlHeader();
+
 app.MapRazorPages()
    .WithStaticAssets();
 

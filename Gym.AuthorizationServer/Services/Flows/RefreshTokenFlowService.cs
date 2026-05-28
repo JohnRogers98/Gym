@@ -2,8 +2,8 @@
 using Gym.AuthorizationServer.Entities.RefreshTokens;
 using Gym.AuthorizationServer.Entities.UserConsents;
 using Gym.AuthorizationServer.Extensions;
+using Gym.AuthorizationServer.Services.Tokens;
 using Gym.AuthorizationServer.Shared.Abstractions;
-using Idp.Services;
 
 namespace Gym.AuthorizationServer.Services.Flows
 {
@@ -17,7 +17,8 @@ namespace Gym.AuthorizationServer.Services.Flows
         IAccessTokenRepository _accessTokenRepository,
         IUserConsentRepository _userConsentRepository,
         IAccessTokenGenerator _accessTokenGenerator,
-        IRefreshTokenGenerator _refreshTokenGenerator) : IRefreshTokenFlowService
+        IRefreshTokenGenerator _refreshTokenGenerator,
+        IIdTokenGeneratorHelper _idTokenGeneratorHelper) : IRefreshTokenFlowService
     {
         public async Task<Result<RefreshTokenResponse>> HandleAsync(RefreshTokenRequest request, CancellationToken cancellationToken)
         {
@@ -34,7 +35,7 @@ namespace Gym.AuthorizationServer.Services.Flows
             if (userConsent is null)
                 return Result<RefreshTokenResponse>.Failure("invalid_grant", "User has no consent");
 
-            String accessToken = await _accessTokenGenerator.GenerateTokenAsync(userConsent, cancellationToken);
+            String accessToken = _accessTokenGenerator.GenerateToken(userConsent);
             AccessTokenEntity newAccessTokenEntity = new()
             {
                 Token = accessToken,
@@ -50,8 +51,17 @@ namespace Gym.AuthorizationServer.Services.Flows
                 Token = refreshToken,
                 AccessTokenId = newAccessTokenEntity.Id,
                 ExpiresAt = DateTime.UtcNow.AddDays(1),
+                Acr = usedRefreshTokenEntity.Acr,
+                Amr = usedRefreshTokenEntity.Amr
             };
             await _refreshTokenRepository.AddAsync(newRefreshTokenEntity, cancellationToken);
+
+            String? idToken = null;
+            if (userConsent.GrantedScopes.Contains("openid"))
+            {
+                idToken = _idTokenGeneratorHelper
+                    .GenerateToken(accessToken, newAccessTokenEntity.UserId, newAccessTokenEntity.ClientId, acr: newRefreshTokenEntity.Acr, amr: newRefreshTokenEntity.Amr);
+            }
 
             return Result<RefreshTokenResponse>.Success(new() 
             {
@@ -59,7 +69,8 @@ namespace Gym.AuthorizationServer.Services.Flows
                 RefreshToken = refreshToken,
                 TokenType = "Bearer",
                 ExpiresIn = newAccessTokenEntity.ExpiresAt.GetSecondsFromUtcNow(),
-                Scope = String.Join(' ', userConsent.GrantedScopes)
+                Scope = String.Join(' ', userConsent.GrantedScopes),
+                IdToken = idToken
             });
         }
     }
@@ -76,5 +87,6 @@ namespace Gym.AuthorizationServer.Services.Flows
         public String? RefreshToken { get; init; }
         public Int32? ExpiresIn { get; init; }
         public String? Scope { get; init; }
+        public String? IdToken { get; init; }
     }
 }

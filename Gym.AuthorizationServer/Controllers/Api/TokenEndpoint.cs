@@ -76,7 +76,8 @@ namespace Gym.AuthorizationServer.Controllers.Api
                             RefreshToken = authorizationCodeFlowResult.Value.RefreshToken,
                             TokenType = authorizationCodeFlowResult.Value.TokenType,
                             ExpiresIn = authorizationCodeFlowResult.Value.ExpiresIn,
-                            Scope = authorizationCodeFlowResult.Value.Scope
+                            Scope = authorizationCodeFlowResult.Value.Scope,
+                            IdToken = authorizationCodeFlowResult.Value.IdToken
                         };
 
                         return base.Ok(tokenResponse);
@@ -96,7 +97,8 @@ namespace Gym.AuthorizationServer.Controllers.Api
                             RefreshToken = refreshTokenFlowResult.Value.RefreshToken,
                             TokenType = refreshTokenFlowResult.Value.TokenType,
                             ExpiresIn = refreshTokenFlowResult.Value.ExpiresIn,
-                            Scope = refreshTokenFlowResult.Value.Scope
+                            Scope = refreshTokenFlowResult.Value.Scope,
+                            IdToken = refreshTokenFlowResult.Value.IdToken
                         };
 
                         return base.Ok(tokenResponse);
@@ -127,7 +129,8 @@ namespace Gym.AuthorizationServer.Controllers.Api
                             RefreshToken = telegramAssertionFlowResult.Value.RefreshToken,
                             TokenType = telegramAssertionFlowResult.Value.TokenType,
                             ExpiresIn = telegramAssertionFlowResult.Value.ExpiresIn,
-                            Scope = telegramAssertionFlowResult.Value.Scope
+                            Scope = telegramAssertionFlowResult.Value.Scope,
+                            IdToken = telegramAssertionFlowResult.Value.IdToken
                         };
 
                         return base.Ok(tokenResponse);
@@ -188,5 +191,8 @@ namespace Gym.AuthorizationServer.Controllers.Api
 
         [JsonPropertyName("scope")]
         public String? Scope { get; set; }
+
+        [JsonPropertyName("id_token")]
+        public String? IdToken { get; init; }
     }
 }

@@ -5,8 +5,8 @@ using Gym.AuthorizationServer.Entities.UserConsents;
 using Gym.AuthorizationServer.Entities.Users;
 using Gym.AuthorizationServer.Entities.Users.TelegramCredentials;
 using Gym.AuthorizationServer.Extensions;
+using Gym.AuthorizationServer.Services.Tokens;
 using Gym.AuthorizationServer.Shared.Abstractions;
-using Idp.Services;
 
 namespace Gym.AuthorizationServer.Services.Flows
 {
@@ -25,7 +25,8 @@ namespace Gym.AuthorizationServer.Services.Flows
         IAccessTokenGenerator _accessTokenGenerator,
         IAccessTokenRepository _accessTokenRepository,
         IRefreshTokenGenerator _refreshTokenGenerator,
-        IRefreshTokenRepository _refreshTokenRepository) : ITelegramAssertionFlowService
+        IRefreshTokenRepository _refreshTokenRepository,
+        IIdTokenGeneratorHelper _idTokenGeneratorHelper) : ITelegramAssertionFlowService
     {
         public async Task<Result<TelegramAssertionResponse>> HandleAsync(TelegramAssertionRequest request, CancellationToken cancellationToken)
         {
@@ -61,7 +62,7 @@ namespace Gym.AuthorizationServer.Services.Flows
             UserConsentEntity userConsent = await _upsertUserConsentService
                 .UpsertAsync(request.Scope.Split(' ').ToList(), request.ClientId, telegramCredential.UserId, cancellationToken);
 
-            String accessToken = await _accessTokenGenerator.GenerateTokenAsync(userConsent, cancellationToken);
+            String accessToken = _accessTokenGenerator.GenerateToken(userConsent);
             AccessTokenEntity accessTokenEntity = new()
             {
                 Token = accessToken,
@@ -76,9 +77,17 @@ namespace Gym.AuthorizationServer.Services.Flows
             {
                 Token = refreshToken,
                 AccessTokenId = accessTokenEntity.Id,
-                ExpiresAt = DateTime.UtcNow.AddDays(1)
+                ExpiresAt = DateTime.UtcNow.AddDays(1),
+                Acr = "2fa",
+                Amr = ["tel"]
             };
             await _refreshTokenRepository.AddAsync(refreshTokenEntity, cancellationToken);
+
+            String? idToken = null;
+            if (userConsent.GrantedScopes.Contains("openid"))
+            {
+                idToken = _idTokenGeneratorHelper.GenerateToken(accessToken, accessTokenEntity.UserId, accessTokenEntity.ClientId, acr: "2fa", amr: ["tel"]);
+            }
 
             return Result<TelegramAssertionResponse>.Success(new()
             {
@@ -86,7 +95,8 @@ namespace Gym.AuthorizationServer.Services.Flows
                 RefreshToken = refreshToken,
                 TokenType = "Bearer",
                 ExpiresIn = accessTokenEntity.ExpiresAt.GetSecondsFromUtcNow(),
-                Scope = String.Join(' ', userConsent.GrantedScopes)
+                Scope = String.Join(' ', userConsent.GrantedScopes),
+                IdToken = idToken
             });
         }
     }
@@ -105,5 +115,6 @@ namespace Gym.AuthorizationServer.Services.Flows
         public String? RefreshToken { get; init; }
         public Int32? ExpiresIn { get; init; }
         public String? Scope { get; init; }
+        public String? IdToken { get; init; }
     }
 }

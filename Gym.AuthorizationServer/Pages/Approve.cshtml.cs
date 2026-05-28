@@ -70,7 +70,7 @@ namespace Gym.AuthorizationServer.Pages
                 Code = grantCode,
                 UserId = userId,
                 ClientId = authorizeQuery.ClientId,
-                State = authorizeQuery.State,
+                Nonce = authorizeQuery.Nonce,
                 ExpiresAt = DateTime.UtcNow.AddMinutes(10),
                 CodeChallenge = authorizeQuery.CodeChallenge,
                 CodeChallengeMethod = authorizeQuery.CodeChallengeMethod

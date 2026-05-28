@@ -24,5 +24,10 @@ namespace Gym.AuthorizationServer.Queries
 
         [FromQuery(Name = "code_challenge_method")]
         public String? CodeChallengeMethod { get; set; }
+
+        #region OIDC params
+        [FromQuery(Name = "nonce")]
+        public String? Nonce { get; set; }
+        #endregion
     }
 }

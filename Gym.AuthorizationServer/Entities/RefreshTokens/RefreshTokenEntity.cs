@@ -15,5 +15,8 @@ namespace Gym.AuthorizationServer.Entities.RefreshTokens
         public required String AccessTokenId { get; set; }
 
         public required DateTime ExpiresAt { get; set; }
+
+        public String? Acr { get; set; }
+        public List<String>? Amr { get; set; }
     }
 }

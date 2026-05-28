@@ -17,7 +17,7 @@ namespace Gym.AuthorizationServer.Entities.GrantCodes
         [BsonRepresentation(BsonType.ObjectId)]
         public required String ClientId { get; set; }
 
-        public String? State { get; set; } 
+        public String? Nonce { get; set; } 
 
         public String? CodeChallenge { get; set; }
         public String? CodeChallengeMethod { get; set; }

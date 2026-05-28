@@ -1,6 +1,4 @@
-﻿using Gym.AuthorizationServer.Services;
-
-namespace Idp.Services
+﻿namespace Gym.AuthorizationServer.Services.Tokens
 {
     public interface IRefreshTokenGenerator
     {

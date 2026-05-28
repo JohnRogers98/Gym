@@ -9,7 +9,7 @@ using Gym.AuthorizationServer.Entities.Users.TelegramCredentials;
 using Gym.AuthorizationServer.Services;
 using Gym.AuthorizationServer.Services.Flows;
 using Gym.AuthorizationServer.Services.Rsa;
-using Idp.Services;
+using Gym.AuthorizationServer.Services.Tokens;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using MongoDB.Driver;
 
@@ -48,6 +48,10 @@ namespace Gym.AuthorizationServer.Extensions
                 services.TryAddSingleton<IClientSecretHashValidator, ClientSecretHashValidator>();
                 services.TryAddSingleton<ICodeChallangeVerifier, CodeChallangeVerifier>();
                 services.TryAddSingleton<ITelegramSignatureVerifier, TelegramSignatureVerifier>();
+
+                services.TryAddSingleton<IComputeOpenIdAtHashService, ComputeOpenIdAtHashService>();
+                services.TryAddSingleton<IIdTokenGenerator, IdTokenGenerator>();
+                services.TryAddSingleton<IIdTokenGeneratorHelper, IdTokenGeneratorHelper>();
 
                 services.TryAddScoped<IUpsertUserConsentService, UpsertUserConsentService>();
                 services.TryAddScoped<IConsentEvaluationService, ConsentEvaluationService>();

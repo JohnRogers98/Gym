@@ -73,9 +73,9 @@ namespace Gym.AuthorizationServer.Integration.Tests.Flows
             var queryParams = System.Web.HttpUtility.ParseQueryString(queryString);
                
             var code = queryParams["code"];
-            var state = queryParams["state"];
-
             Assert.NotNull(code);
+
+            var state = queryParams["state"];            
             Assert.Equal(TestServerFixture.DefaultState, state);
             #endregion
 
@@ -92,9 +92,9 @@ namespace Gym.AuthorizationServer.Integration.Tests.Flows
 
             var tokenPostResponse = await client.PostAsync("/token", tokenRequest.ToFormContent(), TestContext.Current.CancellationToken);
             tokenPostResponse.EnsureSuccessStatusCode();
+            Assert.True(tokenPostResponse.Headers.CacheControl?.NoStore);
 
             var tokenResponse = await tokenPostResponse.Content.ReadFromJsonAsync<TokenResponse>(TestContext.Current.CancellationToken);
-
             Assert.NotNull(tokenResponse);
             Assert.NotNull(tokenResponse.AccessToken);
             Assert.NotNull(tokenResponse.RefreshToken);

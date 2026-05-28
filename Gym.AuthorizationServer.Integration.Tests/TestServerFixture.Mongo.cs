@@ -4,8 +4,7 @@ using Gym.AuthorizationServer.Entities.RefreshTokens;
 using Gym.AuthorizationServer.Entities.UserConsents;
 using Gym.AuthorizationServer.Entities.Users;
 using Gym.AuthorizationServer.Entities.Users.FormCredentials;
-using Gym.AuthorizationServer.Services;
-using Idp.Services;
+using Gym.AuthorizationServer.Services.Tokens;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Driver;
@@ -120,9 +119,9 @@ namespace Gym.AuthorizationServer.Integration.Tests
                 .GetRequiredService<IUserConsentRepository>()
                 .GetByUserIdAndClientIdAsync(DefaultUserId, DefaultClientId, TestContext.Current.CancellationToken);
 
-            var accessTokenCode = await scope.ServiceProvider
+            var accessTokenCode = scope.ServiceProvider
                 .GetRequiredService<IAccessTokenGenerator>()
-                .GenerateTokenAsync(userConsent!, TestContext.Current.CancellationToken);
+                .GenerateToken(userConsent!);
 
             AccessTokenEntity accessTokenEntity = new()
             {

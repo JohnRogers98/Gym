@@ -4,16 +4,16 @@ using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
 
-namespace Gym.AuthorizationServer.Services
+namespace Gym.AuthorizationServer.Services.Tokens
 {
     public interface IAccessTokenGenerator
     {
-        Task<String> GenerateTokenAsync(UserConsentEntity userConsent, CancellationToken cancellationToken);
+        String GenerateToken(UserConsentEntity userConsent);
     }
 
     public class AccessTokenGenerator(IRsaSigningService _rsaSigningService) : IAccessTokenGenerator
     {
-        public async Task<String> GenerateTokenAsync(UserConsentEntity userConsent, CancellationToken cancellationToken)
+        public String GenerateToken(UserConsentEntity userConsent)
         {
             var claimsIdentity = new ClaimsIdentity([
                 new Claim(ClaimTypes.NameIdentifier, userConsent.UserId),
