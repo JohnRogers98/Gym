@@ -9,7 +9,7 @@ namespace Gym.AuthorizationServer.Integration.Tests.Middleware
         public async Task Verify_That_X_Forwarded_Headers_Applied()
         {
             //Given
-            var client = Fixture.CreateClient();
+            var httpClient = Fixture.CreateClient();
             var forwardedHost = "api.example.com";
             var forwardedScheme = "https";
 
@@ -18,7 +18,7 @@ namespace Gym.AuthorizationServer.Integration.Tests.Middleware
             request.Headers.Add("X-Forwarded-Proto", forwardedScheme);
 
             //When
-            var serverInfoGetResponse = await client.SendAsync(request, TestContext.Current.CancellationToken);
+            var serverInfoGetResponse = await httpClient.SendAsync(request, TestContext.Current.CancellationToken);
             var serverInfoObject = await serverInfoGetResponse.Content.ReadFromJsonAsync<ServerInfo>(TestContext.Current.CancellationToken);
 
             //Then

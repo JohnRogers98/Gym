@@ -14,6 +14,7 @@ namespace Gym.AuthorizationServer.Integration.Tests
     public partial class TestServerFixture : WebApplicationFactory<Program>
     {
         public const String DefaultTestDatabase = "test-auth-server";
+        public const String DefaultHost = "https://localhost";
 
         public const String DefaultClientId = "65a3b5c7d8e9f0123456789a";
         public const String DefaultClientSecret = "client_secret";
@@ -26,6 +27,7 @@ namespace Gym.AuthorizationServer.Integration.Tests
         public const String DefaultUserUsername = "john_doe";
 
         public const String DefaultState = "test_state";
+        public const String DefaultNonce = "test_nonce";
 
         public const String DefaultCodeVerifier = "dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk";
         public const String DefaultCodeChallange = "E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM";
@@ -44,11 +46,8 @@ namespace Gym.AuthorizationServer.Integration.Tests
             }
         }
 
-        public async Task<ClientEntity> CreateClientAsync()
+        public async Task<ClientEntity> CreateOAuthClientAsync()
         {
-            using var scope = Services.CreateScope();
-            var clientRepository = scope.ServiceProvider.GetRequiredService<IClientRepository>();
-
             ClientEntity client = new()
             {
                 Id = DefaultClientId,
@@ -58,15 +57,19 @@ namespace Gym.AuthorizationServer.Integration.Tests
                 SecretHash = DefaultClientSecretHash
             };
 
+            return await this.CreateOAuthClientAsync(client);
+        }
+
+        public async Task<ClientEntity> CreateOAuthClientAsync(ClientEntity client)
+        {
+            using var scope = Services.CreateScope();
+            var clientRepository = scope.ServiceProvider.GetRequiredService<IClientRepository>();
             await clientRepository.AddAsync(client, TestContext.Current.CancellationToken);
             return client;
         }
 
-        public async Task<UserEntity> CreateUserAsync()
+        public async Task<UserEntity> CreateOAuthUserAsync()
         {
-            using var scope = Services.CreateScope();
-            var userRepository = scope.ServiceProvider.GetRequiredService<IUserRepository>();
-
             UserEntity user = new()
             {
                 Id = DefaultUserId,
@@ -74,16 +77,19 @@ namespace Gym.AuthorizationServer.Integration.Tests
                 LastName = "Doe",
                 Role = "client"
             };
+            return await this.CreateOAuthUserAsync(user);
+        }
 
+        public async Task<UserEntity> CreateOAuthUserAsync(UserEntity user)
+        {
+            using var scope = Services.CreateScope();
+            var userRepository = scope.ServiceProvider.GetRequiredService<IUserRepository>();
             await userRepository.AddAsync(user, TestContext.Current.CancellationToken);
             return user;
         }
 
-        public async Task<FormCredentialEntity> CreateUserFormCredentialsAsync()
+        public async Task<FormCredentialEntity> CreateOAuthUserFormCredentialsAsync()
         {
-            using var scope = Services.CreateScope();
-            var formCredentialRepository = scope.ServiceProvider.GetRequiredService<IFormCredentialRepository>();
-
             FormCredentialEntity credentials = new()
             {
                 UserId = DefaultUserId,
@@ -91,27 +97,33 @@ namespace Gym.AuthorizationServer.Integration.Tests
                 HashedPassword = DefaultUserPasswordHash
             };
 
+            using var scope = Services.CreateScope();
+            var formCredentialRepository = scope.ServiceProvider.GetRequiredService<IFormCredentialRepository>();
+
             await formCredentialRepository.AddAsync(credentials, TestContext.Current.CancellationToken);
             return credentials;
         }
 
-        public async Task<UserConsentEntity> CreateUserConsentAsync()
+        public async Task<UserConsentEntity> CreateOAuthUserConsentAsync()
         {
-            using var scope = Services.CreateScope();
-            var userConsentsRepository = scope.ServiceProvider.GetRequiredService<IUserConsentRepository>();
-
             UserConsentEntity consent = new()
             {
                 ClientId = DefaultClientId,
                 UserId = DefaultUserId,
                 GrantedScopes = ["scope_1", "scope_2"]
             };
+            return await this.CreateOAuthUserConsentAsync(consent);
+        }
 
+        public async Task<UserConsentEntity> CreateOAuthUserConsentAsync(UserConsentEntity consent)
+        {
+            using var scope = Services.CreateScope();
+            var userConsentsRepository = scope.ServiceProvider.GetRequiredService<IUserConsentRepository>();
             await userConsentsRepository.AddAsync(consent, TestContext.Current.CancellationToken);
             return consent;
         }
 
-        public async Task<(String accessToken, String refreshToken)> CreateTokenPairAsync()
+        public async Task<(String accessToken, String refreshToken)> CreateOAuthTokenPairAsync()
         {
             using var scope = Services.CreateScope();
 

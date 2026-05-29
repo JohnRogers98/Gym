@@ -30,6 +30,9 @@ namespace Gym.AuthorizationServer.Queries
                 if (!String.IsNullOrEmpty(query.CodeChallengeMethod))
                     parameters.Add($"code_challenge_method={Uri.EscapeDataString(query.CodeChallengeMethod)}");
 
+                if (!String.IsNullOrEmpty(query.Nonce))
+                    parameters.Add($"nonce={Uri.EscapeDataString(query.Nonce)}");
+
                 return parameters.Any() ? $"?{String.Join("&", parameters)}" : String.Empty;
             }
         }

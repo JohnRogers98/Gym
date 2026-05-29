@@ -14,7 +14,7 @@ namespace Gym.AuthorizationServer.Integration.Tests.Jwk
         public async Task Verify_Rsa_Jwk_Signing()
         {
             #region Given
-            var client = Fixture.CreateClient();
+            var httpClient = Fixture.CreateClient();
 
             using var scope = Fixture.Services.CreateScope();
             var rsa = scope.ServiceProvider.GetRequiredService<IRsaKeyService>()
@@ -26,7 +26,7 @@ namespace Gym.AuthorizationServer.Integration.Tests.Jwk
             #endregion
 
             #region Jwk response checking
-            var jwksGetResponse = await client.GetAsync("/.well-known/jwks.json", TestContext.Current.CancellationToken);
+            var jwksGetResponse = await httpClient.GetAsync("/.well-known/jwks.json", TestContext.Current.CancellationToken);
             jwksGetResponse.EnsureSuccessStatusCode();
 
             var jwksObject = await jwksGetResponse.Content.ReadFromJsonAsync<JwkSet>(TestContext.Current.CancellationToken);
@@ -34,8 +34,8 @@ namespace Gym.AuthorizationServer.Integration.Tests.Jwk
             #endregion
 
             #region Signature checking
-            Byte[] n = this.Base64UrlDecode(jwksObject.Jwks.First().Modulus);
-            Byte[] e = this.Base64UrlDecode(jwksObject.Jwks.First().Exponent);
+            Byte[] n = jwksObject.Jwks.First().Modulus.Base64UrlDecode();
+            Byte[] e = jwksObject.Jwks.First().Exponent.Base64UrlDecode();
 
             using RSA rsaPublic = RSA.Create();
             rsaPublic.ImportParameters(new RSAParameters { Modulus = n, Exponent = e });
@@ -44,17 +44,5 @@ namespace Gym.AuthorizationServer.Integration.Tests.Jwk
             Assert.True(result);
             #endregion
         }
-
-        private Byte[] Base64UrlDecode(String str)
-        {
-            String base64 = str.Replace('-', '+').Replace('_', '/');
-            switch (base64.Length % 4)
-            {
-                case 2: base64 += "=="; break;
-                case 3: base64 += "="; break;
-            }
-            return Convert.FromBase64String(base64);
-        }
-
     }
 }
