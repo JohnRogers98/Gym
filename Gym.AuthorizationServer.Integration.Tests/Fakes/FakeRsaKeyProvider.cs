@@ -3,7 +3,7 @@ using System.Security.Cryptography;
 
 namespace Gym.AuthorizationServer.Integration.Tests.Fakes
 {
-    internal class FakeRsaKeyService : IRsaKeyService
+    internal class FakeRsaKeyProvider : IRsaKeyProvider
     {
         private RSA? _rsa;
 

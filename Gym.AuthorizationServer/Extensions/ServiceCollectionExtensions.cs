@@ -10,7 +10,10 @@ using Gym.AuthorizationServer.Services;
 using Gym.AuthorizationServer.Services.Flows;
 using Gym.AuthorizationServer.Services.Rsa;
 using Gym.AuthorizationServer.Services.Tokens;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.IdentityModel.Tokens;
 using MongoDB.Driver;
 
 namespace Gym.AuthorizationServer.Extensions
@@ -19,6 +22,42 @@ namespace Gym.AuthorizationServer.Extensions
     {
         extension(IServiceCollection services)
         {
+            public IServiceCollection AddAuthenticationSchemes()
+            {
+                services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                    .AddCookie()
+                    .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
+                    {
+                        options.TokenValidationParameters = new TokenValidationParameters
+                        {
+                            ValidateIssuer = false,
+                            ValidateAudience = false,
+                            ValidateLifetime = true,
+                            ValidateIssuerSigningKey = true,
+                            RequireExpirationTime = true
+                        };
+                        options.MapInboundClaims = false;
+
+                        options.Events = new JwtBearerEvents
+                        {
+                            OnMessageReceived = async (context) =>
+                            {
+                                var rsaSecurityKeyProvider = context.HttpContext.RequestServices.GetRequiredService<IRsaSecurityKeyProvider>();
+                                context.Options.TokenValidationParameters.IssuerSigningKey = rsaSecurityKeyProvider.GetRsaSecurityKey();
+                            }
+                        };
+                    });
+
+                services.PostConfigure<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme, options =>
+                {
+                    var sp = services.BuildServiceProvider(); // всё равно проблема...
+                    var rsaService = sp.GetRequiredService<IRsaKeyProvider>();
+                    options.TokenValidationParameters.IssuerSigningKey = new RsaSecurityKey(rsaService.GetRsa().ExportParameters(false));
+                });
+
+                return services;
+            }
+
             public IServiceCollection AddRepositories()
             {
                 services.TryAddScoped<IUserRepository, UserRepository>();
@@ -76,8 +115,9 @@ namespace Gym.AuthorizationServer.Extensions
 
             public IServiceCollection AddRsaSigningService(IConfiguration configuration)
             {
-                services.TryAddSingleton<IRsaKeyService, RsaKeyService>();
-                services.TryAddSingleton<IRsaSigningService, RsaSigningService>();
+                services.TryAddSingleton<IRsaKeyProvider, RsaKeyProvider>();
+                services.TryAddSingleton<IRsaSecurityKeyProvider, RsaSecurityKeyProvider>();
+                services.TryAddSingleton<IRsaSigningCredentialsProvider, RsaSigningCredentialsProvider>();
                 services.TryAddSingleton<IRsaJwkService, RsaJwkService>();
                 return services;
             }

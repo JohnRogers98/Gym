@@ -17,7 +17,7 @@ namespace Gym.AuthorizationServer.Integration.Tests.Jwk
             var httpClient = Fixture.CreateClient();
 
             using var scope = Fixture.Services.CreateScope();
-            var rsa = scope.ServiceProvider.GetRequiredService<IRsaKeyService>()
+            var rsa = scope.ServiceProvider.GetRequiredService<IRsaKeyProvider>()
                 .GetRsa();
 
             var data = Encoding.UTF8.GetBytes("Hello");

@@ -1,13 +1,9 @@
 using Gym.AuthorizationServer.Extensions;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.HttpOverrides;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
-builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-    .AddCookie();
 
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
 {
@@ -36,12 +32,12 @@ builder.Services.AddSession(options =>
     options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
 });
 
-
 builder.Services.AddMongoInfrastructure(builder.Configuration);
 builder.Services.AddRepositories();
 builder.Services.AddTelegramBotToken(builder.Configuration);
 builder.Services.AddRsaSigningService(builder.Configuration);
 builder.Services.AddServices();
+builder.Services.AddAuthenticationSchemes();
 
 var app = builder.Build();
 
@@ -62,6 +58,7 @@ app.UseRouting();
 
 app.UseSession();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapStaticAssets();

@@ -12,7 +12,7 @@ namespace Gym.AuthorizationServer.Services.Tokens
         String GenerateToken(IdToken idToken);
     }
 
-    public class IdTokenGenerator(IRsaSigningService _rsaSigningService) : IIdTokenGenerator
+    public class IdTokenGenerator(IRsaSigningCredentialsProvider _rsaSigningService) : IIdTokenGenerator
     {
         public String GenerateToken(IdToken idToken)
         {

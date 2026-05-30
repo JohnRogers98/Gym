@@ -12,7 +12,7 @@ namespace Gym.AuthorizationServer.Services.Rsa
     {
         private readonly Jwk _jwk;
 
-        public RsaJwkService(IRsaKeyService rsaKeyService, IConfiguration configuration)
+        public RsaJwkService(IRsaKeyProvider rsaKeyService, IConfiguration configuration)
         {
             var keyId = configuration.GetRequiredConfiguration("Jwt:RsaKeyId");
 

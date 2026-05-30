@@ -173,7 +173,13 @@ namespace Gym.AuthorizationServer.Integration.Tests.Flows
                 ValidAudience = TestServerFixture.DefaultClientId,
                 ValidateLifetime = true,
                 ValidateIssuerSigningKey = true,
-                IssuerSigningKey = new RsaSecurityKey(rsaPublic),
+                IssuerSigningKey = new RsaSecurityKey(rsaPublic)
+                {
+                    CryptoProviderFactory = new CryptoProviderFactory
+                    {
+                        CacheSignatureProviders = false
+                    }
+                },
                 ClockSkew = TimeSpan.FromMinutes(5)
             };
 

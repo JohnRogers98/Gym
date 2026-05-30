@@ -2,16 +2,16 @@
 
 namespace Gym.AuthorizationServer.Services.Rsa
 {
-    public interface IRsaKeyService
+    public interface IRsaKeyProvider
     {
         RSA GetRsa();
     }
 
-    public class RsaKeyService : IRsaKeyService
+    public class RsaKeyProvider : IRsaKeyProvider
     {
         private readonly RSA _rsa;
 
-        public RsaKeyService(IConfiguration configuration)
+        public RsaKeyProvider(IConfiguration configuration)
         {
             var keyPath = configuration.GetRequiredConfiguration("Jwt:RsaKeyPath");
 

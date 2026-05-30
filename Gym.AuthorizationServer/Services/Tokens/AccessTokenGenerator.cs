@@ -11,15 +11,18 @@ namespace Gym.AuthorizationServer.Services.Tokens
         String GenerateToken(UserConsentEntity userConsent);
     }
 
-    public class AccessTokenGenerator(IRsaSigningService _rsaSigningService) : IAccessTokenGenerator
+    public class AccessTokenGenerator(IRsaSigningCredentialsProvider _rsaSigningService) : IAccessTokenGenerator
     {
         public String GenerateToken(UserConsentEntity userConsent)
         {
             var claimsIdentity = new ClaimsIdentity([
-                new Claim(ClaimTypes.NameIdentifier, userConsent.UserId),
-                new Claim(JwtRegisteredClaimNames.Sub, userConsent.ClientId),
-                new Claim(ClaimTypes.Role, String.Join(' ', userConsent.GrantedScopes))
+                new Claim(JwtRegisteredClaimNames.Sub, userConsent.UserId),
+                new Claim(JwtRegisteredClaimNames.Aud, userConsent.ClientId),
+                //new Claim(ClaimTypes.Role, String.Join(' ', userConsent.GrantedScopes))
                 ]);
+
+            if (userConsent.GrantedScopes is not null && userConsent.GrantedScopes.Any())
+                claimsIdentity.AddClaim(new Claim("scope", String.Join(' ', userConsent.GrantedScopes)));
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {
@@ -27,7 +30,7 @@ namespace Gym.AuthorizationServer.Services.Tokens
                 Expires = DateTime.UtcNow.AddDays(1),
                 Issuer = "Gym.AuthorizationServer",
                 Audience = userConsent.ClientId,
-                SigningCredentials = _rsaSigningService.GetSigningCredentials()
+                SigningCredentials = _rsaSigningService.GetSigningCredentials(),
             };
 
             return new JsonWebTokenHandler().CreateToken(tokenDescriptor);

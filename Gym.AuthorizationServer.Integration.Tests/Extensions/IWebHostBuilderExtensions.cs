@@ -32,7 +32,7 @@ namespace Microsoft.Extensions.DependencyInjection
             {
                 services
                     .ReplaceService<IMongoDatabase>(sp => sp.GetRequiredService<IMongoClient>().GetDatabase(TestServerFixture.DefaultTestDatabase))
-                    .ReplaceService<IRsaKeyService, FakeRsaKeyService>();
+                    .ReplaceService<IRsaKeyProvider, FakeRsaKeyProvider>();
             }); 
 
             builder.UseEnvironment("Development");
