@@ -1,7 +1,7 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace Gym.AuthorizationServer.Entities.Users.FormCredentials
+namespace Gym.AuthorizationServer.Infrastructure.Entities.Users.FormCredentials
 {
     public class FormCredentialEntity
     {

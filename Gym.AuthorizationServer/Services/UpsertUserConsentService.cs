@@ -1,4 +1,4 @@
-﻿using Gym.AuthorizationServer.Entities.UserConsents;
+﻿using Gym.AuthorizationServer.Infrastructure.Entities.UserConsents;
 
 namespace Gym.AuthorizationServer.Services
 {

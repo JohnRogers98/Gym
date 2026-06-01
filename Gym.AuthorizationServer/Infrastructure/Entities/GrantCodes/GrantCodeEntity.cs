@@ -1,13 +1,15 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace Gym.AuthorizationServer.Entities.UserConsents
+namespace Gym.AuthorizationServer.Infrastructure.Entities.GrantCodes
 {
-    public class UserConsentEntity
+    public class GrantCodeEntity
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
         public String Id { get; set; } = default!;
+        
+        public required String Code { get; set; }
 
         [BsonRepresentation(BsonType.ObjectId)]
         public required String UserId { get; set; }
@@ -15,9 +17,10 @@ namespace Gym.AuthorizationServer.Entities.UserConsents
         [BsonRepresentation(BsonType.ObjectId)]
         public required String ClientId { get; set; }
 
-        public List<String> GrantedScopes { get; set; } = new List<String>();
+        public String? Nonce { get; set; } 
 
-        public DateTime GrantedAt { get; set; }
+        public String? CodeChallenge { get; set; }
+        public String? CodeChallengeMethod { get; set; }
 
         public DateTime? ExpiresAt { get; set; }
     }

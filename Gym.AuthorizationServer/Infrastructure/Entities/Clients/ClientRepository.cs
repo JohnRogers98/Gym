@@ -1,6 +1,7 @@
-﻿using MongoDB.Driver;
+﻿using Gym.AuthorizationServer.Infrastructure.Session;
+using MongoDB.Driver;
 
-namespace Gym.AuthorizationServer.Entities.Clients
+namespace Gym.AuthorizationServer.Infrastructure.Entities.Clients
 {
     public interface IClientRepository
     {
@@ -8,18 +9,18 @@ namespace Gym.AuthorizationServer.Entities.Clients
         Task AddAsync(ClientEntity entity, CancellationToken cancellationToken);
     }
 
-    public class ClientRepository(IMongoCollection<ClientEntity> _clients) : IClientRepository
+    public class ClientRepository(IMongoCollection<ClientEntity> _clients, MongoUnitOfWork _mongoUnitOfWork) : IClientRepository
     {
 
         public async Task<ClientEntity?> GetByIdAsync(String id, CancellationToken cancellationToken)
         {
-            return await _clients.Find(eClient => eClient.Id == id)
+            return await _clients.Find(_mongoUnitOfWork.Session, eClient => eClient.Id == id)
                 .FirstOrDefaultAsync(cancellationToken);
         }
 
         public async Task AddAsync(ClientEntity entity, CancellationToken cancellationToken)
         {
-            await _clients.InsertOneAsync(entity,  cancellationToken: cancellationToken);
+            await _clients.InsertOneAsync(_mongoUnitOfWork.Session, entity, cancellationToken: cancellationToken);
         }
     }
 }

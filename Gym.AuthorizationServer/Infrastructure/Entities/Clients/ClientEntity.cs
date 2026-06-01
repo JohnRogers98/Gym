@@ -1,7 +1,7 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace Gym.AuthorizationServer.Entities.Clients
+namespace Gym.AuthorizationServer.Infrastructure.Entities.Clients
 {
     public class ClientEntity
     {

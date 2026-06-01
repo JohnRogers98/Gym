@@ -1,9 +1,9 @@
-﻿using Gym.AuthorizationServer.Entities.AccessTokens;
-using Gym.AuthorizationServer.Entities.Clients;
-using Gym.AuthorizationServer.Entities.RefreshTokens;
-using Gym.AuthorizationServer.Entities.UserConsents;
-using Gym.AuthorizationServer.Entities.Users;
-using Gym.AuthorizationServer.Entities.Users.FormCredentials;
+﻿using Gym.AuthorizationServer.Infrastructure.Entities.AccessTokens;
+using Gym.AuthorizationServer.Infrastructure.Entities.Clients;
+using Gym.AuthorizationServer.Infrastructure.Entities.RefreshTokens;
+using Gym.AuthorizationServer.Infrastructure.Entities.UserConsents;
+using Gym.AuthorizationServer.Infrastructure.Entities.Users;
+using Gym.AuthorizationServer.Infrastructure.Entities.Users.FormCredentials;
 using Gym.AuthorizationServer.Services.Tokens;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;

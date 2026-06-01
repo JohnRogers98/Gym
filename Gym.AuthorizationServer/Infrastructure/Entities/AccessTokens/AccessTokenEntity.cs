@@ -1,7 +1,7 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace Gym.AuthorizationServer.Entities.AccessTokens
+namespace Gym.AuthorizationServer.Infrastructure.Entities.AccessTokens
 {
     public class AccessTokenEntity
     {

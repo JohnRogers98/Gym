@@ -1,7 +1,7 @@
-﻿using Gym.AuthorizationServer.Entities.AccessTokens;
-using Gym.AuthorizationServer.Entities.RefreshTokens;
-using Gym.AuthorizationServer.Entities.UserConsents;
-using Gym.AuthorizationServer.Extensions;
+﻿using Gym.AuthorizationServer.Extensions;
+using Gym.AuthorizationServer.Infrastructure.Entities.AccessTokens;
+using Gym.AuthorizationServer.Infrastructure.Entities.RefreshTokens;
+using Gym.AuthorizationServer.Infrastructure.Entities.UserConsents;
 using Gym.AuthorizationServer.Services.Tokens;
 using Gym.AuthorizationServer.Shared.Abstractions;
 

@@ -1,6 +1,7 @@
-﻿using MongoDB.Driver;
+﻿using Gym.AuthorizationServer.Infrastructure.Session;
+using MongoDB.Driver;
 
-namespace Gym.AuthorizationServer.Entities.Users.FormCredentials
+namespace Gym.AuthorizationServer.Infrastructure.Entities.Users.FormCredentials
 {
     public interface IFormCredentialRepository
     {
@@ -10,28 +11,28 @@ namespace Gym.AuthorizationServer.Entities.Users.FormCredentials
         Task<Boolean> ExistsAsync(String id, CancellationToken cancellationToken);
     }
 
-    public class FormCredentialRepository(IMongoCollection<FormCredentialEntity> _formCredentials) : IFormCredentialRepository
+    public class FormCredentialRepository(IMongoCollection<FormCredentialEntity> _formCredentials, MongoUnitOfWork _mongoUnitOfWork) : IFormCredentialRepository
     {
         public async Task AddAsync(FormCredentialEntity entity, CancellationToken cancellationToken)
         {
-            await _formCredentials.InsertOneAsync(entity, cancellationToken: cancellationToken);
+            await _formCredentials.InsertOneAsync(_mongoUnitOfWork.Session, entity, cancellationToken: cancellationToken);
         }
 
         public async Task<Boolean> ExistsAsync(String id, CancellationToken cancellationToken)
         {
-            return await _formCredentials.Find(eFormCredential => eFormCredential.Id == id)
+            return await _formCredentials.Find(_mongoUnitOfWork.Session, eFormCredential => eFormCredential.Id == id)
                 .AnyAsync(cancellationToken);
         }
 
         public async Task<FormCredentialEntity?> GetByIdAsync(String id, CancellationToken cancellationToken)
         {
-            return await _formCredentials.Find(eFormCredential => eFormCredential.Id == id)
+            return await _formCredentials.Find(_mongoUnitOfWork.Session, eFormCredential => eFormCredential.Id == id)
                 .FirstOrDefaultAsync(cancellationToken);
         }
 
         public async Task<FormCredentialEntity?> GetByUsernameAsync(String username, CancellationToken cancellationToken)
         {
-            return await _formCredentials.Find(eFormCredential => eFormCredential.Username == username)
+            return await _formCredentials.Find(_mongoUnitOfWork.Session, eFormCredential => eFormCredential.Username == username)
                 .FirstOrDefaultAsync(cancellationToken);
         }
     }

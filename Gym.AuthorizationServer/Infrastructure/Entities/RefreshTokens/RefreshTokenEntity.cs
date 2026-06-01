@@ -1,7 +1,7 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace Gym.AuthorizationServer.Entities.RefreshTokens
+namespace Gym.AuthorizationServer.Infrastructure.Entities.RefreshTokens
 {
     public class RefreshTokenEntity
     {

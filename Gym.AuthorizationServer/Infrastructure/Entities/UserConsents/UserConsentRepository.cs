@@ -1,6 +1,7 @@
-﻿using MongoDB.Driver;
+﻿using Gym.AuthorizationServer.Infrastructure.Session;
+using MongoDB.Driver;
 
-namespace Gym.AuthorizationServer.Entities.UserConsents
+namespace Gym.AuthorizationServer.Infrastructure.Entities.UserConsents
 {
     public interface IUserConsentRepository
     {
@@ -9,17 +10,17 @@ namespace Gym.AuthorizationServer.Entities.UserConsents
         Task UpdateGrantedScopesAsync(String userId, String clientId, List<String> grantedScopes, DateTime grantedAt, CancellationToken cancellationToken);
     }
 
-    public class UserConsentRepository(IMongoCollection<UserConsentEntity> _userConsents) : IUserConsentRepository
+    public class UserConsentRepository(IMongoCollection<UserConsentEntity> _userConsents, MongoUnitOfWork _mongoUnitOfWork) : IUserConsentRepository
     {
         public async Task<UserConsentEntity?> GetByUserIdAndClientIdAsync(String userId, String  clientId, CancellationToken cancellationToken)
         {
-            return await _userConsents.Find(eConsent => eConsent.UserId == userId && eConsent.ClientId == clientId)
+            return await _userConsents.Find(_mongoUnitOfWork.Session, eConsent => eConsent.UserId == userId && eConsent.ClientId == clientId)
               .FirstOrDefaultAsync(cancellationToken);
         }
 
         public async Task AddAsync(UserConsentEntity userConsentEntity, CancellationToken cancellationToken)
         {
-            await _userConsents.InsertOneAsync(userConsentEntity, cancellationToken: cancellationToken);
+            await _userConsents.InsertOneAsync(_mongoUnitOfWork.Session, userConsentEntity, cancellationToken: cancellationToken);
         }
 
         public async Task UpdateGrantedScopesAsync(String userId, String clientId, List<String> grantedScopes, DateTime grantedAt, CancellationToken cancellationToken)
@@ -32,7 +33,7 @@ namespace Gym.AuthorizationServer.Entities.UserConsents
                 .Set(x => x.GrantedAt, grantedAt)
                 .Set(x => x.ExpiresAt, grantedAt.AddMonths(1));
 
-            await _userConsents.UpdateOneAsync(filter, update, cancellationToken: cancellationToken);
+            await _userConsents.UpdateOneAsync(_mongoUnitOfWork.Session, filter, update, cancellationToken: cancellationToken);
         }
     }
 }

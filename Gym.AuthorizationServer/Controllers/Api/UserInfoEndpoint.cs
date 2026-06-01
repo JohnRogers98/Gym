@@ -1,6 +1,6 @@
 ﻿using Ardalis.ApiEndpoints;
-using Gym.AuthorizationServer.Entities.Users;
 using Gym.AuthorizationServer.Extensions;
+using Gym.AuthorizationServer.Infrastructure.Entities.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json.Serialization;

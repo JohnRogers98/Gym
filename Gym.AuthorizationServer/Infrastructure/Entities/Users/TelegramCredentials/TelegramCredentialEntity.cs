@@ -1,7 +1,7 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace Gym.AuthorizationServer.Entities.Users.TelegramCredentials
+namespace Gym.AuthorizationServer.Infrastructure.Entities.Users.TelegramCredentials
 {
     public class TelegramCredentialEntity
     {

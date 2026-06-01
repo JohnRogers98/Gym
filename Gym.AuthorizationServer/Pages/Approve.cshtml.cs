@@ -1,5 +1,5 @@
-using Gym.AuthorizationServer.Entities.GrantCodes;
 using Gym.AuthorizationServer.Extensions;
+using Gym.AuthorizationServer.Infrastructure.Entities.GrantCodes;
 using Gym.AuthorizationServer.Queries;
 using Gym.AuthorizationServer.Services;
 using Microsoft.AspNetCore.Http.Extensions;

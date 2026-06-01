@@ -1,8 +1,8 @@
-﻿using Gym.AuthorizationServer.Entities.Users.FormCredentials;
+﻿using Gym.AuthorizationServer.Infrastructure.Entities.Users.FormCredentials;
 using Gym.AuthorizationServer.Services;
 using Gym.AuthorizationServer.Shared.Abstractions;
 
-namespace Gym.AuthorizationServer.Entities.Users
+namespace Gym.AuthorizationServer.Infrastructure.Entities.Users
 {
     public interface IUserByUsernameAndPasswordFinder
     {

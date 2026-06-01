@@ -58,6 +58,8 @@ app.UseRouting();
 
 app.UseSession();
 
+app.UseUnitOfWork();
+
 app.UseAuthentication();
 app.UseAuthorization();
 

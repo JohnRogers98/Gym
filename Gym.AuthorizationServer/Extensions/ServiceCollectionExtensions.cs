@@ -1,11 +1,12 @@
-﻿using Gym.AuthorizationServer.Entities.AccessTokens;
-using Gym.AuthorizationServer.Entities.Clients;
-using Gym.AuthorizationServer.Entities.GrantCodes;
-using Gym.AuthorizationServer.Entities.RefreshTokens;
-using Gym.AuthorizationServer.Entities.UserConsents;
-using Gym.AuthorizationServer.Entities.Users;
-using Gym.AuthorizationServer.Entities.Users.FormCredentials;
-using Gym.AuthorizationServer.Entities.Users.TelegramCredentials;
+﻿using Gym.AuthorizationServer.Infrastructure.Entities.AccessTokens;
+using Gym.AuthorizationServer.Infrastructure.Entities.Clients;
+using Gym.AuthorizationServer.Infrastructure.Entities.GrantCodes;
+using Gym.AuthorizationServer.Infrastructure.Entities.RefreshTokens;
+using Gym.AuthorizationServer.Infrastructure.Entities.UserConsents;
+using Gym.AuthorizationServer.Infrastructure.Entities.Users;
+using Gym.AuthorizationServer.Infrastructure.Entities.Users.FormCredentials;
+using Gym.AuthorizationServer.Infrastructure.Entities.Users.TelegramCredentials;
+using Gym.AuthorizationServer.Infrastructure.Session;
 using Gym.AuthorizationServer.Services;
 using Gym.AuthorizationServer.Services.Flows;
 using Gym.AuthorizationServer.Services.Rsa;
@@ -47,13 +48,6 @@ namespace Gym.AuthorizationServer.Extensions
                             }
                         };
                     });
-
-                services.PostConfigure<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme, options =>
-                {
-                    var sp = services.BuildServiceProvider(); // всё равно проблема...
-                    var rsaService = sp.GetRequiredService<IRsaKeyProvider>();
-                    options.TokenValidationParameters.IssuerSigningKey = new RsaSecurityKey(rsaService.GetRsa().ExportParameters(false));
-                });
 
                 return services;
             }
@@ -130,8 +124,8 @@ namespace Gym.AuthorizationServer.Extensions
                 services.TryAddSingleton<IMongoClient>(_ => new MongoClient(mongoConnectionString));
                 services.TryAddSingleton<IMongoDatabase>(sp => sp.GetRequiredService<IMongoClient>().GetDatabase(configuration["MongoDb:DatabaseName"]));
 
-                /*services.TryAddScoped<MongoUnitOfWork>();
-                services.TryAddScoped<IUnitOfWork>(sp => sp.GetRequiredService<MongoUnitOfWork>());*/
+                services.TryAddScoped<MongoUnitOfWork>();
+                services.TryAddScoped<IUnitOfWork>(sp => sp.GetRequiredService<MongoUnitOfWork>());
 
                 services.AddMongoCollection<UserEntity>(configuration["MongoDb:Collections:Users"]!);
                 services.AddMongoCollection<FormCredentialEntity>(configuration["MongoDb:Collections:FormCredentials"]!);

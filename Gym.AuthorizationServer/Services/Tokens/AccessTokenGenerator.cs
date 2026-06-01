@@ -1,4 +1,4 @@
-﻿using Gym.AuthorizationServer.Entities.UserConsents;
+﻿using Gym.AuthorizationServer.Infrastructure.Entities.UserConsents;
 using Gym.AuthorizationServer.Services.Rsa;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
