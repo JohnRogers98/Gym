@@ -26,7 +26,10 @@ namespace Gym.AuthorizationServer.Extensions
             public IServiceCollection AddAuthenticationSchemes()
             {
                 services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-                    .AddCookie()
+                    .AddCookie(options =>
+                    {
+                        options.Cookie.Name = "Gym.AuthorizationServer.Auth";
+                    })
                     .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
                     {
                         options.TokenValidationParameters = new TokenValidationParameters
