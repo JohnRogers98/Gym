@@ -28,7 +28,7 @@ namespace Gym.AuthorizationServer.Extensions
                 services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                     .AddCookie(options =>
                     {
-                        options.Cookie.Name = "Gym.AuthorizationServer.Auth";
+                        options.Cookie.Name = "__Host-Gym.AuthorizationServer.Auth";
                     })
                     .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
                     {

@@ -193,6 +193,6 @@ namespace Gym.AuthorizationServer.Controllers.Api
         public String? Scope { get; set; }
 
         [JsonPropertyName("id_token")]
-        public String? IdToken { get; init; }
+        public String? IdToken { get; set; }
     }
 }
