@@ -1,5 +1,6 @@
 using Gym.BFF.Extensions;
 using Gym.BFF.Middlewares;
+using Gym.BFF.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,10 +16,12 @@ builder.Services.AddServerSideSession();
 
 builder.Services.AddBffCors();
 
-builder.Services.AddAuthorizationServerNamedClient("auth-server");
+builder.Services.AddAuthorizationServerNamedClient(HttpClientNames.AuthorizationServer, builder.Configuration);
 
 builder.Services.AddServices();
 builder.Services.AddOptionsFromCongiguration(builder.Configuration);
+
+builder.Services.AddMemoryCache();
 
 var app = builder.Build();
 

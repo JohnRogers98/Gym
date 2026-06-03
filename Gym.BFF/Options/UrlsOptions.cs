@@ -20,6 +20,9 @@ namespace Gym.BFF.Options
         public String UserInfoEndpoint { get; set; } = "/userinfo";
         public String Jwks { get; set; } = "/.well-known/jwks.json";
 
+        [Required]
+        public String Kid { get; set; } = default!;
+
         public String FullAuthorizeUrl => $"{BaseUrl}{AuthorizeEndpoint}";
         public String FullTokenUrl => $"{BaseUrl}{TokenEndpoint}";
         public String FullUserInfoUrl => $"{BaseUrl}{UserInfoEndpoint}";

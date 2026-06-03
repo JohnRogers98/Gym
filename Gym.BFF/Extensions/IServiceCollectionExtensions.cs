@@ -1,5 +1,7 @@
 ﻿using Gym.BFF.Options;
 using Gym.BFF.Services;
+using Gym.BFF.Services.Jwks;
+using Gym.BFF.Services.Token;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Session;
 
@@ -14,7 +16,7 @@ namespace Gym.BFF.Extensions
                 services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                     .AddCookie(options =>
                     {
-                        options.Cookie.Name = "__Host-Gym.BFF>.Client";
+                        options.Cookie.Name = "__Host-Gym.BFF.Client";
                         options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
                         options.Cookie.HttpOnly = true;
                         options.Cookie.SameSite = SameSiteMode.Strict;
@@ -41,11 +43,16 @@ namespace Gym.BFF.Extensions
                 return services;
             }
 
-            public IServiceCollection AddAuthorizationServerNamedClient(String key)
+            public IServiceCollection AddAuthorizationServerNamedClient(String key, IConfiguration configuration)
             {
-                services.AddHttpClient(key, httpClient =>
+                services.AddHttpClient(key, client =>
                 {
-                    httpClient.BaseAddress = new Uri("https://localhost:7218");
+                    client.BaseAddress = new Uri(configuration.GetRequiredConfiguration("Urls:AuthorizationServer:BaseUrl"));
+                })
+                .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler   
+                {
+                    UseCookies = false,
+                    UseDefaultCredentials = false
                 });
 
                 return services;
@@ -89,6 +96,10 @@ namespace Gym.BFF.Extensions
                 services.AddSingleton<ICodeChallengePairGenerator, CodeChallengePairGenerator>();
                 services.AddSingleton<IOAuthStateGenerator, OAuthStateGenerator>();
                 services.AddSingleton<IOAuthNonceGenerator, OAuthNonceGenerator>();
+                services.AddSingleton<IComputeOpenIdAtHashService, ComputeOpenIdAtHashService>();
+                services.AddSingleton<IOAuthExchangeCodeService, OAuthExchangeCodeService>();
+                services.AddSingleton<IRsaSecurityKeyProvider, RsaSecurityKeyProvider>();
+                services.AddSingleton<IOAuthIdTokenValidator, OAuthIdTokenValidator>();
 
                 return services;
             }

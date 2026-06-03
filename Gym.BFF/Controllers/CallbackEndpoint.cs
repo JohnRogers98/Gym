@@ -1,15 +1,17 @@
-﻿using Gym.BFF.Options;
-using Gym.BFF.Services.Token;
+﻿using Gym.BFF.Services.Token;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
-using System.Net.Http.Headers;
-using System.Text;
+using System.Security.Claims;
 
 namespace Gym.BFF.Controllers
 {
     [ApiController]
-    public class CallbackEndpoint(IHttpClientFactory _httpClientFactory, IOptions<ClientCredentialsOptions> _clientCredentialsOptions) : ControllerBase
+    public class CallbackEndpoint(
+        IOAuthExchangeCodeService _exchangeCodeService,
+        IOAuthIdTokenValidator _idTokenValidator) : ControllerBase
     {
+        //TODO: redirect to SPA endpoint to properly handle errors and success.
         [HttpGet("callback")]
         public async Task<IActionResult> Callback(
             [FromQuery] String code,
@@ -18,36 +20,58 @@ namespace Gym.BFF.Controllers
             [FromQuery] String? error_description,
             CancellationToken cancellationToken)
         {
-            //TODO: redirect to SPA endpoint to properly handle error.
             if (!String.IsNullOrEmpty(error))
                 return BadRequest(new {error, error_description});
 
-            if (base.HttpContext.Session.ConsumeOAuthState() != state)
+            if (String.IsNullOrEmpty(code))
+                return BadRequest(new { error = "missing_code", error_description = "Code is missing" });
+
+            var sessionState = base.HttpContext.Session.ConsumeOAuthState();
+            var sessionNonce = base.HttpContext.Session.ConsumeOAuthNonce();
+            var sessionCodeVerifier = base.HttpContext.Session.ConsumeOAuthCodeVerifier();
+
+            if (sessionState != state)
                 return BadRequest(new { error = "invalid_state", error_description = "State mismatch" });
 
-            HttpClient httpClient = _httpClientFactory.CreateClient("auth-server");
-            
-            var request = new HttpRequestMessage(HttpMethod.Post, "token");
-            request.Headers.Authorization = new AuthenticationHeaderValue("Basic",
-                this.GetCredentialsInBase64(_clientCredentialsOptions.Value.ClientId, _clientCredentialsOptions.Value.ClientSecret));
+            Result<OAuthTokenResponse> tokenResponseResult = await _exchangeCodeService
+                .HandleAsync(code, sessionCodeVerifier, cancellationToken);
 
-            OAuthTokenRequest tokenRequest = new()
+            if(tokenResponseResult.IsFailed)
+                return BadRequest(new { error = "invalid_request", error_description = "Token request failed" });
+
+            if (tokenResponseResult.Value.IdToken is not null)
             {
-                GrantType = "authorization_code",
-                RedirectUri = _clientCredentialsOptions.Value.RedirectUri,
-                Scope = _clientCredentialsOptions.Value.Scope,
-                Code = code,
-                CodeVerifier = base.HttpContext.Session.ConsumeOAuthCodeVerifier()
-            };
-            request.Content = tokenRequest.ToFormContent();
+                Result<ClaimsPrincipal> result = await _idTokenValidator
+                    .ValidateAsync(tokenResponseResult.Value.IdToken, tokenResponseResult.Value.AccessToken, sessionNonce, cancellationToken);
+                if(result.IsFailed)
+                    return BadRequest(new { error = result.ErrorCode, error_description = result.ErrorDescription });
+            }
 
-            var tokenResponse = await httpClient.SendAsync(request, cancellationToken);
-            var tokenResponseObject = await tokenResponse.Content.ReadFromJsonAsync<OAuthTokenResponse>(cancellationToken);
+            await this.GenerateCookieAsync(tokenResponseResult.Value);
 
             return base.Ok();
         }
 
-        private String GetCredentialsInBase64(String login, String password)
-            => Convert.ToBase64String(Encoding.UTF8.GetBytes($"{login}:{password}"));
+        private async Task GenerateCookieAsync(OAuthTokenResponse tokenResponse)
+        {
+            var claims = new List<Claim>
+            {
+                new Claim("access_token", tokenResponse.AccessToken),
+                new Claim("refresh_token", tokenResponse.RefreshToken!)
+            };
+
+            var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            var principal = new ClaimsPrincipal(identity);
+
+            await HttpContext.SignInAsync(
+                CookieAuthenticationDefaults.AuthenticationScheme,
+                principal,
+                new AuthenticationProperties
+                {
+                    IsPersistent = true,
+                    ExpiresUtc = DateTime.UtcNow.AddHours(1)
+                });
+        }
     }
+
 }
