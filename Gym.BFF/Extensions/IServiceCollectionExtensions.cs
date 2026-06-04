@@ -1,6 +1,7 @@
 ﻿using Gym.BFF.Options;
 using Gym.BFF.Services;
 using Gym.BFF.Services.Jwks;
+using Gym.BFF.Services.Session;
 using Gym.BFF.Services.Token;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Session;
@@ -64,7 +65,6 @@ namespace Gym.BFF.Extensions
                 services.AddSession(options =>
                 {
                     options.Cookie.Name = "__Host-Gym.BFF.Server";
-                    /*options.Cookie.Path = "/";*/
                     options.IdleTimeout = TimeSpan.FromMinutes(30);
                     options.Cookie.HttpOnly = true;
                     options.Cookie.IsEssential = true;
@@ -100,6 +100,8 @@ namespace Gym.BFF.Extensions
                 services.AddSingleton<IOAuthExchangeCodeService, OAuthExchangeCodeService>();
                 services.AddSingleton<IRsaSecurityKeyProvider, RsaSecurityKeyProvider>();
                 services.AddSingleton<IOAuthIdTokenValidator, OAuthIdTokenValidator>();
+                services.AddSingleton<IOAuthRefreshTokenService, OAuthRefreshTokenService>();
+                services.AddSingleton<ISetTokensToClientSideSessionService, SetTokensToClientSideSessionService>();
 
                 return services;
             }

@@ -1,6 +1,5 @@
-﻿using Gym.BFF.Services.Token;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
+﻿using Gym.BFF.Services.Session;
+using Gym.BFF.Services.Token;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
@@ -9,7 +8,8 @@ namespace Gym.BFF.Controllers
     [ApiController]
     public class CallbackEndpoint(
         IOAuthExchangeCodeService _exchangeCodeService,
-        IOAuthIdTokenValidator _idTokenValidator) : ControllerBase
+        IOAuthIdTokenValidator _idTokenValidator,
+        ISetTokensToClientSideSessionService _setTokensToClientSideSessionService) : ControllerBase
     {
         //TODO: redirect to SPA endpoint to properly handle errors and success.
         [HttpGet("callback")]
@@ -47,30 +47,10 @@ namespace Gym.BFF.Controllers
                     return BadRequest(new { error = result.ErrorCode, error_description = result.ErrorDescription });
             }
 
-            await this.GenerateCookieAsync(tokenResponseResult.Value);
+            await _setTokensToClientSideSessionService
+                .HandleAsync(tokenResponseResult.Value.AccessToken, tokenResponseResult.Value.RefreshToken);
 
             return base.Ok();
-        }
-
-        private async Task GenerateCookieAsync(OAuthTokenResponse tokenResponse)
-        {
-            var claims = new List<Claim>
-            {
-                new Claim("access_token", tokenResponse.AccessToken),
-                new Claim("refresh_token", tokenResponse.RefreshToken!)
-            };
-
-            var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-            var principal = new ClaimsPrincipal(identity);
-
-            await HttpContext.SignInAsync(
-                CookieAuthenticationDefaults.AuthenticationScheme,
-                principal,
-                new AuthenticationProperties
-                {
-                    IsPersistent = true,
-                    ExpiresUtc = DateTime.UtcNow.AddHours(1)
-                });
         }
     }
 

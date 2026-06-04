@@ -4,33 +4,32 @@ using System.Net.Http.Headers;
 
 namespace Gym.BFF.Services.Token
 {
-    public interface IOAuthExchangeCodeService
+    public interface IOAuthRefreshTokenService
     {
-        Task<Result<OAuthTokenResponse>> HandleAsync(String code, String? codeVerifier, CancellationToken cancellationToken);
+        Task<Result<OAuthTokenResponse>> HandleAsync(String refreshToken, CancellationToken cancellationToken);
     }
 
-    public class OAuthExchangeCodeService(
+    public class OAuthRefreshTokenService(
         IHttpClientFactory _httpClientFactory,
         IOptions<ClientCredentialsOptions> _clientCredentials,
-        IOptions<UrlsOptions> _urls) : IOAuthExchangeCodeService
+        IOptions<UrlsOptions> _urls) : IOAuthRefreshTokenService
     {
         //TODO: propagate token error 
-        public async Task<Result<OAuthTokenResponse>> HandleAsync(String code, String? codeVerifier, CancellationToken cancellationToken)
+        public async Task<Result<OAuthTokenResponse>> HandleAsync(String refreshToken, CancellationToken cancellationToken)
         {
             HttpClient httpClient = _httpClientFactory.CreateClient(HttpClientNames.AuthorizationServer);
 
             var requestMessage = new HttpRequestMessage(HttpMethod.Post, _urls.Value.AuthorizationServer.TokenEndpoint);
 
-            requestMessage.Headers.Authorization 
+            requestMessage.Headers.Authorization
                 = new AuthenticationHeaderValue("Basic", _clientCredentials.Value.GetCredentialsInBase64());
 
             OAuthTokenRequest tokenRequest = new()
             {
-                GrantType = "authorization_code",
+                GrantType = "refresh_token",
                 RedirectUri = _clientCredentials.Value.RedirectUri,
                 Scope = _clientCredentials.Value.Scope,
-                Code = code,
-                CodeVerifier = codeVerifier
+                RefreshToken = refreshToken
             };
             requestMessage.Content = tokenRequest.ToFormContent();
 

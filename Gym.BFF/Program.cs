@@ -22,6 +22,7 @@ builder.Services.AddServices();
 builder.Services.AddOptionsFromCongiguration(builder.Configuration);
 
 builder.Services.AddMemoryCache();
+builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
 
