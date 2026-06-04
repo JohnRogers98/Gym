@@ -103,6 +103,7 @@ namespace Gym.BFF.Extensions
                 services.AddSingleton<IOAuthRefreshTokenService, OAuthRefreshTokenService>();
                 services.AddSingleton<ISetTokensToClientSideSessionService, SetTokensToClientSideSessionService>();
                 services.AddSingleton<IOAuthTelegramAssertionService, OAuthTelegramAssertionService>();
+                services.AddSingleton<IGetUserInfoService, GetUserInfoService>();
 
                 return services;
             }

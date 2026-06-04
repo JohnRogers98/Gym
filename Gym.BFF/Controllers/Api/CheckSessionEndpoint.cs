@@ -3,10 +3,10 @@
 namespace Gym.BFF.Controllers.Api
 {
     [ApiController]
-    [Route("api")]
+    [Route("api/check-session")]
     public class CheckSessionEndpoint : ControllerBase
     {
-        [HttpGet("check-session")]
+        [HttpGet]
         public IActionResult CheckSession()
         {
             if (User.Identity?.IsAuthenticated == true)
