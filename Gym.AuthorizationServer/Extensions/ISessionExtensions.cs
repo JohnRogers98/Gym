@@ -1,4 +1,4 @@
-﻿using Gym.AuthorizationServer.Queries;
+﻿using Gym.OAuth.Extensions;
 using System.Text.Json;
 
 namespace Gym.AuthorizationServer.Extensions

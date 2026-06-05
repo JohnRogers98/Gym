@@ -1,19 +1,19 @@
 ﻿using Ardalis.ApiEndpoints;
 using Gym.AuthorizationServer.Extensions;
 using Gym.AuthorizationServer.Infrastructure.Entities.Users;
+using Gym.OAuth.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Text.Json.Serialization;
 
 namespace Gym.AuthorizationServer.Controllers.Api
 {
     [Route("userinfo")]
     [ApiController]
     [Authorize(AuthenticationSchemes = "Bearer")]
-    public class UserInfoEndpoint(IUserRepository _userRepository) : EndpointBaseAsync.WithoutRequest.WithActionResult<UserInfoResponse>
+    public class UserInfoEndpoint(IUserRepository _userRepository) : EndpointBaseAsync.WithoutRequest.WithActionResult<UserInfo>
     {
         [HttpGet, HttpPost]
-        public override async Task<ActionResult<UserInfoResponse>> HandleAsync(CancellationToken cancellationToken = default)
+        public override async Task<ActionResult<UserInfo>> HandleAsync(CancellationToken cancellationToken = default)
         {
             if (String.IsNullOrEmpty(User.GetSub()))
                 return base.Unauthorized(new { error = "invalid_token", error_description = "Missing 'sub' claim" });
@@ -28,7 +28,7 @@ namespace Gym.AuthorizationServer.Controllers.Api
             if (user is null)
                 return base.Unauthorized(new { error = "invalid_token", error_description = "User not found" });
 
-            UserInfoResponse userInfo = new()
+            UserInfo userInfo = new()
             {
                 Subject = user.Id
             };
@@ -44,25 +44,5 @@ namespace Gym.AuthorizationServer.Controllers.Api
 
             return base.Ok(userInfo);
         }
-    }
-
-    public class UserInfoResponse
-    {
-        [JsonPropertyName("sub")]
-        public required String Subject { get; set; }
-
-        #region profile
-        [JsonPropertyName("name")]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public String? Name { get; set; }
-
-        [JsonPropertyName("given_name")]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public String? GivenName { get; set; }
-
-        [JsonPropertyName("family_name")]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public String? FamilyName { get; set; }
-        #endregion
     }
 }

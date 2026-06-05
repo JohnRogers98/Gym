@@ -1,6 +1,7 @@
 ﻿using Gym.BFF.Options;
 using Gym.BFF.Services.Session;
 using Gym.BFF.Services.Token;
+using Gym.OAuth.Extensions;
 using System.Net;
 using System.Net.Http.Headers;
 
@@ -23,7 +24,7 @@ public class RefreshTokenHandler(
 
             if (!String.IsNullOrEmpty(refreshToken))
             {
-                Result<OAuthTokenResponse> newTokensResponseResult = await _refreshTokenService.HandleAsync(refreshToken, cancellationToken);
+                Result<TokenResponse> newTokensResponseResult = await _refreshTokenService.HandleAsync(refreshToken, cancellationToken);
                 if(newTokensResponseResult.IsSuccess)
                 {
                     await _setTokensToClientSideSessionService

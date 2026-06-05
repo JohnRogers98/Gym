@@ -18,4 +18,8 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="10.1.7" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Gym.OAuth.Extensions\Gym.OAuth.Extensions.csproj" />
+  </ItemGroup>
+
 </Project>

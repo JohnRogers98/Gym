@@ -1,4 +1,4 @@
-﻿using Gym.AuthorizationServer.Controllers.Api;
+﻿using Gym.OAuth.Extensions;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 
@@ -44,7 +44,7 @@ namespace Gym.AuthorizationServer.Integration.Tests.UserInfo
 
             //When
             var userInfoResponse = await httpClient.SendAsync(request, TestContext.Current.CancellationToken);
-            var userInfoObject = await userInfoResponse.Content.ReadFromJsonAsync<UserInfoResponse>(TestContext.Current.CancellationToken);
+            var userInfoObject = await userInfoResponse.Content.ReadFromJsonAsync<OAuth.Extensions.UserInfo>(TestContext.Current.CancellationToken);
 
             //Then
             Assert.NotNull(userInfoObject);

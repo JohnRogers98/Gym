@@ -1,7 +1,7 @@
 using Gym.AuthorizationServer.Extensions;
 using Gym.AuthorizationServer.Infrastructure.Entities.GrantCodes;
-using Gym.AuthorizationServer.Queries;
 using Gym.AuthorizationServer.Services;
+using Gym.OAuth.Extensions;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;

@@ -1,5 +1,6 @@
 ﻿using Gym.BFF.Services.Session;
 using Gym.BFF.Services.Token;
+using Gym.OAuth.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
@@ -33,7 +34,7 @@ namespace Gym.BFF.Controllers
             if (sessionState != state)
                 return BadRequest(new { error = "invalid_state", error_description = "State mismatch" });
 
-            Result<OAuthTokenResponse> tokenResponseResult = await _exchangeCodeService
+            Result<TokenResponse> tokenResponseResult = await _exchangeCodeService
                 .HandleAsync(code, sessionCodeVerifier, cancellationToken);
 
             if(tokenResponseResult.IsFailed)

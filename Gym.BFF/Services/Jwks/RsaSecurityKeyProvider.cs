@@ -1,4 +1,5 @@
 ﻿using Gym.BFF.Options;
+using Gym.OAuth.Extensions;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;

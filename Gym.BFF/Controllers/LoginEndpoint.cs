@@ -1,6 +1,6 @@
-﻿using Gym.BFF.Controllers.Api;
-using Gym.BFF.Options;
+﻿using Gym.BFF.Options;
 using Gym.BFF.Services;
+using Gym.OAuth.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 
@@ -40,21 +40,6 @@ namespace Gym.BFF.Controllers
 
             return base.Redirect($"{_urlsOptions.Value.AuthorizationServer.FullAuthorizeUrl}{authorizeQuery.ToQueryString()}");
         }
-    }
-
-    public class AuthorizeQuery
-    {
-        public required String ClientId { get; set; }
-        public required String ResponseType { get; set; }
-        public String? RedirectUri { get; set; }
-        public String? Scope { get; set; }
-        public String? State { get; set; }
-        public String? CodeChallenge { get; set; }
-        public String? CodeChallengeMethod { get; set; }
-
-        #region OIDC params
-        public String? Nonce { get; set; }
-        #endregion
     }
 
 }

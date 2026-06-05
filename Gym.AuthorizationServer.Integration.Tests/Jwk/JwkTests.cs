@@ -1,5 +1,5 @@
-﻿using Gym.AuthorizationServer.Controllers.Api;
-using Gym.AuthorizationServer.Services.Rsa;
+﻿using Gym.AuthorizationServer.Services.Rsa;
+using Gym.OAuth.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using System.Net.Http.Json;
 using System.Security.Cryptography;

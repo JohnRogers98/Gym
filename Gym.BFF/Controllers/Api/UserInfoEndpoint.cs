@@ -1,5 +1,6 @@
 ﻿using Gym.BFF.Options;
 using Gym.BFF.Services;
+using Gym.OAuth.Extensions;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Gym.BFF.Controllers.Api
@@ -9,7 +10,7 @@ namespace Gym.BFF.Controllers.Api
     public class UserInfoEndpoint(IGetUserInfoService _getUserInfoService) : ControllerBase
     {
         [HttpGet]
-        public async Task<ActionResult<UserInfoResponse>> GetUserInfo(CancellationToken cancellationToken)
+        public async Task<ActionResult<UserInfo>> GetUserInfo(CancellationToken cancellationToken)
         {
             var accessToken = User.FindFirst(ExtendedClaimTypes.AccessToken)?.Value;
 

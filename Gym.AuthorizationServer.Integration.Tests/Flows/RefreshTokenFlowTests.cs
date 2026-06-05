@@ -1,5 +1,5 @@
-﻿using Gym.AuthorizationServer.Controllers.Api;
-using Gym.AuthorizationServer.Infrastructure.Entities.UserConsents;
+﻿using Gym.AuthorizationServer.Infrastructure.Entities.UserConsents;
+using Gym.OAuth.Extensions;
 using System.Net.Http.Json;
 
 namespace Gym.AuthorizationServer.Integration.Tests.Flows

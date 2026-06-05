@@ -1,5 +1,5 @@
-﻿using Gym.AuthorizationServer.Claims;
-using Gym.AuthorizationServer.Services.Rsa;
+﻿using Gym.AuthorizationServer.Services.Rsa;
+using Gym.OAuth.Extensions;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;

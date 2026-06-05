@@ -3,8 +3,8 @@ using Gym.AuthorizationServer.Extensions;
 using Gym.AuthorizationServer.Infrastructure.Entities.Clients;
 using Gym.AuthorizationServer.Services;
 using Gym.AuthorizationServer.Services.Flows;
+using Gym.OAuth.Extensions;
 using Microsoft.AspNetCore.Mvc;
-using System.Text.Json.Serialization;
 
 namespace Gym.AuthorizationServer.Controllers.Api
 {
@@ -54,7 +54,7 @@ namespace Gym.AuthorizationServer.Controllers.Api
 
             switch (request.GrantType)
             {
-                case "authorization_code":
+                case GrantTypes.AuthorizationCode:
                     {
                         if (String.IsNullOrWhiteSpace(request.Code))
                             return base.BadRequest(new { Error = "invalid_request" });
@@ -82,7 +82,7 @@ namespace Gym.AuthorizationServer.Controllers.Api
 
                         return base.Ok(tokenResponse);
                     }
-                case "refresh_token":
+                case GrantTypes.RefreshToken:
                     {
                         if (String.IsNullOrWhiteSpace(request.RefreshToken))
                             return base.BadRequest(new { Error = "invalid_request" });
@@ -103,7 +103,7 @@ namespace Gym.AuthorizationServer.Controllers.Api
 
                         return base.Ok(tokenResponse);
                     }
-                case "urn:telegram:grant-type:webapp":
+                case GrantTypes.TelegramAssertion:
                     {
                         if (String.IsNullOrWhiteSpace(request.Assertion))
                             return base.BadRequest(new { Error = "invalid_request" });
@@ -143,56 +143,5 @@ namespace Gym.AuthorizationServer.Controllers.Api
             }
         }
 
-    }
-
-    public class TokenRequest
-    {
-        [FromForm(Name = "client_id")]
-        public String? ClientId { get; set; }
-
-        [FromForm(Name = "client_secret")]
-        public String? ClientSecret { get; set; }
-
-        [FromForm(Name = "redirect_uri")]
-        public required String RedirectUri { get; set; }
-
-        [FromForm(Name = "grant_type")]
-        public required String GrantType { get; set; }
-
-        [FromForm(Name = "code")]
-        public String? Code { get; set; }
-
-        [FromForm(Name = "scope")]
-        public String? Scope { get; set; }
-
-        [FromForm(Name = "refresh_token")]
-        public String? RefreshToken { get; set; }
-
-        [FromForm(Name = "assertion")]
-        public String? Assertion { get; set; }
-
-        [FromForm(Name = "code_verifier")]
-        public String? CodeVerifier { get; set; }
-    }
-
-    public class TokenResponse
-    {
-        [JsonPropertyName("access_token")]
-        public required String AccessToken { get; set; }
-
-        [JsonPropertyName("token_type")]
-        public required String TokenType { get; set; }
-
-        [JsonPropertyName("refresh_token")]
-        public String? RefreshToken { get; set; }
-
-        [JsonPropertyName("expires_in")]
-        public Int32? ExpiresIn { get; set; }
-
-        [JsonPropertyName("scope")]
-        public String? Scope { get; set; }
-
-        [JsonPropertyName("id_token")]
-        public String? IdToken { get; set; }
     }
 }

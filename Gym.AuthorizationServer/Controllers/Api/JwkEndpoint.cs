@@ -1,7 +1,7 @@
 ﻿using Ardalis.ApiEndpoints;
 using Gym.AuthorizationServer.Services.Rsa;
+using Gym.OAuth.Extensions;
 using Microsoft.AspNetCore.Mvc;
-using System.Text.Json.Serialization;
 
 namespace Gym.AuthorizationServer.Controllers.Api
 {
@@ -19,11 +19,5 @@ namespace Gym.AuthorizationServer.Controllers.Api
 
             return base.Ok(jwks);
         }
-    }
-
-    public class JwkSet
-    {
-        [JsonPropertyName("keys")]
-        public required List<Jwk> Jwks { get; set; }
     }
 }

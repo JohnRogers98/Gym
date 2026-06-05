@@ -1,5 +1,6 @@
 ﻿using Gym.BFF.Services.Session;
 using Gym.BFF.Services.Token;
+using Gym.OAuth.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
@@ -18,7 +19,7 @@ namespace Gym.BFF.Controllers
             if (initData is null)
                 return BadRequest(new { error = "invalid_request", error_description = "No init data present" });
 
-            Result<OAuthTokenResponse> tokenResponseResult = await _telegramAssertionService
+            Result<TokenResponse> tokenResponseResult = await _telegramAssertionService
                 .HandleAsync(initData, cancellationToken);
             if (tokenResponseResult.IsFailed)
                 return BadRequest(new { error = "invalid_request", error_description = "Init data invalid" });

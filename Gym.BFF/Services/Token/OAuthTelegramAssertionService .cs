@@ -1,4 +1,5 @@
 ﻿using Gym.BFF.Options;
+using Gym.OAuth.Extensions;
 using Microsoft.Extensions.Options;
 using System.Net.Http.Headers;
 
@@ -6,7 +7,7 @@ namespace Gym.BFF.Services.Token
 {
     public interface IOAuthTelegramAssertionService
     {
-        Task<Result<OAuthTokenResponse>> HandleAsync(String initData, CancellationToken cancellationToken);
+        Task<Result<TokenResponse>> HandleAsync(String initData, CancellationToken cancellationToken);
     }
 
     public class OAuthTelegramAssertionService(
@@ -15,7 +16,7 @@ namespace Gym.BFF.Services.Token
         IOptions<UrlsOptions> _urls) : IOAuthTelegramAssertionService
     {
         //TODO: propagate token error 
-        public async Task<Result<OAuthTokenResponse>> HandleAsync(String initData, CancellationToken cancellationToken)
+        public async Task<Result<TokenResponse>> HandleAsync(String initData, CancellationToken cancellationToken)
         {
             HttpClient httpClient = _httpClientFactory.CreateClient(HttpClientNames.AuthorizationServer);
 
@@ -24,9 +25,9 @@ namespace Gym.BFF.Services.Token
             requestMessage.Headers.Authorization 
                 = new AuthenticationHeaderValue("Basic", _clientCredentials.Value.GetCredentialsInBase64());
 
-            OAuthTokenRequest tokenRequest = new()
+            TokenRequest tokenRequest = new()
             {
-                GrantType = "urn:telegram:grant-type:webapp",
+                GrantType = GrantTypes.TelegramAssertion,
                 RedirectUri = _clientCredentials.Value.RedirectUri,
                 Scope = _clientCredentials.Value.Scope,
                 Assertion = initData
@@ -36,10 +37,10 @@ namespace Gym.BFF.Services.Token
             var tokenResponse = await httpClient.SendAsync(requestMessage, cancellationToken);
             tokenResponse.EnsureSuccessStatusCode();
 
-            var deserializedResponse = await tokenResponse.Content.ReadFromJsonAsync<OAuthTokenResponse>(cancellationToken)
+            var deserializedResponse = await tokenResponse.Content.ReadFromJsonAsync<TokenResponse>(cancellationToken)
                 ?? throw new InvalidOperationException("Failed to deserialize token response");
 
-            return Result<OAuthTokenResponse>.Success(deserializedResponse);
+            return Result<TokenResponse>.Success(deserializedResponse);
         }
     }
 }

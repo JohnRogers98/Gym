@@ -1,5 +1,5 @@
-﻿using System.Security.Cryptography;
-using System.Text.Json.Serialization;
+﻿using Gym.OAuth.Extensions;
+using System.Security.Cryptography;
 
 namespace Gym.AuthorizationServer.Services.Rsa
 {
@@ -32,31 +32,5 @@ namespace Gym.AuthorizationServer.Services.Rsa
         }
 
         public Jwk GetJwk() => _jwk;
-    }
-
-    public class Jwk
-    {
-        [JsonPropertyName("kty")]
-        public required String KeyType { get; set; }
-
-        [JsonPropertyName("use")]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public String? PublicKeyUse { get; set; }
-
-        [JsonPropertyName("key_ops")]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public List<String>? KeyOperations { get; set; }
-
-        [JsonPropertyName("alg")]
-        public required String Algorithm { get; set; }
-
-        [JsonPropertyName("kid")]
-        public required String KeyId { get; set; }
-
-        [JsonPropertyName("n")]
-        public required String Modulus { get; set; }
-
-        [JsonPropertyName("e")]
-        public required String Exponent { get; set; }
     }
 }

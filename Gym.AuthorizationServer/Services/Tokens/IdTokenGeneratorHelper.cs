@@ -1,4 +1,4 @@
-﻿using Gym.AuthorizationServer.Claims;
+﻿using Gym.OAuth.Extensions;
 
 namespace Gym.AuthorizationServer.Services.Tokens
 {

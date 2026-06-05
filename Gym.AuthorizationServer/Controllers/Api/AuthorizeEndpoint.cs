@@ -1,8 +1,8 @@
 ﻿using Ardalis.ApiEndpoints;
 using Gym.AuthorizationServer.Extensions;
 using Gym.AuthorizationServer.Infrastructure.Entities.Clients;
-using Gym.AuthorizationServer.Queries;
 using Gym.AuthorizationServer.Services;
+using Gym.OAuth.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

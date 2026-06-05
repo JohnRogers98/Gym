@@ -1,6 +1,5 @@
-﻿using Gym.AuthorizationServer.Controllers.Api;
-using Gym.AuthorizationServer.Queries;
-using Gym.AuthorizationServer.Services.Tokens;
+﻿using Gym.AuthorizationServer.Services.Tokens;
+using Gym.OAuth.Extensions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.JsonWebTokens;
