@@ -13,12 +13,11 @@
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.7" />
 	<PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" Version="8.17.0" />
 	<PackageReference Include="Microsoft.IdentityModel.Tokens" Version="8.17.0" />
-    <PackageReference Include="MongoDB.Driver" Version="3.8.1" />
-    <PackageReference Include="SharpCompress" Version="0.48.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="10.1.7" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Gym.AuthorizationServer.Infrastructure\Gym.AuthorizationServer.Infrastructure.csproj" />
     <ProjectReference Include="..\Gym.OAuth.Extensions\Gym.OAuth.Extensions.csproj" />
   </ItemGroup>
 
