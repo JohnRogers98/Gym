@@ -1,32 +1,31 @@
-﻿namespace Gym.BFF.Middlewares
+﻿using Gym.BFF.Options;
+using Microsoft.Extensions.Options;
+
+namespace Gym.BFF.Middlewares
 {
     public class StaticHeaderCheckForCorsImposing
     {
         private readonly RequestDelegate _next;
-        private readonly HashSet<PathString> _excludedPaths;
+        private readonly StaticHeaderCheckOptions _options;
 
-        public StaticHeaderCheckForCorsImposing(RequestDelegate next)
+        public StaticHeaderCheckForCorsImposing(RequestDelegate next, IOptions<StaticHeaderCheckOptions> options)
         {
             _next = next;
-
-            _excludedPaths = new HashSet<PathString>
-            {
-                "/login",
-                "/callback",
-                "/logout"
-            };
+            _options = options.Value;
         }
 
         public async Task InvokeAsync(HttpContext context)
         {
             var path = context.Request.Path;
 
-            var isExcludedFromCheck = _excludedPaths.Contains(path) || _excludedPaths.Any(path.StartsWithSegments);
+            var isExcludedFromCheck = !_options.Enabled 
+                || _options.GetExcludedPathStrings().Contains(path) 
+                || _options.GetExcludedPathStrings().Any(path.StartsWithSegments);
 
             if (isExcludedFromCheck is false && !context.Request.Headers.ContainsKey("X-Static-Header"))
             {
                 context.Response.StatusCode = StatusCodes.Status400BadRequest;
-                await context.Response.WriteAsync("Missing X-Static-Header header");
+                await context.Response.WriteAsync("Missing X-Static-Header");
                 return;
             }
             await _next(context);

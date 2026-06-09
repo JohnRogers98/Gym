@@ -87,6 +87,11 @@ namespace Gym.BFF.Extensions
                     .ValidateDataAnnotations()
                     .ValidateOnStart();
 
+                services.AddOptions<StaticHeaderCheckOptions>()
+                    .Bind(configuration.GetRequiredSection(StaticHeaderCheckOptions.SectionName))
+                    .ValidateDataAnnotations()
+                    .ValidateOnStart();
+
                 return services;
             }
 

@@ -10,7 +10,12 @@ namespace Gym.BFF.Controllers
         [HttpPost("logout")]
         public async Task<IActionResult> Logout()
         {
+            //client-side session
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
+            //server-side session
+            HttpContext.Session.Clear();
+            
             return Ok();
         }
     }

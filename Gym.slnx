@@ -3,6 +3,7 @@
     <Project Path="Gym.AuthorizationServer.Integration.Tests/Gym.AuthorizationServer.Integration.Tests.csproj" Id="7791cd4b-e8cd-494e-9e5c-c904d2620b99" />
     <Project Path="Gym.AuthorizationServer.Tests/Gym.AuthorizationServer.Tests.csproj" Id="10963a41-ef15-4075-b455-c386865b5676" />
     <Project Path="Gym.AuthorizationServer/Gym.AuthorizationServer.csproj" Id="6900d9af-622c-4bdc-b313-ac2aac2ecf7f" />
+    <Project Path="Gym.BFF.Integration.Tests/Gym.BFF.Integration.Tests.csproj" Id="4560fcb8-d71a-45cd-8b54-0bd73b799803" />
     <Project Path="Gym.BFF/Gym.BFF.csproj" Id="be3ffeed-ab4d-4c52-beb8-19ac91e4d601" />
     <Project Path="Gym.OAuth.Extensions/Gym.OAuth.Extensions.csproj" Id="a3819741-56a9-4f67-9dc2-39d5c4f85989" />
   </Folder>
