@@ -14,6 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Gym.AuthorizationServer.Client\Gym.AuthorizationServer.Client.csproj" />
     <ProjectReference Include="..\Gym.OAuth.Extensions\Gym.OAuth.Extensions.csproj" />
   </ItemGroup>
 

@@ -1,6 +1,7 @@
+using Gym.AuthorizationServer.Client.Options;
+using Gym.AuthorizationServer.Client;
 using Gym.BFF.Extensions;
 using Gym.BFF.Middlewares;
-using Gym.BFF.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,10 +17,18 @@ builder.Services.AddServerSideSession();
 
 builder.Services.AddBffCors();
 
-builder.Services.AddAuthorizationServerNamedClient(HttpClientNames.AuthorizationServer, builder.Configuration);
+ClientCredentialsOptions clientCredentialsOptions = new();
+builder.Configuration.GetRequiredSection("ClientCredentials").Bind(clientCredentialsOptions);
+
+AuthorizationServerOptions authorizationServerOptions = new();
+builder.Configuration.GetRequiredSection("Urls:AuthorizationServer").Bind(authorizationServerOptions);
+
+builder.Services.AddAuthorizationServerNamedClient(authorizationServerOptions.ClientName, authorizationServerOptions.BaseUrl);
+
+builder.Services.SetupOAuthClientConfiguration(clientCredentialsOptions, authorizationServerOptions);
 
 builder.Services.AddServices();
-builder.Services.AddOptionsFromCongiguration(builder.Configuration);
+builder.Services.AddOptionsFromConfiguration(builder.Configuration);
 
 builder.Services.AddMemoryCache();
 builder.Services.AddHttpContextAccessor();

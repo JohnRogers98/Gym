@@ -1,11 +1,11 @@
-﻿using Gym.BFF.Options;
+﻿using Gym.AuthorizationServer.Client.Options;
+using Gym.AuthorizationServer.Client.Services;
 using Gym.OAuth.Extensions;
 using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Cryptography;
 
-namespace Gym.BFF.Services.Jwks
+namespace Gym.BFF.Services
 {
     public interface IRsaSecurityKeyProvider
     {
@@ -13,8 +13,8 @@ namespace Gym.BFF.Services.Jwks
     }
 
     public class RsaSecurityKeyProvider(
-        IHttpClientFactory _httpClientFactory,
-        IOptions<UrlsOptions> _urls,
+        IJwkKeyProvider _jwkKeyProvider,
+        AuthorizationServerOptions _authorizationServerOptions,
         IMemoryCache _cache) : IRsaSecurityKeyProvider
     {
         private readonly TimeSpan _cacheTtl = TimeSpan.FromHours(1);
@@ -22,20 +22,20 @@ namespace Gym.BFF.Services.Jwks
 
         public async Task<RsaSecurityKey> GetKeyAsync(CancellationToken cancellationToken)
         {
-            if (_cache.TryGetValue<RsaSecurityKey>(_urls.Value.AuthorizationServer.Kid, out var cachedKey))
+            if (_cache.TryGetValue<RsaSecurityKey>(_authorizationServerOptions.Kid, out var cachedKey))
                 return cachedKey!;
 
             await _lock.WaitAsync(cancellationToken);
             try
             {
                 // Double-check
-                if (_cache.TryGetValue<RsaSecurityKey>(_urls.Value.AuthorizationServer.Kid, out cachedKey))
+                if (_cache.TryGetValue<RsaSecurityKey>(_authorizationServerOptions.Kid, out cachedKey))
                     return cachedKey!;
 
-                var fetchedJwt = await this.FetchJwkFromServerAsync(cancellationToken);
+                var fetchedJwk = await _jwkKeyProvider.GetKeyAsync(cancellationToken);
 
-                var securityKey = this.CreateSecurityKey(fetchedJwt);
-                _cache.Set(_urls.Value.AuthorizationServer.Kid, securityKey, new MemoryCacheEntryOptions
+                var securityKey = this.CreateSecurityKey(fetchedJwk.Value);
+                _cache.Set(_authorizationServerOptions.Kid, securityKey, new MemoryCacheEntryOptions
                 {
                     AbsoluteExpirationRelativeToNow = _cacheTtl,
                     Priority = CacheItemPriority.NeverRemove
@@ -44,22 +44,6 @@ namespace Gym.BFF.Services.Jwks
                 return securityKey;
             }
             finally { _lock.Release(); }
-        }
-
-        private async Task<Jwk> FetchJwkFromServerAsync(CancellationToken cancellationToken)
-        {
-            HttpClient httpClient = _httpClientFactory.CreateClient(HttpClientNames.AuthorizationServer);
-
-            var requestMessage = new HttpRequestMessage(HttpMethod.Get, _urls.Value.AuthorizationServer.Jwks);
-
-            var jwksResponse = await httpClient.SendAsync(requestMessage, cancellationToken);
-            jwksResponse.EnsureSuccessStatusCode();
-
-            var jwks = await jwksResponse.Content.ReadFromJsonAsync<JwkSet>(cancellationToken);
-            if (jwks is null || jwks.Jwks.Any(jwk => jwk.KeyId == _urls.Value.AuthorizationServer.Kid) is false)
-                throw new InvalidOperationException($"Failed to load jwks with kid {_urls.Value.AuthorizationServer.Kid}");
-
-            return jwks.Jwks.First(jwk => jwk.KeyId == _urls.Value.AuthorizationServer.Kid);
         }
 
         private RsaSecurityKey CreateSecurityKey(Jwk jwk)

@@ -1,6 +1,7 @@
 <Solution>
   <Folder Name="/OAuth/">
     <Project Path="Gym.AuthorizationServer.Admin/Gym.AuthorizationServer.Admin.csproj" Id="3abc1b7b-6bf9-4a63-8391-393c34499318" />
+    <Project Path="Gym.AuthorizationServer.Client/Gym.AuthorizationServer.Client.csproj" Id="a2d11c65-4644-4423-b434-d7952657361a" />
     <Project Path="Gym.AuthorizationServer.Infrastructure/Gym.AuthorizationServer.Infrastructure.csproj" Id="b58a41a8-2506-4a35-a4f7-65eb0fa3d042" />
     <Project Path="Gym.AuthorizationServer.Integration.Tests/Gym.AuthorizationServer.Integration.Tests.csproj" Id="7791cd4b-e8cd-494e-9e5c-c904d2620b99" />
     <Project Path="Gym.AuthorizationServer.Tests/Gym.AuthorizationServer.Tests.csproj" Id="10963a41-ef15-4075-b455-c386865b5676" />

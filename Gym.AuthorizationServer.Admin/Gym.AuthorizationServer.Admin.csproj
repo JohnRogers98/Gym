@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.8" />
+	<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.8" />
   </ItemGroup>
 
   <ItemGroup>
@@ -15,6 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Gym.AuthorizationServer.Client\Gym.AuthorizationServer.Client.csproj" />
     <ProjectReference Include="..\Gym.AuthorizationServer.Infrastructure\Gym.AuthorizationServer.Infrastructure.csproj" />
   </ItemGroup>
 

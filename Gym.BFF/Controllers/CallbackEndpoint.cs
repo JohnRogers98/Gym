@@ -1,5 +1,6 @@
-﻿using Gym.BFF.Services.Session;
-using Gym.BFF.Services.Token;
+﻿using Gym.AuthorizationServer.Client.Services;
+using Gym.BFF.Services;
+using Gym.BFF.Services.Session;
 using Gym.OAuth.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -8,7 +9,7 @@ namespace Gym.BFF.Controllers
 {
     [ApiController]
     public class CallbackEndpoint(
-        IOAuthExchangeCodeService _exchangeCodeService,
+        IExchangeCodeForTokenService _exchangeCodeForTokenService,
         IOAuthIdTokenValidator _idTokenValidator,
         ISetTokensToClientSideSessionService _setTokensToClientSideSessionService) : ControllerBase
     {
@@ -25,27 +26,27 @@ namespace Gym.BFF.Controllers
                 return BadRequest(new {error, error_description});
 
             if (String.IsNullOrEmpty(code))
-                return BadRequest(new { error = "missing_code", error_description = "Code is missing" });
+                return BadRequest(new OAuthError { Error = "missing_code", ErrorDescription = "Code is missing" });
 
             var sessionState = base.HttpContext.Session.ConsumeOAuthState();
             var sessionNonce = base.HttpContext.Session.ConsumeOAuthNonce();
             var sessionCodeVerifier = base.HttpContext.Session.ConsumeOAuthCodeVerifier();
 
             if (sessionState != state)
-                return BadRequest(new { error = "invalid_state", error_description = "State mismatch" });
+                return BadRequest(new OAuthError { Error = "invalid_state", ErrorDescription = "State mismatch" });
 
-            Result<TokenResponse> tokenResponseResult = await _exchangeCodeService
+            var tokenResponseResult = await _exchangeCodeForTokenService
                 .HandleAsync(code, sessionCodeVerifier, cancellationToken);
 
-            if(tokenResponseResult.IsFailed)
-                return BadRequest(new { error = "invalid_request", error_description = "Token request failed" });
+            if(tokenResponseResult.IsFailure)
+                return BadRequest(tokenResponseResult.Error);
 
             if (tokenResponseResult.Value.IdToken is not null)
             {
                 Result<ClaimsPrincipal> result = await _idTokenValidator
                     .ValidateAsync(tokenResponseResult.Value.IdToken, tokenResponseResult.Value.AccessToken, sessionNonce, cancellationToken);
                 if(result.IsFailed)
-                    return BadRequest(new { error = result.ErrorCode, error_description = result.ErrorDescription });
+                    return BadRequest(new OAuthError { Error = result.ErrorCode, ErrorDescription = result.ErrorDescription });
             }
 
             await _setTokensToClientSideSessionService

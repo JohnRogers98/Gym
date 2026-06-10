@@ -1,8 +1,6 @@
 ﻿using Gym.BFF.Options;
 using Gym.BFF.Services;
-using Gym.BFF.Services.Jwks;
 using Gym.BFF.Services.Session;
-using Gym.BFF.Services.Token;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Session;
 
@@ -29,36 +27,6 @@ namespace Gym.BFF.Extensions
                 return services;
             }
 
-            public IServiceCollection AddBffCors()
-            {
-                services.AddCors(options =>
-                {
-                    options.AddPolicy("BffCorsPolicy", policy =>
-                    {
-                        policy.WithOrigins("https://localhost")
-                              .WithHeaders("X-Static-Header")
-                              .AllowCredentials();
-                    });
-                });
-
-                return services;
-            }
-
-            public IServiceCollection AddAuthorizationServerNamedClient(String key, IConfiguration configuration)
-            {
-                services.AddHttpClient(key, client =>
-                {
-                    client.BaseAddress = new Uri(configuration.GetRequiredConfiguration("Urls:AuthorizationServer:BaseUrl"));
-                })
-                .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler   
-                {
-                    UseCookies = false,
-                    UseDefaultCredentials = false
-                });
-
-                return services;
-            }
-
             public IServiceCollection AddServerSideSession()
             {
                 services.AddDistributedMemoryCache();
@@ -75,18 +43,38 @@ namespace Gym.BFF.Extensions
                 return services;
             }
 
-            public IServiceCollection AddOptionsFromCongiguration(IConfiguration configuration)
+            public IServiceCollection AddBffCors()
             {
-                services.AddOptions<ClientCredentialsOptions>()
-                    .Bind(configuration.GetRequiredSection(ClientCredentialsOptions.SectionName))
-                    .ValidateDataAnnotations()
-                    .ValidateOnStart();
+                services.AddCors(options =>
+                {
+                    options.AddPolicy("BffCorsPolicy", policy =>
+                    {
+                        policy.WithOrigins("https://localhost")
+                              .WithHeaders("X-Static-Header")
+                              .AllowCredentials();
+                    });
+                });
 
-                services.AddOptions<UrlsOptions>()
-                    .Bind(configuration.GetRequiredSection(UrlsOptions.SectionName))
-                    .ValidateDataAnnotations()
-                    .ValidateOnStart();
+                return services;
+            }
 
+            public IServiceCollection AddAuthorizationServerNamedClient(String key, String baseUrl)
+            {
+                services.AddHttpClient(key, client =>
+                {
+                    client.BaseAddress = new Uri(baseUrl);
+                })
+                .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler   
+                {
+                    UseCookies = false,
+                    UseDefaultCredentials = false
+                });
+
+                return services;
+            }
+
+            public IServiceCollection AddOptionsFromConfiguration(IConfiguration configuration)
+            {
                 services.AddOptions<StaticHeaderCheckOptions>()
                     .Bind(configuration.GetRequiredSection(StaticHeaderCheckOptions.SectionName))
                     .ValidateDataAnnotations()
@@ -102,13 +90,9 @@ namespace Gym.BFF.Extensions
                 services.AddSingleton<IOAuthStateGenerator, OAuthStateGenerator>();
                 services.AddSingleton<IOAuthNonceGenerator, OAuthNonceGenerator>();
                 services.AddSingleton<IComputeOpenIdAtHashService, ComputeOpenIdAtHashService>();
-                services.AddSingleton<IOAuthExchangeCodeService, OAuthExchangeCodeService>();
                 services.AddSingleton<IRsaSecurityKeyProvider, RsaSecurityKeyProvider>();
                 services.AddSingleton<IOAuthIdTokenValidator, OAuthIdTokenValidator>();
-                services.AddSingleton<IOAuthRefreshTokenService, OAuthRefreshTokenService>();
                 services.AddSingleton<ISetTokensToClientSideSessionService, SetTokensToClientSideSessionService>();
-                services.AddSingleton<IOAuthTelegramAssertionService, OAuthTelegramAssertionService>();
-                services.AddSingleton<IGetUserInfoService, GetUserInfoService>();
 
                 return services;
             }

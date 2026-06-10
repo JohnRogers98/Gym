@@ -1,4 +1,4 @@
-﻿using Gym.BFF.Options;
+﻿using Gym.AuthorizationServer.Client.Options;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -17,9 +17,9 @@ namespace Gym.BFF.Integration.Tests.Tests
             #region Given
             var httpClient = Fixture.CreateClient();
 
-            var urls = Fixture.Services.GetRequiredService<IOptions<UrlsOptions>>().Value;
+            var urls = Fixture.Services.GetRequiredService<AuthorizationServerOptions>();
 
-            Fixture.AuthorizationServerMock.SetupExchageCodeToken(urls.AuthorizationServer.TokenEndpoint, "test_access_token", "test_refresh_token");
+            Fixture.AuthorizationServerMock.SetupExchageCodeToken(urls.TokenEndpoint, "test_access_token", "test_refresh_token");
 
             var loginResponse = await httpClient.GetAsync("/login", TestContext.Current.CancellationToken);
             var queryParams = QueryHelpers.ParseQuery(loginResponse.Headers.Location!.Query);

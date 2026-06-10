@@ -1,15 +1,14 @@
-﻿using Gym.BFF.Options;
+﻿using Gym.AuthorizationServer.Client.Options;
 using Gym.BFF.Services;
 using Gym.OAuth.Extensions;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
 
 namespace Gym.BFF.Controllers
 {
     [ApiController]
     public class LoginEndpoint(
-        IOptions<ClientCredentialsOptions> _clientCredentialsOptions,
-        IOptions<UrlsOptions> _urlsOptions,
+        ClientCredentialsOptions _clientCredentialsOptions,
+        AuthorizationServerOptions _authorizationServerOptions,
         IOAuthStateGenerator _stateGenerator,
         IOAuthNonceGenerator _nonceGenerator,
         ICodeChallengePairGenerator _codeChallengePairGenerator) : ControllerBase
@@ -28,17 +27,17 @@ namespace Gym.BFF.Controllers
 
             AuthorizeQuery authorizeQuery = new()
             {
-                ClientId = _clientCredentialsOptions.Value.ClientId,
+                ClientId = _clientCredentialsOptions.ClientId,
                 ResponseType = "code",
-                RedirectUri = _clientCredentialsOptions.Value.RedirectUri,
-                Scope = _clientCredentialsOptions.Value.Scope,
+                RedirectUri = _clientCredentialsOptions.RedirectUri,
+                Scope = _clientCredentialsOptions.Scope,
                 State = state,
                 Nonce = nonce,
                 CodeChallengeMethod = codeChallengePair.CodeChallengeMethod,
                 CodeChallenge = codeChallengePair.CodeChallenge
             };
 
-            return base.Redirect($"{_urlsOptions.Value.AuthorizationServer.FullAuthorizeUrl}{authorizeQuery.ToQueryString()}");
+            return base.Redirect($"{_authorizationServerOptions.FullAuthorizeUrl}{authorizeQuery.ToQueryString()}");
         }
     }
 

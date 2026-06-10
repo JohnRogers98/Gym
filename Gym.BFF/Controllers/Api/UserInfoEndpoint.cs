@@ -18,8 +18,8 @@ namespace Gym.BFF.Controllers.Api
                 return Unauthorized();
 
             var userInfoResult = await _getUserInfoService.HandleAsync(accessToken, cancellationToken);
-            if(userInfoResult.IsFailed)
-                return BadRequest(new { error = "invalid_request", error_description = "Error occured" });
+            if(userInfoResult.IsFailure)
+                return BadRequest(userInfoResult.Error);
 
             return Ok(userInfoResult.Value);
         }

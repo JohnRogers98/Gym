@@ -1,7 +1,6 @@
-﻿using Gym.BFF.Options;
+﻿using Gym.AuthorizationServer.Client.Services;
+using Gym.BFF.Options;
 using Gym.BFF.Services.Session;
-using Gym.BFF.Services.Token;
-using Gym.OAuth.Extensions;
 using System.Net;
 using System.Net.Http.Headers;
 
@@ -9,7 +8,7 @@ namespace Gym.BFF.DelegatingHandlers;
 
 public class RefreshTokenHandler(
     IHttpContextAccessor _httpContextAccessor,
-    IOAuthRefreshTokenService _refreshTokenService,
+    IRefreshTokenService _refreshTokenService,
     ISetTokensToClientSideSessionService _setTokensToClientSideSessionService) : DelegatingHandler
 {
     protected override async Task<HttpResponseMessage> SendAsync(
@@ -24,7 +23,7 @@ public class RefreshTokenHandler(
 
             if (!String.IsNullOrEmpty(refreshToken))
             {
-                Result<TokenResponse> newTokensResponseResult = await _refreshTokenService.HandleAsync(refreshToken, cancellationToken);
+                var newTokensResponseResult = await _refreshTokenService.HandleAsync(refreshToken, cancellationToken);
                 if(newTokensResponseResult.IsSuccess)
                 {
                     await _setTokensToClientSideSessionService

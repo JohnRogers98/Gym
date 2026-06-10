@@ -1,6 +1,6 @@
 ﻿using Gym.OAuth.Extensions;
 
-namespace Gym.BFF.Services.Token
+namespace Gym.BFF.Services
 {
     public interface IComputeOpenIdAtHashService
     {

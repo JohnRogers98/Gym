@@ -1,6 +1,7 @@
-﻿using System.Text;
+﻿using Gym.AuthorizationServer.Client.Options;
+using System.Text;
 
-namespace Gym.BFF.Options;
+namespace Gym.AuthorizationServer.Client;
 
 public static class ClientCredentialsOptionsExtensions
 {

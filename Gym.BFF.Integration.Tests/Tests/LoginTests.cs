@@ -1,9 +1,8 @@
-﻿using Gym.BFF.Integration.Tests.Rsa;
-using Gym.BFF.Options;
+﻿using Gym.AuthorizationServer.Client.Options;
+using Gym.BFF.Integration.Tests.Rsa;
 using Gym.OAuth.Extensions;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Cryptography;
 using WireMock.Server;
@@ -18,9 +17,9 @@ public class LoginTests(BFFServerFixture _fixture, ITestOutputHelper _outputHelp
     {
         var httpClient = Fixture.CreateClient();
 
-        var urls = Fixture.Services.GetRequiredService<IOptions<UrlsOptions>>().Value;
+        var urls = Fixture.Services.GetRequiredService<AuthorizationServerOptions>();
 
-        Fixture.AuthorizationServerMock.SetupExchageCodeToken(urls.AuthorizationServer.TokenEndpoint, "test_access_token", "test_refresh_token");
+        Fixture.AuthorizationServerMock.SetupExchageCodeToken(urls.TokenEndpoint, "test_access_token", "test_refresh_token");
 
         var loginResponse = await httpClient.GetAsync("/login", TestContext.Current.CancellationToken);
         var queryParams = QueryHelpers.ParseQuery(loginResponse.Headers.Location!.Query);
@@ -35,8 +34,8 @@ public class LoginTests(BFFServerFixture _fixture, ITestOutputHelper _outputHelp
     {
         var httpClient = Fixture.CreateClient();
 
-        var urls = Fixture.Services.GetRequiredService<IOptions<UrlsOptions>>().Value;
-        var clientCredentials = Fixture.Services.GetRequiredService<IOptions<ClientCredentialsOptions>>().Value;
+        var urls = Fixture.Services.GetRequiredService<AuthorizationServerOptions>();
+        var clientCredentials = Fixture.Services.GetRequiredService<ClientCredentialsOptions>();
         
         var rsaKeyProvider = Fixture.Services.GetRequiredService<FakeRsaKeyProvider>();
 
@@ -55,7 +54,7 @@ public class LoginTests(BFFServerFixture _fixture, ITestOutputHelper _outputHelp
             Modulus = Convert.ToBase64String(publicParams.Modulus!).ToUrlSafe(),
             Exponent = Convert.ToBase64String(publicParams.Exponent!).ToUrlSafe()
         };
-        Fixture.AuthorizationServerMock.SetupJwks(urls.AuthorizationServer.Jwks, jwk);
+        Fixture.AuthorizationServerMock.SetupJwks(urls.JwksEndpoint, jwk);
 
         var loginResponse = await httpClient.GetAsync("/login", TestContext.Current.CancellationToken);
         var queryParams = QueryHelpers.ParseQuery(loginResponse.Headers.Location!.Query);
@@ -64,7 +63,7 @@ public class LoginTests(BFFServerFixture _fixture, ITestOutputHelper _outputHelp
 
         IdToken idToken = new()
         {
-            Issuer = urls.AuthorizationServer.BaseUrl,
+            Issuer = urls.BaseUrl,
             Subject = "user",
             Audience = clientCredentials.ClientId,
             Expiration = DateTimeOffset.UtcNow.AddMinutes(2).ToUnixTimeSeconds(),
@@ -74,7 +73,7 @@ public class LoginTests(BFFServerFixture _fixture, ITestOutputHelper _outputHelp
         };
         var signedIdToken = idToken.Sign(signingCredentials);
 
-        Fixture.AuthorizationServerMock.SetupExchageCodeToken(urls.AuthorizationServer.TokenEndpoint, "test_access_token", "test_refresh_token", signedIdToken);
+        Fixture.AuthorizationServerMock.SetupExchageCodeToken(urls.TokenEndpoint, "test_access_token", "test_refresh_token", signedIdToken);
 
         var callbackResponse = await httpClient.GetAsync($"/callback?code=test_code&state={state}", TestContext.Current.CancellationToken);
         callbackResponse.EnsureSuccessStatusCode();
