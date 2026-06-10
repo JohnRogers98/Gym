@@ -11,11 +11,14 @@ namespace Gym.AuthorizationServer.Services.Tokens
         String GenerateToken(UserConsentEntity userConsent);
     }
 
-    public class AccessTokenGenerator(IRsaSigningCredentialsProvider _rsaSigningService) : IAccessTokenGenerator
+    public class AccessTokenGenerator(IRsaSigningCredentialsProvider _rsaSigningService, IHttpContextAccessor _httpContextAccessor) : IAccessTokenGenerator
     {
+        public const String TypHeader = "at+JWT";
+
         public String GenerateToken(UserConsentEntity userConsent)
         {
             var claimsIdentity = new ClaimsIdentity([
+                new Claim(JwtRegisteredClaimNames.Iss, _httpContextAccessor.HttpContext!.GetBaseUrl()),
                 new Claim(JwtRegisteredClaimNames.Sub, userConsent.UserId),
                 new Claim(JwtRegisteredClaimNames.Aud, userConsent.ClientId),
                 //new Claim(ClaimTypes.Role, String.Join(' ', userConsent.GrantedScopes))
@@ -27,10 +30,9 @@ namespace Gym.AuthorizationServer.Services.Tokens
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = claimsIdentity,
-                Expires = DateTime.UtcNow.AddDays(1),
-                Issuer = "Gym.AuthorizationServer",
-                Audience = userConsent.ClientId,
+                Expires = DateTime.UtcNow.AddMinutes(5),
                 SigningCredentials = _rsaSigningService.GetSigningCredentials(),
+                TokenType = TypHeader
             };
 
             return new JsonWebTokenHandler().CreateToken(tokenDescriptor);

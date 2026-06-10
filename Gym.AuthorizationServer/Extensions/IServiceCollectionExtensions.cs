@@ -40,7 +40,8 @@ namespace Gym.AuthorizationServer.Extensions
                             ValidateAudience = false,
                             ValidateLifetime = true,
                             ValidateIssuerSigningKey = true,
-                            RequireExpirationTime = true
+                            RequireExpirationTime = true,
+                            ValidTypes = [AccessTokenGenerator.TypHeader]
                         };
                         options.MapInboundClaims = false;
 

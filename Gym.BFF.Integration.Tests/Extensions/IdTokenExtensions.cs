@@ -32,7 +32,9 @@ public static class IdTokenExtensions
         var tokenDescriptor = new SecurityTokenDescriptor
         {
             Subject = claimsIdentity,
-            SigningCredentials = signingCredentials
+            SigningCredentials = signingCredentials,
+            TokenType = "id_token+jwt",
+
         };
 
         return new JsonWebTokenHandler().CreateToken(tokenDescriptor);

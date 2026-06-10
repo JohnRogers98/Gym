@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace Gym.AuthorizationServer.Admin.Extensions;
 
@@ -20,7 +21,8 @@ public static class IServiceCollectionExtensions
                         ValidateAudience = true,
                         ValidateLifetime = true,
                         ValidateIssuerSigningKey = true,
-                        RequireExpirationTime = true
+                        RequireExpirationTime = true,
+                        ValidTypes = ["at+JWT"]
                     };
                     options.MapInboundClaims = false;
 
@@ -28,8 +30,17 @@ public static class IServiceCollectionExtensions
                     {
                         OnMessageReceived = async (context) =>
                         {
-                            var rsaSecurityKeyProvider = context.HttpContext.RequestServices.GetRequiredService<IRsaSecurityKeyProvider>();
-                            context.Options.TokenValidationParameters.IssuerSigningKey = await rsaSecurityKeyProvider.GetKeyAsync();
+                            var token = context.Token;
+                            if (String.IsNullOrEmpty(token))
+                                return;
+
+                            var jwtToken = new JwtSecurityTokenHandler().ReadJwtToken(token);
+                            var kid = jwtToken.Header.Kid;
+
+                            var rsaKeyProvider = context.HttpContext.RequestServices.GetRequiredService<IRsaSecurityKeyProvider>();
+
+                            var signingKey = await rsaKeyProvider.GetKeyAsync(kid);
+                            context.Options.TokenValidationParameters.IssuerSigningKey = signingKey;
                         }
                     };
                 });

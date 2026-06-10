@@ -20,6 +20,8 @@ namespace Gym.BFF.Services
 
         public async Task<Result<ClaimsPrincipal>> ValidateAsync(String idToken, String? accessToken, String? nonce, CancellationToken cancellationToken)
         {
+            var kid = _tokenHandler.ReadJwtToken(idToken).Header.Kid;
+
             TokenValidationParameters tokenValidationParameters = new()
             {
                 ValidateIssuer = true,
@@ -32,7 +34,11 @@ namespace Gym.BFF.Services
                 ClockSkew = TimeSpan.FromMinutes(1),
 
                 ValidateIssuerSigningKey = true,
-                IssuerSigningKey = await _rsaSecurityKeyProvider.GetKeyAsync(cancellationToken)
+                IssuerSigningKey = await _rsaSecurityKeyProvider.GetKeyAsync(kid, cancellationToken),
+
+                ValidTypes = ["id_token+jwt"],
+
+                ValidAlgorithms = new[] { SecurityAlgorithms.RsaSha256 }
             };
 
             ClaimsPrincipal claimsPrincipal;

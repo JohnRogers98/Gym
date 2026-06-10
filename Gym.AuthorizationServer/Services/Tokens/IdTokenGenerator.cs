@@ -14,6 +14,8 @@ namespace Gym.AuthorizationServer.Services.Tokens
 
     public class IdTokenGenerator(IRsaSigningCredentialsProvider _rsaSigningService) : IIdTokenGenerator
     {
+        public const String TypHeader = "id_token+jwt";
+
         public String GenerateToken(IdToken idToken)
         {
             var claimsIdentity = new ClaimsIdentity(new[]
@@ -39,7 +41,8 @@ namespace Gym.AuthorizationServer.Services.Tokens
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = claimsIdentity,
-                SigningCredentials = _rsaSigningService.GetSigningCredentials()
+                SigningCredentials = _rsaSigningService.GetSigningCredentials(),
+                TokenType = TypHeader
             };
 
             return new JsonWebTokenHandler().CreateToken(tokenDescriptor);

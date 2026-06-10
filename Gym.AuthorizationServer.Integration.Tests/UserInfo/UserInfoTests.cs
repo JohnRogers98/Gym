@@ -1,5 +1,4 @@
-﻿using Gym.OAuth.Extensions;
-using System.Net.Http.Headers;
+﻿using System.Net.Http.Headers;
 using System.Net.Http.Json;
 
 namespace Gym.AuthorizationServer.Integration.Tests.UserInfo

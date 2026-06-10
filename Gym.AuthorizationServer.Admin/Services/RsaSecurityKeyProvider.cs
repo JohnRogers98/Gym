@@ -10,6 +10,7 @@ namespace Gym.AuthorizationServer.Admin.Services
     public interface IRsaSecurityKeyProvider
     {
         Task<RsaSecurityKey> GetKeyAsync(CancellationToken cancellationToken = default);
+        Task<RsaSecurityKey> GetKeyAsync(String kid, CancellationToken cancellationToken = default);
     }
 
     public class RsaSecurityKeyProvider(
@@ -22,20 +23,25 @@ namespace Gym.AuthorizationServer.Admin.Services
 
         public async Task<RsaSecurityKey> GetKeyAsync(CancellationToken cancellationToken = default)
         {
-            if (_cache.TryGetValue<RsaSecurityKey>(_authorizationServerOptions.Kid, out var cachedKey))
+            return await this.GetKeyAsync(_authorizationServerOptions.Kid, cancellationToken);
+        }
+
+        public async Task<RsaSecurityKey> GetKeyAsync(String kid, CancellationToken cancellationToken = default)
+        {
+            if (_cache.TryGetValue<RsaSecurityKey>(kid, out var cachedKey))
                 return cachedKey!;
 
             await _lock.WaitAsync(cancellationToken);
             try
             {
                 // Double-check
-                if (_cache.TryGetValue<RsaSecurityKey>(_authorizationServerOptions.Kid, out cachedKey))
+                if (_cache.TryGetValue<RsaSecurityKey>(kid, out cachedKey))
                     return cachedKey!;
 
                 var fetchedJwk = await _jwkKeyProvider.GetKeyAsync(cancellationToken);
 
                 var securityKey = this.CreateSecurityKey(fetchedJwk.Value);
-                _cache.Set(_authorizationServerOptions.Kid, securityKey, new MemoryCacheEntryOptions
+                _cache.Set(kid, securityKey, new MemoryCacheEntryOptions
                 {
                     AbsoluteExpirationRelativeToNow = _cacheTtl,
                     Priority = CacheItemPriority.NeverRemove
