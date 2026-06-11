@@ -13,7 +13,10 @@ builder.Services.AddOpenApi();
 
 builder.Services.AddMemoryCache();
 
-builder.Services.AddAuthenticationSchemes();
+builder.Services.AddAuthenticationSchemes(
+    builder.Configuration.GetRequiredConfiguration("AccessTokenIssuer"),
+    builder.Configuration.GetRequiredConfiguration("AudienceUri")
+    );
 
 var mongoOptions = new MongoOptions();
 builder.Configuration.GetRequiredSection("MongoDb").Bind(mongoOptions);

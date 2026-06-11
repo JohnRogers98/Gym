@@ -10,7 +10,7 @@ public static class IServiceCollectionExtensions
 {
     extension(IServiceCollection services) 
     {
-        public IServiceCollection AddAuthenticationSchemes()
+        public IServiceCollection AddAuthenticationSchemes(String validIssuer, String validAudience)
         {
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
@@ -18,7 +18,9 @@ public static class IServiceCollectionExtensions
                     options.TokenValidationParameters = new TokenValidationParameters
                     {
                         ValidateIssuer = true,
+                        ValidIssuer = validIssuer,
                         ValidateAudience = true,
+                        ValidAudience = validAudience,
                         ValidateLifetime = true,
                         ValidateIssuerSigningKey = true,
                         RequireExpirationTime = true,
