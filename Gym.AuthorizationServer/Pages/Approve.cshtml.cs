@@ -1,5 +1,8 @@
 using Gym.AuthorizationServer.Extensions;
 using Gym.AuthorizationServer.Infrastructure.Entities.GrantCodes;
+using Gym.AuthorizationServer.Infrastructure.Entities.ProtectedResources;
+using Gym.AuthorizationServer.Infrastructure.Entities.UserConsents;
+using Gym.AuthorizationServer.Infrastructure.Entities.Users;
 using Gym.AuthorizationServer.Services;
 using Gym.OAuth.Extensions;
 using Microsoft.AspNetCore.Http.Extensions;
@@ -9,7 +12,11 @@ using System.Security.Claims;
 
 namespace Gym.AuthorizationServer.Pages
 {
-    public class ApproveModel(IGrantCodeGenerator _grantCodeGenerator,
+    public class ApproveModel(
+        IUserRepository _userRepository,
+        IProtectedResourceRepository _protectedResourceRepository,
+        IScopeGrantResolveService _scopeGrantResolveService,
+        IGrantCodeGenerator _grantCodeGenerator,
         IGrantCodeRepository _grantCodeRepository,
         IConsentEvaluationService _consentEvaluationService,
         IUpsertUserConsentService _upsertUserConsentService) : PageModel
@@ -17,35 +24,45 @@ namespace Gym.AuthorizationServer.Pages
         [BindProperty]
         public List<ScopeItem> Scopes { get; set; } = default!;
 
-        public async Task<IActionResult> OnGetAsync([FromQuery(Name = "req_id")] String requestId)
+        public async Task<IActionResult> OnGetAsync([FromQuery(Name = "req_id")] String requestId, CancellationToken cancellationToken)
         {
             var authorizeQuery = base.HttpContext.Session.GetAuthorizeRequest(requestId);
             if (authorizeQuery is null || User.IsUserAuthenticated() is false)
                 return this.RedirectToErrorPage("access_denied", "Request was not validated");
 
-            if (String.IsNullOrEmpty(authorizeQuery.Scope))
-                return this.CallbackClientWithError($"{authorizeQuery.RedirectUri}", error: "access_denied", state: authorizeQuery.State);
+            var user = await _userRepository.GetByIdAsync(this.GetUserId(), cancellationToken);
+            var targetProtectedResource = await _protectedResourceRepository.GetByAudienceUriAsync(authorizeQuery.Resource!, cancellationToken);
 
-            var needsConsent = await _consentEvaluationService
-                .NeedsConsentAsync(authorizeQuery.Scope.Split(' ').ToList(), authorizeQuery.ClientId, this.GetUserId());
-            if (needsConsent is false)
+            var scopeResolveResult = await _scopeGrantResolveService.Resolve(user!.RoleId, targetProtectedResource!.Id, authorizeQuery.Scope, cancellationToken);
+            if (scopeResolveResult.IsFailed)
+                return this.CallbackClientWithError(authorizeQuery.RedirectUri!, error: "invalid_scope", state: authorizeQuery.State);
+
+            Boolean needConsent = await _consentEvaluationService
+                   .NeedsConsentAsync(scopeResolveResult.Value, this.GetUserId(), authorizeQuery.ClientId, targetProtectedResource.Id, cancellationToken);
+            if (needConsent is false)
             {
                 String grantCode = _grantCodeGenerator.GenerateGrantCode();
-                await this.SaveGrantCodeAsync(grantCode, authorizeQuery, this.GetUserId(), CancellationToken.None);
+                await this.SaveGrantCodeAsync(grantCode, authorizeQuery, this.GetUserId(), targetProtectedResource!.Id, cancellationToken);
 
                 return this.RedirectToClient(authorizeQuery.RedirectUri!, grantCode, authorizeQuery.State);
             }
 
-            Scopes = authorizeQuery.Scope.Split(' ').Select(s => new ScopeItem { Name = s, IsSelected = true }).ToList();
+            Scopes = scopeResolveResult.Value.Select(s => new ScopeItem { Id = s.Id, Name = s.Name, IsSelected = true }).ToList();
 
             base.TempData["req_id"] = requestId;
+            base.TempData["target_protected_resource_id"] = targetProtectedResource!.Id;
             return base.Page();
         }
 
-        public async Task<IActionResult> OnPostAsync()
+        public async Task<IActionResult> OnPostAsync(CancellationToken cancellationToken)
         {
+            #region Guard clause
             String? requestId = base.TempData["req_id"]!.ToString();
             if (requestId is null)
+                return this.RedirectToErrorPage("server_error", "Illegal state");
+
+            String? targetProtectedResourceId = base.TempData["target_protected_resource_id"]!.ToString();
+            if (targetProtectedResourceId is null)
                 return this.RedirectToErrorPage("server_error", "Illegal state");
 
             AuthorizeQuery? authorizeQuery = base.HttpContext.Session.GetAuthorizeRequest(requestId);
@@ -54,22 +71,34 @@ namespace Gym.AuthorizationServer.Pages
 
             if (Scopes!.Any(aScope => aScope.IsSelected == false))
                 return this.CallbackClientWithError(authorizeQuery.RedirectUri!, error: "access_denied", state: authorizeQuery.State);
+            #endregion
 
             String grantCode = _grantCodeGenerator.GenerateGrantCode();
-            await this.SaveGrantCodeAsync(grantCode, authorizeQuery, this.GetUserId(), CancellationToken.None);
+            await this.SaveGrantCodeAsync(grantCode, authorizeQuery, this.GetUserId(), targetProtectedResourceId, cancellationToken);
 
-            await _upsertUserConsentService.UpsertAsync(Scopes.Select(aScope => aScope.Name).ToList(), authorizeQuery.ClientId, this.GetUserId(), CancellationToken.None);
+            await _upsertUserConsentService.UpsertAsync(
+                Scopes.Select(aScope => new ScopeInfo() { Id = aScope.Id, Name = aScope.Name } ),
+                this.GetUserId(),
+                authorizeQuery.ClientId,
+                targetProtectedResourceId,
+                cancellationToken);
 
             return this.RedirectToClient(authorizeQuery.RedirectUri!, grantCode, authorizeQuery.State);
         }
 
-        private async Task SaveGrantCodeAsync(String grantCode, AuthorizeQuery authorizeQuery, String userId, CancellationToken cancellationToken)
+        private async Task SaveGrantCodeAsync(
+            String grantCode,
+            AuthorizeQuery authorizeQuery,
+            String userId,
+            String protectedResourceId,
+            CancellationToken cancellationToken)
         {
             GrantCodeEntity grantCodeEntity = new GrantCodeEntity
             {
                 Code = grantCode,
                 UserId = userId,
                 ClientId = authorizeQuery.ClientId,
+                ProtectedResourceId = protectedResourceId,
                 Nonce = authorizeQuery.Nonce,
                 ExpiresAt = DateTime.UtcNow.AddMinutes(10),
                 CodeChallenge = authorizeQuery.CodeChallenge,
@@ -96,6 +125,7 @@ namespace Gym.AuthorizationServer.Pages
 
     public class ScopeItem
     {
+        public required String Id { get; set; }
         public required String Name { get; set; }
         public Boolean IsSelected { get; set; }
     }

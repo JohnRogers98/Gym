@@ -59,10 +59,14 @@ namespace Gym.AuthorizationServer.Controllers.Api
                         if (String.IsNullOrWhiteSpace(request.Code))
                             return base.BadRequest(new { Error = "invalid_request" });
 
+                        if (String.IsNullOrWhiteSpace(request.Resource))
+                            return base.BadRequest(new { Error = "invalid_request" });
+
                         AuthorizationCodeRequest authorizationCodeRequest = new()
                         {
                             ClientId = client.Id,
                             Code = request.Code,
+                            Resource = request.Resource,
                             CodeVerifier = request.CodeVerifier
                         }; 
 
@@ -87,7 +91,9 @@ namespace Gym.AuthorizationServer.Controllers.Api
                         if (String.IsNullOrWhiteSpace(request.RefreshToken))
                             return base.BadRequest(new { Error = "invalid_request" });
 
-                        var refreshTokenFlowResult = await _tokenFlowCoordinator.RefreshTokenAsync(new RefreshTokenRequest { RefreshToken = request.RefreshToken }, cancellationToken);
+                        RefreshTokenRequest refreshTokenRequest = new RefreshTokenRequest { RefreshToken = request.RefreshToken, Resource = request.Resource };
+
+                        var refreshTokenFlowResult = await _tokenFlowCoordinator.RefreshTokenAsync(refreshTokenRequest, cancellationToken);
                         if (refreshTokenFlowResult.IsFailed)
                             return base.BadRequest(new { Error = refreshTokenFlowResult.ErrorCode, refreshTokenFlowResult.ErrorDescription });
 
@@ -111,12 +117,16 @@ namespace Gym.AuthorizationServer.Controllers.Api
                         if (String.IsNullOrWhiteSpace(request.Scope))
                             return base.BadRequest(new { Error = "invalid_request" });
 
+                        if (String.IsNullOrWhiteSpace(request.Resource))
+                            return base.BadRequest(new { Error = "invalid_request" });
+
 
                         TelegramAssertionRequest telegramAssertionRequest = new()
                         {
                             Assertion = request.Assertion,
                             ClientId = client.Id,
-                            Scope = request.Scope
+                            Scope = request.Scope,
+                            Resource = request.Resource
                         };
 
                         var telegramAssertionFlowResult = await _tokenFlowCoordinator.TelegramAssertionAsync(telegramAssertionRequest, cancellationToken);

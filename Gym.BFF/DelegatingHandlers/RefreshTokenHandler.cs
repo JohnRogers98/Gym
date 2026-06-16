@@ -23,7 +23,7 @@ public class RefreshTokenHandler(
 
             if (!String.IsNullOrEmpty(refreshToken))
             {
-                var newTokensResponseResult = await _refreshTokenService.HandleAsync(refreshToken, cancellationToken);
+                var newTokensResponseResult = await _refreshTokenService.HandleAsync(refreshToken, cancellationToken: cancellationToken);
                 if(newTokensResponseResult.IsSuccess)
                 {
                     await _setTokensToClientSideSessionService

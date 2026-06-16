@@ -15,7 +15,10 @@ namespace Gym.AuthorizationServer.Infrastructure.Entities.UserConsents
         [BsonRepresentation(BsonType.ObjectId)]
         public required String ClientId { get; set; }
 
-        public List<String> GrantedScopes { get; set; } = new List<String>();
+        [BsonRepresentation(BsonType.ObjectId)]
+        public required String ProtectedResourceId { get; set; }
+
+        public ICollection<ScopeInfo> GrantedScopes { get; set; } = new List<ScopeInfo>();
 
         public DateTime GrantedAt { get; set; }
 

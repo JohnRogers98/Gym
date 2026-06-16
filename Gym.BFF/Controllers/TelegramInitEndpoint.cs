@@ -1,14 +1,17 @@
 ﻿using Gym.AuthorizationServer.Client.Services;
+using Gym.BFF.Options;
 using Gym.BFF.Services;
 using Gym.BFF.Services.Session;
 using Gym.OAuth.Extensions;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using System.Security.Claims;
 
 namespace Gym.BFF.Controllers
 {
     [ApiController]
     public class TelegramInitEndpoint(
+        IOptions<ResourceUrisOptions> _resourceUrisOptions,
         ITelegramAssertionService _telegramAssertionService,
         IOAuthIdTokenValidator _idTokenValidator,
         ISetTokensToClientSideSessionService _setTokensToClientSideSessionService) : ControllerBase
@@ -21,7 +24,7 @@ namespace Gym.BFF.Controllers
                 return BadRequest(new OAuthError() { Error = "invalid_request", ErrorDescription = "No init data present" });
 
             var tokenResponseResult = await _telegramAssertionService
-                .HandleAsync(initData, cancellationToken);
+                .HandleAsync(initData, _resourceUrisOptions.Value.Api, cancellationToken);
             if (tokenResponseResult.IsFailure)
                 return BadRequest(tokenResponseResult.Error);
 

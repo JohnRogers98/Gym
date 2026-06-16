@@ -1,6 +1,7 @@
 ﻿using Ardalis.ApiEndpoints;
 using Gym.AuthorizationServer.Extensions;
 using Gym.AuthorizationServer.Infrastructure.Entities.Clients;
+using Gym.AuthorizationServer.Infrastructure.Entities.ProtectedResources;
 using Gym.AuthorizationServer.Services;
 using Gym.OAuth.Extensions;
 using Microsoft.AspNetCore.Authorization;
@@ -10,8 +11,10 @@ namespace Gym.AuthorizationServer.Controllers.Api
 {
     [ApiController]
     [AllowAnonymous]
-    public class AuthorizeEndpoint(IClientRepository _clientRepository, IRequestIdGenerator _requestIdGenerator, IScopeChecker _scopeChecker) 
-        : EndpointBaseAsync.WithRequest<AuthorizeQuery>.WithoutResult
+    public class AuthorizeEndpoint(
+        IClientRepository _clientRepository,
+        IProtectedResourceRepository _protectedResourceRepository,
+        IRequestIdGenerator _requestIdGenerator) : EndpointBaseAsync.WithRequest<AuthorizeQuery>.WithoutResult
     {
         [HttpGet("authorize")]
         public async override Task<IActionResult> HandleAsync(AuthorizeQuery request, CancellationToken cancellationToken = default)
@@ -30,14 +33,17 @@ namespace Gym.AuthorizationServer.Controllers.Api
             if (client.RedirectUri != request.RedirectUri)
                 return this.RedirectToErrorPage("invalid_request", "Provided redirect_uri is not registered");
 
-            var checkResult = _scopeChecker.CheckScopes(client.ScopesAsString, request.Scope);
-            if (checkResult is false)
-                return this.CallbackClientWithError(client.RedirectUri, error: "invalid_scope", state: request.State);
+            if(request.Resource is null)
+                return this.RedirectToErrorPage("invalid_request", "Resource is requierd");
 
-            if(request.CodeChallengeMethod != "S256")
+            var targetProtectedResource = await _protectedResourceRepository.GetByAudienceUriAsync(request.Resource, cancellationToken);
+            if (targetProtectedResource is null)
+                return this.RedirectToErrorPage("invalid_target", "Provided resource is not registered");
+
+            if (request.CodeChallengeMethod is not null)
             {
-                if (request.RedirectUri is null)
-                    return this.RedirectToErrorPage("invalid_request", "Unsupported code_challenge_method. Only 'S256' is supported");
+                if (request.CodeChallengeMethod != "S256" || request.CodeChallenge is null)
+                    return this.CallbackClientWithError("invalid_request", "Unsupported code_challenge_method. Only 'S256' is supported");
             }
             #endregion
 

@@ -26,6 +26,8 @@ public static class TokenRequestExtensions
                 formData["assertion"] = request.Assertion;
             if (!String.IsNullOrEmpty(request.CodeVerifier))
                 formData["code_verifier"] = request.CodeVerifier;
+            if (!String.IsNullOrEmpty(request.Resource))
+                formData["resource"] = request.Resource;
 
             return new FormUrlEncodedContent(formData);
         }

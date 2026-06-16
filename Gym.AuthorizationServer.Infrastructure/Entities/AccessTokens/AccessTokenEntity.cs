@@ -17,6 +17,9 @@ namespace Gym.AuthorizationServer.Infrastructure.Entities.AccessTokens
         [BsonRepresentation(BsonType.ObjectId)]
         public required String ClientId { get; set; }
 
+        [BsonRepresentation(BsonType.ObjectId)]
+        public String? ProtectedResourceId { get; set; }
+
         public DateTime ExpiresAt { get; set; }
     }
 }

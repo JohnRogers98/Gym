@@ -1,7 +1,9 @@
 ﻿using Gym.AuthorizationServer.Extensions;
 using Gym.AuthorizationServer.Infrastructure.Entities.AccessTokens;
 using Gym.AuthorizationServer.Infrastructure.Entities.Clients;
+using Gym.AuthorizationServer.Infrastructure.Entities.ProtectedResources;
 using Gym.AuthorizationServer.Infrastructure.Entities.RefreshTokens;
+using Gym.AuthorizationServer.Infrastructure.Entities.Roles;
 using Gym.AuthorizationServer.Infrastructure.Entities.UserConsents;
 using Gym.AuthorizationServer.Infrastructure.Entities.Users;
 using Gym.AuthorizationServer.Infrastructure.Entities.Users.TelegramCredentials;
@@ -19,7 +21,9 @@ namespace Gym.AuthorizationServer.Services.Flows
         ITelegramSignatureVerifier _telegramSignatureVerifier,
         ITelegramCredentialRepository _telegramCredentialRepository,
         IClientRepository _clientRepository,
-        IScopeChecker _scopeChecker,
+        IProtectedResourceRepository _protectedResourceRepository,
+        IScopeGrantResolveService _scopeGrantResolveService,
+        IRoleRepository _roleRepository,
         IUserRepository _userRepository,
         IUpsertUserConsentService _upsertUserConsentService,
         IAccessTokenGenerator _accessTokenGenerator,
@@ -34,19 +38,18 @@ namespace Gym.AuthorizationServer.Services.Flows
             if (verificationResult.IsFailed)
                 return Result<TelegramAssertionResponse>.Failure("invalid_grant", "Telegram assertion hash not valid");
 
-            ClientEntity clientEntity = await _clientRepository.GetByIdAsync(request.ClientId, cancellationToken) ?? default!;
-            var checkResult = _scopeChecker.CheckScopes(clientEntity.Scope is null ? null : String.Join(' ', clientEntity.Scope), request.Scope);
-            if (checkResult is false)
-                return Result<TelegramAssertionResponse>.Failure("invalid_scope", "Such scopes not defined for client");
+            ClientEntity client = await _clientRepository.GetByIdAsync(request.ClientId, cancellationToken) ?? default!;
+            var targetProtectedResource = await _protectedResourceRepository.GetByAudienceUriAsync(request.Resource, cancellationToken);
 
             TelegramCredentialEntity? telegramCredential = await _telegramCredentialRepository.GetByIdAsync(verificationResult.Value.Id, cancellationToken);
             if (telegramCredential is null)
             {
+                var clientRole = await _roleRepository.GetByNameAsync("Client", cancellationToken);
                 UserEntity newUser = new()
                 {
                     FirstName = verificationResult.Value.FirstName,
                     LastName = verificationResult.Value.LastName,
-                    Role = "Client"
+                    RoleId = clientRole!.Id
                 };
                 await _userRepository.AddAsync(newUser, cancellationToken);
 
@@ -59,8 +62,15 @@ namespace Gym.AuthorizationServer.Services.Flows
                 await _telegramCredentialRepository.AddAsync(telegramCredential, cancellationToken);
             }
 
-            UserConsentEntity userConsent = await _upsertUserConsentService
-                .UpsertAsync(request.Scope.Split(' ').ToList(), request.ClientId, telegramCredential.UserId, cancellationToken);
+            var user = await _userRepository.GetByIdAsync(telegramCredential.UserId, cancellationToken);
+            var scopeResolveResult = await _scopeGrantResolveService.Resolve(user!.RoleId, targetProtectedResource!.Id, request.Scope, cancellationToken);
+
+            UserConsentEntity userConsent = await _upsertUserConsentService.UpsertAsync(
+                scopeResolveResult.Value,
+                telegramCredential.UserId,
+                request.ClientId,
+                targetProtectedResource.Id,
+                cancellationToken);
 
             String accessToken = _accessTokenGenerator.GenerateToken(userConsent);
             AccessTokenEntity accessTokenEntity = new()
@@ -68,6 +78,7 @@ namespace Gym.AuthorizationServer.Services.Flows
                 Token = accessToken,
                 ClientId = userConsent.ClientId,
                 UserId = userConsent.UserId,
+                ProtectedResourceId = targetProtectedResource.Id,
                 ExpiresAt = DateTime.UtcNow.AddHours(1)
             };
             await _accessTokenRepository.AddAsync(accessTokenEntity, cancellationToken);
@@ -84,7 +95,7 @@ namespace Gym.AuthorizationServer.Services.Flows
             await _refreshTokenRepository.AddAsync(refreshTokenEntity, cancellationToken);
 
             String? idToken = null;
-            if (userConsent.GrantedScopes.Contains("openid"))
+            if (userConsent.GrantedScopes.Any(aScope => aScope.Name == "openid"))
             {
                 idToken = _idTokenGeneratorHelper.GenerateToken(accessToken, accessTokenEntity.UserId, accessTokenEntity.ClientId, acr: "2fa", amr: ["tel"]);
             }
@@ -95,7 +106,7 @@ namespace Gym.AuthorizationServer.Services.Flows
                 RefreshToken = refreshToken,
                 TokenType = "Bearer",
                 ExpiresIn = accessTokenEntity.ExpiresAt.GetSecondsFromUtcNow(),
-                Scope = String.Join(' ', userConsent.GrantedScopes),
+                Scope = String.Join(' ', userConsent.GrantedScopes.Select(aScope => aScope.Name)),
                 IdToken = idToken
             });
         }
@@ -106,6 +117,7 @@ namespace Gym.AuthorizationServer.Services.Flows
         public required String ClientId { get; init; }
         public required String Scope { get; init; }
         public required String Assertion { get; init; }
+        public required String Resource { get; init; }
     }
 
     public record TelegramAssertionResponse

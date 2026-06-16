@@ -80,6 +80,11 @@ namespace Gym.BFF.Extensions
                     .ValidateDataAnnotations()
                     .ValidateOnStart();
 
+                services.AddOptions<ResourceUrisOptions>()
+                    .Bind(configuration.GetRequiredSection(ResourceUrisOptions.SectionName))
+                    .ValidateDataAnnotations()
+                    .ValidateOnStart();
+
                 return services;
             }
 

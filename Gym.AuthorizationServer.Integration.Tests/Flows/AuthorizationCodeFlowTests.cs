@@ -1,9 +1,11 @@
-﻿using Gym.AuthorizationServer.Services.Tokens;
+﻿using Gym.AuthorizationServer.Infrastructure.Entities.Scopes;
+using Gym.AuthorizationServer.Services.Tokens;
 using Gym.OAuth.Extensions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
+using MongoDB.Bson;
 using System.Net.Http.Json;
 using System.Security.Cryptography;
 
@@ -15,54 +17,88 @@ namespace Gym.AuthorizationServer.Integration.Tests.Flows
         [Fact]
         public async Task Pass_Through_Authorization_Code_Flow()
         {
-            await Fixture.CreateOAuthClientAsync();
-            await Fixture.CreateOAuthUserAsync();
-            await Fixture.CreateOAuthUserFormCredentialsAsync();
+            #region Given
+            DatabaseShaper databaseShaper = new DatabaseShaper(Fixture);
+            await databaseShaper.WithDefaultClientAsync();
+            await databaseShaper.WithDefaultUserAsync();
+            await databaseShaper.WithDefaultUserRoleAsync();
+            await databaseShaper.WithDefaultProtectedResourceAsync();
+            var scope_1 = await databaseShaper.WithScopeAsync(
+                new()
+                {
+                    Id = ObjectId.GenerateNewId().ToString(),
+                    RoleId = DatabaseShaper.DefaultRoleId,
+                    ProtectedResourceId = DatabaseShaper.DefaultProtectedResourceId,
+                    Name = "scope_1"
+                });
+            var scope_2 = await databaseShaper.WithScopeAsync(
+                new()
+                {
+                    Id = ObjectId.GenerateNewId().ToString(),
+                    RoleId = DatabaseShaper.DefaultRoleId,
+                    ProtectedResourceId = DatabaseShaper.DefaultProtectedResourceId,
+                    Name = "scope_2"
+                });
+            await databaseShaper.WithDefaultUserFormCredentialsAsync();
+
+            var httpClient = Fixture.CreateClient();
+            #endregion
 
             var authorizeQuery = new AuthorizeQuery
             {
-                ClientId = TestServerFixture.DefaultClientId,
+                ClientId = DatabaseShaper.DefaultClientId,
                 ResponseType = "code",
-                RedirectUri = TestServerFixture.DefaultClientRedirectUri,
+                RedirectUri = DatabaseShaper.DefaultClientRedirectUri,
                 Scope = "scope_2",
-                State = TestServerFixture.DefaultState,
-                CodeChallenge = TestServerFixture.DefaultCodeChallange,
-                CodeChallengeMethod = TestServerFixture.DefaultCodeChallangeMethod
+                State = DatabaseShaper.DefaultState,
+                Resource = DatabaseShaper.DefaultProtectedResourceAudienceUri,
+                CodeChallenge = DatabaseShaper.DefaultCodeChallange,
+                CodeChallengeMethod = DatabaseShaper.DefaultCodeChallangeMethod
             };
 
-            await RunAuthorizationCodeFlow(authorizeQuery, expectIdToken: false);
+            await RunAuthorizationCodeFlow(authorizeQuery, scope_2, expectIdToken: false);
         }
 
         [Fact]
         public async Task Pass_Through_Authorization_Code_Flow_Using_Open_Id_Connect()
         {
-            await Fixture.CreateOAuthClientAsync(new()
-            {
-                Id = TestServerFixture.DefaultClientId,
-                Name = "test_client",
-                RedirectUri = TestServerFixture.DefaultClientRedirectUri,
-                Scope = ["openid"],
-                SecretHash = TestServerFixture.DefaultClientSecretHash
-            });
-            await Fixture.CreateOAuthUserAsync();
-            await Fixture.CreateOAuthUserFormCredentialsAsync();
+            #region Given
+            DatabaseShaper databaseShaper = new DatabaseShaper(Fixture);
+            await databaseShaper.WithDefaultClientAsync();
+            await databaseShaper.WithDefaultUserAsync();
+            await databaseShaper.WithDefaultUserRoleAsync();
+            await databaseShaper.WithDefaultProtectedResourceAsync();
+            var openidScope = await databaseShaper.WithScopeAsync(
+                new()
+                {
+                    Id = ObjectId.GenerateNewId().ToString(),
+                    RoleId = DatabaseShaper.DefaultRoleId,
+                    ProtectedResourceId = DatabaseShaper.DefaultProtectedResourceId,
+                    Name = "openid"
+                });
+         
+            await databaseShaper.WithDefaultUserFormCredentialsAsync();
+
+            var httpClient = Fixture.CreateClient();
+            #endregion
 
             var authorizeQuery = new AuthorizeQuery
             {
-                ClientId = TestServerFixture.DefaultClientId,
+                ClientId = DatabaseShaper.DefaultClientId,
                 ResponseType = "code",
-                RedirectUri = TestServerFixture.DefaultClientRedirectUri,
+                RedirectUri = DatabaseShaper.DefaultClientRedirectUri,
                 Scope = "openid",
-                State = TestServerFixture.DefaultState,
-                CodeChallenge = TestServerFixture.DefaultCodeChallange,
-                CodeChallengeMethod = TestServerFixture.DefaultCodeChallangeMethod,
-                Nonce = TestServerFixture.DefaultNonce
+                State = DatabaseShaper.DefaultState,
+                Resource = DatabaseShaper.DefaultProtectedResourceAudienceUri,
+                CodeChallenge = DatabaseShaper.DefaultCodeChallange,
+                CodeChallengeMethod = DatabaseShaper.DefaultCodeChallangeMethod,
+                Nonce = DatabaseShaper.DefaultNonce
             };
 
-            await RunAuthorizationCodeFlow(authorizeQuery, expectIdToken: true);
+            await RunAuthorizationCodeFlow(authorizeQuery, openidScope, expectIdToken: true);
         }
 
-        private async Task RunAuthorizationCodeFlow(AuthorizeQuery authorizeQuery, Boolean expectIdToken)
+        private async Task RunAuthorizationCodeFlow(AuthorizeQuery authorizeQuery, ScopeEntity scope, Boolean expectIdToken)
         {
             var httpClient = Fixture.CreateClient();
 
@@ -80,8 +116,8 @@ namespace Gym.AuthorizationServer.Integration.Tests.Flows
             var loginFormData = new Dictionary<String, String>
             {
                 [tokens.FormFieldName] = tokens.RequestToken,
-                ["Username"] = TestServerFixture.DefaultUserUsername,
-                ["Password"] = TestServerFixture.DefaultUserPassword
+                ["Username"] = DatabaseShaper.DefaultUserUsername,
+                ["Password"] = DatabaseShaper.DefaultUserPassword
             };
             var loginFormContent = new FormUrlEncodedContent(loginFormData);
 
@@ -99,7 +135,8 @@ namespace Gym.AuthorizationServer.Integration.Tests.Flows
             {
                 [tokens.FormFieldName] = tokens.RequestToken,
                 ["Scopes[0].IsSelected"] = "true",
-                ["Scopes[0].Name"] = expectIdToken ? "openid" : "scope_2" 
+                ["Scopes[0].Id"] = scope.Id,
+                ["Scopes[0].Name"] = scope.Name,
             };
             var approveFormContent = new FormUrlEncodedContent(approveFormData);
 
@@ -113,18 +150,19 @@ namespace Gym.AuthorizationServer.Integration.Tests.Flows
 
             var code = queryParams["code"];
             Assert.NotNull(code);
-            Assert.Equal(TestServerFixture.DefaultState, queryParams["state"]);
+            Assert.Equal(DatabaseShaper.DefaultState, queryParams["state"]);
             #endregion
 
             #region Token
             var tokenRequest = new TokenRequest
             {
-                ClientId = TestServerFixture.DefaultClientId,
-                ClientSecret = TestServerFixture.DefaultClientSecret,
-                RedirectUri = TestServerFixture.DefaultClientRedirectUri,
+                ClientId = DatabaseShaper.DefaultClientId,
+                ClientSecret = DatabaseShaper.DefaultClientSecret,
+                RedirectUri = DatabaseShaper.DefaultClientRedirectUri,
                 GrantType = "authorization_code",
+                Resource = DatabaseShaper.DefaultProtectedResourceAudienceUri,
                 Code = code,
-                CodeVerifier = TestServerFixture.DefaultCodeVerifier
+                CodeVerifier = DatabaseShaper.DefaultCodeVerifier
             };
 
             var tokenPostResponse = await httpClient.PostAsync("/token", tokenRequest.ToFormContent(), TestContext.Current.CancellationToken);
@@ -169,7 +207,7 @@ namespace Gym.AuthorizationServer.Integration.Tests.Flows
                 ValidateIssuer = true,
                 ValidIssuer = TestServerFixture.DefaultHost,
                 ValidateAudience = true,
-                ValidAudience = TestServerFixture.DefaultClientId,
+                ValidAudience = DatabaseShaper.DefaultClientId,
                 ValidateLifetime = true,
                 ValidateIssuerSigningKey = true,
                 IssuerSigningKey = new RsaSecurityKey(rsaPublic)
@@ -185,7 +223,7 @@ namespace Gym.AuthorizationServer.Integration.Tests.Flows
             var tokenHandler = new JsonWebTokenHandler();
             var result = await tokenHandler.ValidateTokenAsync(idToken, validationParameters);
             Assert.True(result.IsValid);
-            Assert.Equal(TestServerFixture.DefaultNonce, result.Claims[JwtRegisteredClaimNames.Nonce]);
+            Assert.Equal(DatabaseShaper.DefaultNonce, result.Claims[JwtRegisteredClaimNames.Nonce]);
         }
 
         private async Task ValidateAtHash(String accessToken, String idToken)

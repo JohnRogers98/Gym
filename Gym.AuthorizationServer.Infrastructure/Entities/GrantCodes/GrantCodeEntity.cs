@@ -17,6 +17,9 @@ namespace Gym.AuthorizationServer.Infrastructure.Entities.GrantCodes
         [BsonRepresentation(BsonType.ObjectId)]
         public required String ClientId { get; set; }
 
+        [BsonRepresentation(BsonType.ObjectId)]
+        public String? ProtectedResourceId { get; set; }
+
         public String? Nonce { get; set; } 
 
         public String? CodeChallenge { get; set; }

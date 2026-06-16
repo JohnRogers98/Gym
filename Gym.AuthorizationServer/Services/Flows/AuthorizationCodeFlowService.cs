@@ -1,6 +1,7 @@
 ﻿using Gym.AuthorizationServer.Extensions;
 using Gym.AuthorizationServer.Infrastructure.Entities.AccessTokens;
 using Gym.AuthorizationServer.Infrastructure.Entities.GrantCodes;
+using Gym.AuthorizationServer.Infrastructure.Entities.ProtectedResources;
 using Gym.AuthorizationServer.Infrastructure.Entities.RefreshTokens;
 using Gym.AuthorizationServer.Infrastructure.Entities.UserConsents;
 using Gym.AuthorizationServer.Services.Tokens;
@@ -15,6 +16,7 @@ namespace Gym.AuthorizationServer.Services.Flows
 
     public class AuthorizationCodeFlowService(
         IGrantCodeRepository _grantCodeRepository,
+        IProtectedResourceRepository _protectedResourceRepository,
         ICodeChallangeVerifier _codeChallangeVerifier,
         IUserConsentRepository _userConsentRepository,
         IAccessTokenGenerator _accessTokenGenerator,
@@ -29,6 +31,10 @@ namespace Gym.AuthorizationServer.Services.Flows
             if (grantCode is null || grantCode.ClientId != request.ClientId)
                 return Result<AuthorizationCodeResponse>.Failure("invalid_grant", "Code has not been granted");
 
+            ProtectedResourceEntity? protectedResource = await _protectedResourceRepository.GetByAudienceUriAsync(request.Resource, cancellationToken);
+            if(protectedResource is null || protectedResource.Id != grantCode.ProtectedResourceId)
+                return Result<AuthorizationCodeResponse>.Failure("invalid_grant", "Param resource is not valid for grant_code");
+
             if (grantCode.CodeChallenge is not null)
             {
                 if (request.CodeVerifier is null)
@@ -39,8 +45,8 @@ namespace Gym.AuthorizationServer.Services.Flows
                     return Result<AuthorizationCodeResponse>.Failure("invalid_grant", "Code verification failed");
             }
 
-            UserConsentEntity? userConsent = await _userConsentRepository.GetByUserIdAndClientIdAsync(
-                grantCode.UserId, grantCode.ClientId, cancellationToken);
+            UserConsentEntity? userConsent = await _userConsentRepository
+                .GetAsync(grantCode.UserId, grantCode.ClientId, grantCode.ProtectedResourceId, cancellationToken);
             if (userConsent is null)
                 return Result<AuthorizationCodeResponse>.Failure("invalid_grant", "User has no consent");
 
@@ -50,6 +56,7 @@ namespace Gym.AuthorizationServer.Services.Flows
                 Token = accessToken,
                 ClientId = grantCode.ClientId,
                 UserId = grantCode.UserId,
+                ProtectedResourceId = grantCode.ProtectedResourceId,
                 ExpiresAt = DateTime.UtcNow.AddHours(1)
             };
             await _accessTokenRepository.AddAsync(accessTokenEntity, cancellationToken);
@@ -64,9 +71,9 @@ namespace Gym.AuthorizationServer.Services.Flows
                 Amr = ["pwd"]
             };
             await _refreshTokenRepository.AddAsync(refreshTokenEntity, cancellationToken);
-
+            
             String? idToken = null;
-            if (userConsent.GrantedScopes.Contains("openid"))
+            if (userConsent.GrantedScopes.Any(aScope => aScope.Name == "openid"))
             {
                 idToken = _idTokenGeneratorHelper.GenerateToken(accessToken, grantCode.UserId, grantCode.ClientId, grantCode.Nonce, "1fa", ["pwd"]);
             }
@@ -77,7 +84,7 @@ namespace Gym.AuthorizationServer.Services.Flows
                 RefreshToken = refreshToken,
                 TokenType = "Bearer",
                 ExpiresIn = accessTokenEntity.ExpiresAt.GetSecondsFromUtcNow(),
-                Scope = String.Join(' ', userConsent.GrantedScopes),
+                Scope = String.Join(' ', userConsent.GrantedScopes.Select(aScope => aScope.Name)),
                 IdToken = idToken
             });
         }
@@ -88,6 +95,7 @@ namespace Gym.AuthorizationServer.Services.Flows
     {
         public required String ClientId { get; init; }
         public required String Code { get; init; }
+        public required String Resource { get; init; }
         public String? CodeVerifier { get; init; }
     }
 

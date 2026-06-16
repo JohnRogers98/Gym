@@ -25,6 +25,9 @@ public class AuthorizeQuery
     [FromQuery(Name = "code_challenge_method")]
     public String? CodeChallengeMethod { get; set; }
 
+    [FromQuery(Name = "resource")]
+    public String? Resource { get; set; }
+
     #region OIDC params
     [FromQuery(Name = "nonce")]
     public String? Nonce { get; set; }

@@ -25,7 +25,7 @@ namespace Gym.AuthorizationServer.Services.Tokens
                 ]);
 
             if (userConsent.GrantedScopes is not null && userConsent.GrantedScopes.Any())
-                claimsIdentity.AddClaim(new Claim("scope", String.Join(' ', userConsent.GrantedScopes)));
+                claimsIdentity.AddClaim(new Claim("scope", String.Join(' ', userConsent.GrantedScopes.Select(aScope => aScope.Name))));
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {

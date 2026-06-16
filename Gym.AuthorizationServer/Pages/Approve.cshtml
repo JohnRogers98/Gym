@@ -18,7 +18,7 @@
                                 <input asp-for="@Model.Scopes[i].IsSelected" type="checkbox"/>
                                 <span>@Model.Scopes[i].Name</span>
                             </label>
-
+                            <input type="hidden" asp-for="@Model.Scopes[i].Id" />
                             <input type="hidden" asp-for="@Model.Scopes[i].Name" />
                         </div>
                     </div>

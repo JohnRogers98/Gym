@@ -11,7 +11,7 @@ namespace Gym.AuthorizationServer.Infrastructure.Entities.Users
         Task<Boolean> ExistsAsync(String id, CancellationToken cancellationToken);
     }
 
-    public class UserRepository(IMongoCollection<UserEntity> _users, MongoUnitOfWork _mongoUnitOfWork) : IUserRepository
+    internal class UserRepository(IMongoCollection<UserEntity> _users, MongoUnitOfWork _mongoUnitOfWork) : IUserRepository
     {
         public async Task AddAsync(UserEntity entity, CancellationToken cancellationToken)
         {

@@ -5,17 +5,18 @@ namespace Gym.AuthorizationServer.Infrastructure.Entities.UserConsents
 {
     public interface IUserConsentRepository
     {
-        Task<UserConsentEntity?> GetByUserIdAndClientIdAsync(String userId, String clientId, CancellationToken cancellationToken);
+        Task<UserConsentEntity?> GetAsync(String userId, String clientId, String protectedResourceId, CancellationToken cancellationToken);
         Task AddAsync(UserConsentEntity entity, CancellationToken cancellationToken);
-        Task UpdateGrantedScopesAsync(String userId, String clientId, List<String> grantedScopes, DateTime grantedAt, CancellationToken cancellationToken);
+        Task UpdateGrantedScopesAsync(String userId, String clientId, List<ScopeInfo> grantedScopes, DateTime grantedAt, CancellationToken cancellationToken);
     }
 
     public class UserConsentRepository(IMongoCollection<UserConsentEntity> _userConsents, MongoUnitOfWork _mongoUnitOfWork) : IUserConsentRepository
     {
-        public async Task<UserConsentEntity?> GetByUserIdAndClientIdAsync(String userId, String  clientId, CancellationToken cancellationToken)
+        public async Task<UserConsentEntity?> GetAsync(String userId, String  clientId, String protectedResourceId, CancellationToken cancellationToken)
         {
-            return await _userConsents.Find(_mongoUnitOfWork.Session, eConsent => eConsent.UserId == userId && eConsent.ClientId == clientId)
-              .FirstOrDefaultAsync(cancellationToken);
+            return await _userConsents
+                .Find(_mongoUnitOfWork.Session, eConsent => eConsent.UserId == userId && eConsent.ClientId == clientId && eConsent.ProtectedResourceId == protectedResourceId)
+                .FirstOrDefaultAsync(cancellationToken);
         }
 
         public async Task AddAsync(UserConsentEntity userConsentEntity, CancellationToken cancellationToken)
@@ -23,7 +24,7 @@ namespace Gym.AuthorizationServer.Infrastructure.Entities.UserConsents
             await _userConsents.InsertOneAsync(_mongoUnitOfWork.Session, userConsentEntity, cancellationToken: cancellationToken);
         }
 
-        public async Task UpdateGrantedScopesAsync(String userId, String clientId, List<String> grantedScopes, DateTime grantedAt, CancellationToken cancellationToken)
+        public async Task UpdateGrantedScopesAsync(String userId, String clientId, List<ScopeInfo> grantedScopes, DateTime grantedAt, CancellationToken cancellationToken)
         {
             var filter = Builders<UserConsentEntity>.Filter.Eq(x => x.UserId, userId)
                        & Builders<UserConsentEntity>.Filter.Eq(x => x.ClientId, clientId);

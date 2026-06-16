@@ -1,14 +1,17 @@
 ﻿using Gym.AuthorizationServer.Client.Services;
+using Gym.BFF.Options;
 using Gym.BFF.Services;
 using Gym.BFF.Services.Session;
 using Gym.OAuth.Extensions;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using System.Security.Claims;
 
 namespace Gym.BFF.Controllers
 {
     [ApiController]
     public class CallbackEndpoint(
+        IOptions<ResourceUrisOptions> _resourceUrisOptions,
         IExchangeCodeForTokenService _exchangeCodeForTokenService,
         IOAuthIdTokenValidator _idTokenValidator,
         ISetTokensToClientSideSessionService _setTokensToClientSideSessionService) : ControllerBase
@@ -36,7 +39,7 @@ namespace Gym.BFF.Controllers
                 return BadRequest(new OAuthError { Error = "invalid_state", ErrorDescription = "State mismatch" });
 
             var tokenResponseResult = await _exchangeCodeForTokenService
-                .HandleAsync(code, sessionCodeVerifier, cancellationToken);
+                .HandleAsync(code, sessionCodeVerifier, _resourceUrisOptions.Value.Api, cancellationToken);
 
             if(tokenResponseResult.IsFailure)
                 return BadRequest(tokenResponseResult.Error);

@@ -1,7 +1,9 @@
 ﻿using Gym.AuthorizationServer.Client.Options;
+using Gym.BFF.Options;
 using Gym.BFF.Services;
 using Gym.OAuth.Extensions;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 
 namespace Gym.BFF.Controllers
 {
@@ -9,6 +11,7 @@ namespace Gym.BFF.Controllers
     public class LoginEndpoint(
         ClientCredentialsOptions _clientCredentialsOptions,
         AuthorizationServerOptions _authorizationServerOptions,
+        IOptions<ResourceUrisOptions> _resourceUrisOptions,
         IOAuthStateGenerator _stateGenerator,
         IOAuthNonceGenerator _nonceGenerator,
         ICodeChallengePairGenerator _codeChallengePairGenerator) : ControllerBase
@@ -34,7 +37,8 @@ namespace Gym.BFF.Controllers
                 State = state,
                 Nonce = nonce,
                 CodeChallengeMethod = codeChallengePair.CodeChallengeMethod,
-                CodeChallenge = codeChallengePair.CodeChallenge
+                CodeChallenge = codeChallengePair.CodeChallenge,
+                Resource = _resourceUrisOptions.Value.Api
             };
 
             return base.Redirect($"{_authorizationServerOptions.FullAuthorizeUrl}{authorizeQuery.ToQueryString()}");

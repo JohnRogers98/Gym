@@ -30,4 +30,7 @@ public class TokenRequest
 
     [FromForm(Name = "code_verifier")]
     public String? CodeVerifier { get; set; }
+
+    [FromForm(Name = "resource")]
+    public String? Resource { get; set; }
 }

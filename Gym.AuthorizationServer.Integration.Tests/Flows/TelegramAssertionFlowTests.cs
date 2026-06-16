@@ -1,4 +1,5 @@
 ﻿using Gym.OAuth.Extensions;
+using MongoDB.Bson;
 using System.Net.Http.Json;
 
 namespace Gym.AuthorizationServer.Integration.Tests.Flows
@@ -9,19 +10,42 @@ namespace Gym.AuthorizationServer.Integration.Tests.Flows
         [Fact]
         public async Task Pass_Through_Telegram_Assertion_Flow()
         {
-            await Fixture.CreateOAuthClientAsync();
+            #region Given
+            DatabaseShaper databaseShaper = new DatabaseShaper(Fixture);
+            await databaseShaper.WithDefaultClientAsync();
+            await databaseShaper.WithDefaultUserAsync();
+            await databaseShaper.WithDefaultUserRoleAsync();
+            await databaseShaper.WithDefaultProtectedResourceAsync();
+            var scope_1 = await databaseShaper.WithScopeAsync(
+                new()
+                {
+                    Id = ObjectId.GenerateNewId().ToString(),
+                    RoleId = DatabaseShaper.DefaultRoleId,
+                    ProtectedResourceId = DatabaseShaper.DefaultProtectedResourceId,
+                    Name = "scope_1"
+                });
+            var scope_2 = await databaseShaper.WithScopeAsync(
+                new()
+                {
+                    Id = ObjectId.GenerateNewId().ToString(),
+                    RoleId = DatabaseShaper.DefaultRoleId,
+                    ProtectedResourceId = DatabaseShaper.DefaultProtectedResourceId,
+                    Name = "scope_2"
+                });
 
             var httpClient = Fixture.CreateClient();
+            #endregion
 
             #region Token
             TokenRequest tokenRequest = new()
             {
-                ClientId = TestServerFixture.DefaultClientId,
-                ClientSecret = TestServerFixture.DefaultClientSecret,
+                ClientId = DatabaseShaper.DefaultClientId,
+                ClientSecret = DatabaseShaper.DefaultClientSecret,
                 Scope = "scope_1 scope_2",
-                RedirectUri = TestServerFixture.DefaultClientRedirectUri,
+                RedirectUri = DatabaseShaper.DefaultClientRedirectUri,
                 GrantType = "urn:telegram:grant-type:webapp",
-                Assertion = TestServerFixture.DefaultTelegramAssertion
+                Assertion = DatabaseShaper.DefaultTelegramAssertion,
+                Resource = DatabaseShaper.DefaultProtectedResourceAudienceUri
             };
 
             var tokenPostResponse = await httpClient.PostAsync("/token", tokenRequest.ToFormContent(), TestContext.Current.CancellationToken);
@@ -39,26 +63,34 @@ namespace Gym.AuthorizationServer.Integration.Tests.Flows
         [Fact]
         public async Task Pass_Through_Telegram_Assertion_Flow_Using_Open_Id_Connect()
         {
-            await Fixture.CreateOAuthClientAsync(new()
-            {
-                Id = TestServerFixture.DefaultClientId,
-                Name = "test_client",
-                RedirectUri = TestServerFixture.DefaultClientRedirectUri,
-                Scope = ["openid"],
-                SecretHash = TestServerFixture.DefaultClientSecretHash
-            });
+            #region Given
+            DatabaseShaper databaseShaper = new DatabaseShaper(Fixture);
+            await databaseShaper.WithDefaultClientAsync();
+            await databaseShaper.WithDefaultUserAsync();
+            await databaseShaper.WithDefaultUserRoleAsync();
+            await databaseShaper.WithDefaultProtectedResourceAsync();
+            var openidScope = await databaseShaper.WithScopeAsync(
+                new()
+                {
+                    Id = ObjectId.GenerateNewId().ToString(),
+                    RoleId = DatabaseShaper.DefaultRoleId,
+                    ProtectedResourceId = DatabaseShaper.DefaultProtectedResourceId,
+                    Name = "openid"
+                });
 
             var httpClient = Fixture.CreateClient();
+            #endregion
 
             #region Token
             TokenRequest tokenRequest = new()
             {
-                ClientId = TestServerFixture.DefaultClientId,
-                ClientSecret = TestServerFixture.DefaultClientSecret,
+                ClientId = DatabaseShaper.DefaultClientId,
+                ClientSecret = DatabaseShaper.DefaultClientSecret,
                 Scope = "openid",
-                RedirectUri = TestServerFixture.DefaultClientRedirectUri,
+                RedirectUri = DatabaseShaper.DefaultClientRedirectUri,
                 GrantType = "urn:telegram:grant-type:webapp",
-                Assertion = TestServerFixture.DefaultTelegramAssertion
+                Assertion = DatabaseShaper.DefaultTelegramAssertion,
+                Resource = DatabaseShaper.DefaultProtectedResourceAudienceUri
             };
 
             var tokenPostResponse = await httpClient.PostAsync("/token", tokenRequest.ToFormContent(), TestContext.Current.CancellationToken);

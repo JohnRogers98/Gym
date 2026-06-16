@@ -4,20 +4,31 @@ namespace Gym.AuthorizationServer.Services
 {
     public interface IConsentEvaluationService
     {
-        Task<Boolean> NeedsConsentAsync(List<String> requestedScopes, String clientId, String userId);
+        Task<Boolean> NeedsConsentAsync(
+            IEnumerable<ScopeInfo> requestedScopes,
+            String userId,
+            String clientId,
+            String protectedResourceId,
+            CancellationToken cancellationToken);
     }
 
     public class ConsentEvaluationService(IUserConsentRepository _userConsentRepository) : IConsentEvaluationService
     {
-        public async Task<Boolean> NeedsConsentAsync(List<String> requestedScopes, String clientId, String userId)
+        public async Task<Boolean> NeedsConsentAsync(
+            IEnumerable<ScopeInfo> requestedScopes,
+            String userId,
+            String clientId,
+            String protectedResourceId,
+            CancellationToken cancellationToken)
         {
-            var existingConsent = await _userConsentRepository.GetByUserIdAndClientIdAsync(userId, clientId, CancellationToken.None);
+            var existingUserConsent = await _userConsentRepository.GetAsync(userId, clientId, protectedResourceId, cancellationToken);
 
-            if (existingConsent is null)
+            if (existingUserConsent is null)
                 return true;
 
-            var existingScopesSet = new HashSet<String>(existingConsent.GrantedScopes);
-            return requestedScopes.Any(scope => !existingScopesSet.Contains(scope));
+            return requestedScopes
+                .Except(existingUserConsent.GrantedScopes, ScopeInfoComparer.Instance)
+                .Any();
         }
     }
 }

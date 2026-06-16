@@ -17,5 +17,8 @@
         public String GrantCodes { get; set; } = default!;
         public String AccessTokens { get; set; } = default!;
         public String RefreshTokens { get; set; } = default!;
+        public String Roles { get; set; } = default!;
+        public String Scopes { get; set; } = default!;
+        public String ProtectedResources { get; set; } = default!;
     }
 }

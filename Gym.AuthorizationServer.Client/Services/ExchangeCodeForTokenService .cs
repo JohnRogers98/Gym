@@ -7,7 +7,7 @@ namespace Gym.AuthorizationServer.Client.Services
 {
     public interface IExchangeCodeForTokenService
     {
-        Task<HttpResult<TokenResponse>> HandleAsync(String code, String? codeVerifier, CancellationToken cancellationToken = default);
+        Task<HttpResult<TokenResponse>> HandleAsync(String code, String? codeVerifier, String resource, CancellationToken cancellationToken = default);
     }
 
     internal class ExchangeCodeForTokenService(
@@ -15,7 +15,7 @@ namespace Gym.AuthorizationServer.Client.Services
         ClientCredentialsOptions _clientCredentials,
         AuthorizationServerOptions _authorizationServerOptions) : IExchangeCodeForTokenService
     {
-        public async Task<HttpResult<TokenResponse>> HandleAsync(String code, String? codeVerifier, CancellationToken cancellationToken = default)
+        public async Task<HttpResult<TokenResponse>> HandleAsync(String code, String? codeVerifier, String resource, CancellationToken cancellationToken = default)
         {
             HttpClient httpClient = _httpClientFactory.CreateClient(_authorizationServerOptions.ClientName);
 
@@ -28,6 +28,7 @@ namespace Gym.AuthorizationServer.Client.Services
                 GrantType = GrantTypes.AuthorizationCode,
                 RedirectUri = _clientCredentials.RedirectUri,
                 Scope = _clientCredentials.Scope,
+                Resource = resource,
                 Code = code,
                 CodeVerifier = codeVerifier
             };

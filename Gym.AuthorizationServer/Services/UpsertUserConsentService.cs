@@ -4,21 +4,32 @@ namespace Gym.AuthorizationServer.Services
 {
     public interface IUpsertUserConsentService
     {
-        Task<UserConsentEntity> UpsertAsync(List<String> scopes, String clientId, String userId, CancellationToken cancellationToken);
+        Task<UserConsentEntity> UpsertAsync(
+            IEnumerable<ScopeInfo> requestedGrantedScopes,
+            String userId,
+            String clientId,
+            String protectedResourceId,
+            CancellationToken cancellationToken);
     }
 
     public class UpsertUserConsentService(IUserConsentRepository _userConsentRepository) : IUpsertUserConsentService
     {
-        public async Task<UserConsentEntity> UpsertAsync(List<String> requestedScopes, String clientId, String userId, CancellationToken cancellationToken)
+        public async Task<UserConsentEntity> UpsertAsync(
+            IEnumerable<ScopeInfo> requestedGrantedScopes,
+            String userId,
+            String clientId,
+            String protectedResourceId,
+            CancellationToken cancellationToken)
         {
-            UserConsentEntity? userConsent = await _userConsentRepository.GetByUserIdAndClientIdAsync(userId, clientId, cancellationToken);
+            UserConsentEntity? userConsent = await _userConsentRepository.GetAsync(userId, clientId, protectedResourceId, cancellationToken);
             if (userConsent is null)
             {
                 userConsent = new()
                 {
                     ClientId = clientId,
                     UserId = userId,
-                    GrantedScopes = requestedScopes,
+                    ProtectedResourceId = protectedResourceId,
+                    GrantedScopes = requestedGrantedScopes.ToList(),
                     GrantedAt = DateTime.UtcNow,
                 };
 
@@ -26,14 +37,16 @@ namespace Gym.AuthorizationServer.Services
             }
             else
             {
-                var mergedScopes = userConsent.GrantedScopes
-                        .Union(requestedScopes)
-                        .ToList();
-
+                var mergedScopes = this.MergeScopes(userConsent.GrantedScopes, requestedGrantedScopes);
                 await _userConsentRepository.UpdateGrantedScopesAsync(userId, clientId, mergedScopes, DateTime.UtcNow, cancellationToken);
             }
 
             return userConsent;
+        }
+
+        private List<ScopeInfo> MergeScopes(IEnumerable<ScopeInfo> sourceScope, IEnumerable<ScopeInfo> targetScope)
+        {
+            return sourceScope.Union(targetScope, ScopeInfoComparer.Instance).ToList();
         }
     }
 

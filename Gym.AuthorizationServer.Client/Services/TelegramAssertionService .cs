@@ -7,7 +7,7 @@ namespace Gym.AuthorizationServer.Client.Services
 {
     public interface ITelegramAssertionService
     {
-        Task<HttpResult<TokenResponse>> HandleAsync(String initData, CancellationToken cancellationToken = default);
+        Task<HttpResult<TokenResponse>> HandleAsync(String initData, String resource, CancellationToken cancellationToken = default);
     }
 
     internal class TelegramAssertionService(
@@ -15,7 +15,7 @@ namespace Gym.AuthorizationServer.Client.Services
         ClientCredentialsOptions _clientCredentials,
         AuthorizationServerOptions _authorizationServerOptions) : ITelegramAssertionService
     {
-        public async Task<HttpResult<TokenResponse>> HandleAsync(String initData, CancellationToken cancellationToken = default)
+        public async Task<HttpResult<TokenResponse>> HandleAsync(String initData, String resource, CancellationToken cancellationToken = default)
         {
             HttpClient httpClient = _httpClientFactory.CreateClient(_authorizationServerOptions.ClientName);
 
@@ -28,6 +28,7 @@ namespace Gym.AuthorizationServer.Client.Services
                 GrantType = GrantTypes.TelegramAssertion,
                 RedirectUri = _clientCredentials.RedirectUri,
                 Scope = _clientCredentials.Scope,
+                Resource = resource,
                 Assertion = initData
             };
             requestMessage.Content = tokenRequest.ToFormContent();

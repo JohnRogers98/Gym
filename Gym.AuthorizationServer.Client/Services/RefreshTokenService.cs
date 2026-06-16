@@ -7,7 +7,7 @@ namespace Gym.AuthorizationServer.Client.Services
 {
     public interface IRefreshTokenService
     {
-        Task<HttpResult<TokenResponse>> HandleAsync(String refreshToken, CancellationToken cancellationToken = default);
+        Task<HttpResult<TokenResponse>> HandleAsync(String refreshToken, String? resource = null, CancellationToken cancellationToken = default);
     }
 
     internal class RefreshTokenService(
@@ -15,7 +15,7 @@ namespace Gym.AuthorizationServer.Client.Services
         ClientCredentialsOptions _clientCredentials,
         AuthorizationServerOptions _authorizationServerOptions) : IRefreshTokenService
     {
-        public async Task<HttpResult<TokenResponse>> HandleAsync(String refreshToken, CancellationToken cancellationToken = default)
+        public async Task<HttpResult<TokenResponse>> HandleAsync(String refreshToken, String? resource = null, CancellationToken cancellationToken = default)
         {
             HttpClient httpClient = _httpClientFactory.CreateClient(_authorizationServerOptions.ClientName);
 
@@ -28,6 +28,7 @@ namespace Gym.AuthorizationServer.Client.Services
                 GrantType = GrantTypes.RefreshToken,
                 RedirectUri = _clientCredentials.RedirectUri,
                 Scope = _clientCredentials.Scope,
+                Resource = resource,
                 RefreshToken = refreshToken
             };
             requestMessage.Content = tokenRequest.ToFormContent();

@@ -30,6 +30,9 @@ public static class AuthorizeQueryExtensions
             if (!String.IsNullOrEmpty(query.CodeChallengeMethod))
                 parameters.Add($"code_challenge_method={Uri.EscapeDataString(query.CodeChallengeMethod)}");
 
+            if (!String.IsNullOrEmpty(query.Resource))
+                parameters.Add($"resource={Uri.EscapeDataString(query.Resource)}");
+
             if (!String.IsNullOrEmpty(query.Nonce))
                 parameters.Add($"nonce={Uri.EscapeDataString(query.Nonce)}");
 
