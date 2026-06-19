@@ -1,5 +1,5 @@
 ﻿using Gym.AuthorizationServer.Infrastructure.Entities.Users.FormCredentials;
-using Gym.AuthorizationServer.Services;
+using Gym.AuthorizationServer.Infrastructure.Services;
 using Gym.AuthorizationServer.Shared.Abstractions;
 
 namespace Gym.AuthorizationServer.Infrastructure.Entities.Users

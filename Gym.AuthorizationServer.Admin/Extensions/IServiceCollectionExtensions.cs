@@ -50,6 +50,17 @@ public static class IServiceCollectionExtensions
             return services;
         }
 
+        public IServiceCollection AddAuthorizationPolicies()
+        {
+            services.AddAuthorizationBuilder()
+                .AddPolicy(nameof(SecurityPolicy.AuthenticatedOnly), policy => policy.RequireAuthenticatedUser())
+                .AddPolicy(nameof(SecurityPolicy.AdminOnly), policy => policy.RequireRole("Admin"))
+                .AddPolicy(nameof(SecurityPolicy.ClientOnly), policy => policy.RequireRole("Client"))
+                .AddPolicy(nameof(SecurityPolicy.InstructorOnly), policy => policy.RequireRole("Instructor"));
+
+            return services;
+        }
+
         public IServiceCollection AddAuthorizationServerNamedClient(String key, String baseUrl)
         {
             services.AddHttpClient(key, client =>

@@ -1,7 +1,7 @@
 using Gym.AuthorizationServer.Admin.Extensions;
+using Gym.AuthorizationServer.Client;
 using Gym.AuthorizationServer.Client.Options;
 using Gym.AuthorizationServer.Infrastructure;
-using Gym.AuthorizationServer.Client;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,21 +11,33 @@ builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
+builder.Services.AddSwaggerGen();
+
+builder.Services.AddProblemDetails();
+
 builder.Services.AddMemoryCache();
+
+builder.Services.AddMediatR(cfg =>
+{
+    cfg.Lifetime = ServiceLifetime.Scoped;
+    cfg.RegisterServicesFromAssembly(typeof(Gym.AuthorizationServer.Admin.Application.DependencyInjection).Assembly);
+});
 
 builder.Services.AddAuthenticationSchemes(
     builder.Configuration.GetRequiredConfiguration("AccessTokenIssuer"),
     builder.Configuration.GetRequiredConfiguration("AudienceUri")
     );
+builder.Services.AddAuthorizationPolicies();
 
 var mongoOptions = new MongoOptions();
 builder.Configuration.GetRequiredSection("MongoDb").Bind(mongoOptions);
 builder.Services.AddMongoInfrastructure(mongoOptions);
 
 builder.Services.AddRepositories();
+builder.Services.AddPasswordHashingServices();
 
 AuthorizationServerOptions authorizationServerOptions = new();
-builder.Configuration.GetRequiredSection("Urls:AuthorizationServer").Bind(authorizationServerOptions);
+builder.Configuration.GetRequiredSection("AuthorizationServer").Bind(authorizationServerOptions);
 
 builder.Services.AddAuthorizationServerNamedClient(authorizationServerOptions.ClientName, authorizationServerOptions.BaseUrl);
 
@@ -37,6 +49,9 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
 app.UseHttpsRedirection();

@@ -73,6 +73,21 @@ namespace Gym.BFF.Extensions
                 return services;
             }
 
+            public IServiceCollection AddAuthorizationServerAdminApiNamedClient(String key, String baseUrl)
+            {
+                services.AddHttpClient(key, client =>
+                {
+                    client.BaseAddress = new Uri(baseUrl);
+                })
+                .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+                {
+                    UseCookies = false,
+                    UseDefaultCredentials = false
+                });
+
+                return services;
+            }
+
             public IServiceCollection AddOptionsFromConfiguration(IConfiguration configuration)
             {
                 services.AddOptions<StaticHeaderCheckOptions>()
@@ -82,6 +97,11 @@ namespace Gym.BFF.Extensions
 
                 services.AddOptions<ResourceUrisOptions>()
                     .Bind(configuration.GetRequiredSection(ResourceUrisOptions.SectionName))
+                    .ValidateDataAnnotations()
+                    .ValidateOnStart();
+
+                services.AddOptions<AuthorizationServerAdminApiOptions>()
+                    .Bind(configuration.GetRequiredSection(AuthorizationServerAdminApiOptions.SectionName))
                     .ValidateDataAnnotations()
                     .ValidateOnStart();
 

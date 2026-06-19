@@ -17,6 +17,8 @@ builder.Services.AddServerSideSession();
 
 builder.Services.AddBffCors();
 
+builder.Services.AddOptionsFromConfiguration(builder.Configuration);
+
 ClientCredentialsOptions clientCredentialsOptions = new();
 builder.Configuration.GetRequiredSection("ClientCredentials").Bind(clientCredentialsOptions);
 
@@ -25,10 +27,14 @@ builder.Configuration.GetRequiredSection("Urls:AuthorizationServer").Bind(author
 
 builder.Services.AddAuthorizationServerNamedClient(authorizationServerOptions.ClientName, authorizationServerOptions.BaseUrl);
 
+builder.Services.AddAuthorizationServerAdminApiNamedClient(
+    builder.Configuration.GetRequiredConfiguration("Urls:AuthorizationServerAdminApi:ClientName"),
+    builder.Configuration.GetRequiredConfiguration("Urls:AuthorizationServerAdminApi:BaseUrl")
+);
+
 builder.Services.SetupOAuthClientConfiguration(clientCredentialsOptions, authorizationServerOptions);
 
 builder.Services.AddServices();
-builder.Services.AddOptionsFromConfiguration(builder.Configuration);
 
 builder.Services.AddMemoryCache();
 builder.Services.AddHttpContextAccessor();

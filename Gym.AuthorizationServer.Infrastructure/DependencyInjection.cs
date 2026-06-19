@@ -10,6 +10,7 @@ using Gym.AuthorizationServer.Infrastructure.Entities.UserConsents;
 using Gym.AuthorizationServer.Infrastructure.Entities.Users;
 using Gym.AuthorizationServer.Infrastructure.Entities.Users.FormCredentials;
 using Gym.AuthorizationServer.Infrastructure.Entities.Users.TelegramCredentials;
+using Gym.AuthorizationServer.Infrastructure.Services;
 using Gym.AuthorizationServer.Infrastructure.Session;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using MongoDB.Driver;
@@ -34,6 +35,14 @@ namespace Microsoft.Extensions.DependencyInjection
                 services.TryAddScoped<IGrantCodeRepository, GrantCodeRepository>();
                 services.TryAddScoped<IAccessTokenRepository, AccessTokenRepository>();
                 services.TryAddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+
+                return services;
+            }
+
+            public IServiceCollection AddPasswordHashingServices()
+            {
+                services.TryAddSingleton<IPasswordHasher, PasswordHasher>();
+                services.TryAddSingleton<IPasswordHashValidator, PasswordHashValidator>();
 
                 return services;
             }

@@ -9,6 +9,7 @@ namespace Gym.AuthorizationServer.Infrastructure.Entities.Users.FormCredentials
         Task<FormCredentialEntity?> GetByUsernameAsync(String username, CancellationToken cancellationToken);
         Task AddAsync(FormCredentialEntity entity, CancellationToken cancellationToken);
         Task<Boolean> ExistsAsync(String id, CancellationToken cancellationToken);
+        Task<Boolean> ExistsByUsernameAsync(String username, CancellationToken cancellationToken);
     }
 
     public class FormCredentialRepository(IMongoCollection<FormCredentialEntity> _formCredentials, MongoUnitOfWork _mongoUnitOfWork) : IFormCredentialRepository
@@ -21,6 +22,12 @@ namespace Gym.AuthorizationServer.Infrastructure.Entities.Users.FormCredentials
         public async Task<Boolean> ExistsAsync(String id, CancellationToken cancellationToken)
         {
             return await _formCredentials.Find(_mongoUnitOfWork.Session, eFormCredential => eFormCredential.Id == id)
+                .AnyAsync(cancellationToken);
+        }
+
+        public async Task<Boolean> ExistsByUsernameAsync(String username, CancellationToken cancellationToken)
+        {
+            return await _formCredentials.Find(_mongoUnitOfWork.Session, eFormCredential => eFormCredential.Username == username)
                 .AnyAsync(cancellationToken);
         }
 

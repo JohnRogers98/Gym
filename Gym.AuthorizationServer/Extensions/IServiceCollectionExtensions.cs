@@ -67,8 +67,6 @@ namespace Gym.AuthorizationServer.Extensions
                 services.TryAddSingleton<IGrantCodeGenerator, GrantCodeGenerator>();
                 services.TryAddSingleton<IScopeChecker, ScopeChecker>();
                 services.TryAddScoped<IScopeGrantResolveService, ScopeGrantResolveService>();
-                services.TryAddSingleton<IPasswordHasher, PasswordHasher>();
-                services.TryAddSingleton<IPasswordHashValidator, PasswordHashValidator>();
                 services.TryAddSingleton<IClientSecretHashValidator, ClientSecretHashValidator>();
                 services.TryAddSingleton<ICodeChallangeVerifier, CodeChallangeVerifier>();
                 services.TryAddSingleton<ITelegramSignatureVerifier, TelegramSignatureVerifier>();

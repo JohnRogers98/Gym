@@ -18,7 +18,7 @@ namespace Gym.BFF.Controllers
     {
         //TODO: redirect to SPA endpoint to properly handle errors and success.
         [HttpPost("telegram-init")]
-        public async Task<IActionResult> TelegramInit([FromForm] String initData, CancellationToken cancellationToken)
+        public async Task<IActionResult> HandleAsync([FromForm] String initData, CancellationToken cancellationToken)
         {
             if (initData is null)
                 return BadRequest(new OAuthError() { Error = "invalid_request", ErrorDescription = "No init data present" });

@@ -8,7 +8,7 @@ namespace Gym.BFF.Controllers
     public class LogoutEndpoint : ControllerBase
     {
         [HttpPost("logout")]
-        public async Task<IActionResult> Logout()
+        public async Task<IActionResult> HandleAsync()
         {
             //client-side session
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);

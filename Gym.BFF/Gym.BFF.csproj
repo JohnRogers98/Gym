@@ -16,6 +16,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Gym.AuthorizationServer.Client\Gym.AuthorizationServer.Client.csproj" />
     <ProjectReference Include="..\Gym.OAuth.Extensions\Gym.OAuth.Extensions.csproj" />
+    <ProjectReference Include="..\Gym.WebDto\Gym.WebDto.csproj" />
   </ItemGroup>
 
 </Project>

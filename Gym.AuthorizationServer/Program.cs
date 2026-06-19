@@ -40,6 +40,7 @@ builder.Configuration.GetRequiredSection("MongoDb").Bind(mongoOptions);
 builder.Services.AddMongoInfrastructure(mongoOptions);
 
 builder.Services.AddRepositories();
+builder.Services.AddPasswordHashingServices();
 
 builder.Services.AddTelegramBotToken(builder.Configuration);
 builder.Services.AddRsaSigningService(builder.Configuration);

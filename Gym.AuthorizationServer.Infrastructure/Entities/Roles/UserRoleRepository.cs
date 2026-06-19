@@ -7,8 +7,10 @@ namespace Gym.AuthorizationServer.Infrastructure.Entities.Roles
     {
         Task<UserRoleEntity?> GetByIdAsync(String id, CancellationToken cancellationToken);
         Task AddAsync(UserRoleEntity entity, CancellationToken cancellationToken);
+        Task<Boolean> ExistsAsync(String id, CancellationToken cancellationToken);
         Task<Boolean> ExistsByNameAsync(String roleName, CancellationToken cancellationToken);
         Task<UserRoleEntity?> GetByNameAsync(String name, CancellationToken cancellationToken);
+        Task<IEnumerable<UserRoleEntity>> GetAllAsync(CancellationToken cancellationToken);
     }
 
     internal class UserRoleRepository(IMongoCollection<UserRoleEntity> _roles, MongoUnitOfWork _mongoUnitOfWork) : IRoleRepository
@@ -16,6 +18,12 @@ namespace Gym.AuthorizationServer.Infrastructure.Entities.Roles
         public async Task AddAsync(UserRoleEntity entity, CancellationToken cancellationToken)
         {
             await _roles.InsertOneAsync(_mongoUnitOfWork.Session, entity, cancellationToken: cancellationToken);
+        }
+
+        public async Task<Boolean> ExistsAsync(String id, CancellationToken cancellationToken)
+        {
+            return await _roles.Find(_mongoUnitOfWork.Session, eUser => eUser.Id == id)
+                .AnyAsync(cancellationToken);
         }
 
         public async Task<Boolean> ExistsByNameAsync(String roleName, CancellationToken cancellationToken)
@@ -34,6 +42,12 @@ namespace Gym.AuthorizationServer.Infrastructure.Entities.Roles
         {
             return await _roles.Find(_mongoUnitOfWork.Session, eRole => eRole.Name == name)
                 .FirstOrDefaultAsync(cancellationToken);
+        }
+
+        public async Task<IEnumerable<UserRoleEntity>> GetAllAsync(CancellationToken cancellationToken)
+        {
+            return await _roles.Find(_mongoUnitOfWork.Session, FilterDefinition<UserRoleEntity>.Empty)
+                .ToListAsync(cancellationToken);
         }
     }
 }

@@ -17,7 +17,7 @@ namespace Gym.BFF.Controllers
         ICodeChallengePairGenerator _codeChallengePairGenerator) : ControllerBase
     {
         [HttpGet("login")]
-        public async Task<IActionResult> Login()
+        public async Task<IActionResult> HandleAsync()
         {
             String state = _stateGenerator.Generate();
             base.HttpContext.Session.SetOAuthState(state);

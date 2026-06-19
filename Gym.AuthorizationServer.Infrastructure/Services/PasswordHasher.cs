@@ -1,6 +1,6 @@
 ﻿using Isopoh.Cryptography.Argon2;
 
-namespace Gym.AuthorizationServer.Services
+namespace Gym.AuthorizationServer.Infrastructure.Services
 {
     public interface IPasswordHasher
     {

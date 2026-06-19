@@ -18,7 +18,7 @@ namespace Gym.BFF.Controllers
     {
         //TODO: redirect to SPA endpoint to properly handle errors and success.
         [HttpGet("callback")]
-        public async Task<IActionResult> Callback(
+        public async Task<IActionResult> HandleAsync(
             [FromQuery] String code,
             [FromQuery] String? state,
             [FromQuery] String? error,
