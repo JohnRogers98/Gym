@@ -17,6 +17,12 @@ builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
+var corsOrigins = builder.Configuration.GetRequiredSection("CorsOrigins").Get<String[]>();
+if (corsOrigins is null)
+    throw new InvalidOperationException("No CorsOrigins presented");
+
+builder.Services.AddCorsPolicy("AuthenticationServerCorsPolicy", corsOrigins);
+
 builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddRazorPages();
@@ -64,9 +70,9 @@ app.UseHttpsRedirection();
 
 app.UseRouting();
 
-app.UseSession();
+app.UseCors("AuthenticationServerCorsPolicy");
 
-app.UseUnitOfWork();
+app.UseSession();
 
 app.UseAuthentication();
 app.UseAuthorization();
@@ -74,6 +80,8 @@ app.UseAuthorization();
 app.MapStaticAssets();
 
 app.UseCacheControlHeader();
+
+app.UseUnitOfWork();
 
 app.MapRazorPages()
    .WithStaticAssets();

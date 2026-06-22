@@ -43,14 +43,15 @@ namespace Gym.BFF.Extensions
                 return services;
             }
 
-            public IServiceCollection AddBffCors()
+            public IServiceCollection AddCorsPolicy(String policyName, String spaUrl)
             {
                 services.AddCors(options =>
                 {
-                    options.AddPolicy("BffCorsPolicy", policy =>
+                    options.AddPolicy(policyName, policy =>
                     {
-                        policy.WithOrigins("https://localhost")
-                              .WithHeaders("X-Static-Header")
+                        policy.WithOrigins(spaUrl)
+                              .AllowAnyHeader()
+                              .AllowAnyMethod()
                               .AllowCredentials();
                     });
                 });
@@ -102,6 +103,11 @@ namespace Gym.BFF.Extensions
 
                 services.AddOptions<AuthorizationServerAdminApiOptions>()
                     .Bind(configuration.GetRequiredSection(AuthorizationServerAdminApiOptions.SectionName))
+                    .ValidateDataAnnotations()
+                    .ValidateOnStart();
+
+                services.AddOptions<SpaOptions>()
+                    .Bind(configuration.GetRequiredSection(SpaOptions.SectionName))
                     .ValidateDataAnnotations()
                     .ValidateOnStart();
 

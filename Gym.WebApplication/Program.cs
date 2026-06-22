@@ -12,6 +12,8 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 
 builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: false);
 
+builder.Services.AddOptionsFromConfiguration(builder.Configuration);
+
 builder.Services.AddAutoMapper(cfg => { }, typeof(Program).Assembly);
 
 builder.Services.AddMudServices(config =>

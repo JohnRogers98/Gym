@@ -38,13 +38,14 @@ using Gym.WebApplication.Features.Instructor.CreatePersonalTrainingPage.Services
 using Gym.WebApplication.Features.Login.Services;
 using Gym.WebApplication.JSAdapters;
 using Gym.WebApplication.Operations;
+using Gym.WebApplication.Options;
 using Gym.WebApplication.ViewModels;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.WebAssembly.Http;
 
 namespace Gym.WebApplication.Extensions
 {
-    public static class ServiceCollectionExtensions
+    public static class IServiceCollectionExtensions
     {
         public static IServiceCollection AddHttpClient(this IServiceCollection services, IConfiguration configuration) 
         {
@@ -63,6 +64,16 @@ namespace Gym.WebApplication.Extensions
                     BaseAddress = new Uri(configuration["WebApiBaseUrl"]!)
                 };
             });
+
+            return services;
+        }
+
+        public static IServiceCollection AddOptionsFromConfiguration(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.AddOptions<BffOptions>()
+                .Bind(configuration.GetRequiredSection(BffOptions.SectionName))
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
 
             return services;
         }

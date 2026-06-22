@@ -15,7 +15,7 @@ builder.Services.AddBffAuthentication();
 
 builder.Services.AddServerSideSession();
 
-builder.Services.AddBffCors();
+builder.Services.AddCorsPolicy("BffCorsPolicy", builder.Configuration.GetRequiredConfiguration("Urls:Spa:BaseUrl"));
 
 builder.Services.AddOptionsFromConfiguration(builder.Configuration);
 

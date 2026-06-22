@@ -12,11 +12,11 @@ namespace Gym.BFF.Controllers
     [ApiController]
     public class CallbackEndpoint(
         IOptions<ResourceUrisOptions> _resourceUrisOptions,
+        IOptions<SpaOptions> _spaOptions,
         IExchangeCodeForTokenService _exchangeCodeForTokenService,
         IOAuthIdTokenValidator _idTokenValidator,
         ISetTokensToClientSideSessionService _setTokensToClientSideSessionService) : ControllerBase
     {
-        //TODO: redirect to SPA endpoint to properly handle errors and success.
         [HttpGet("callback")]
         public async Task<IActionResult> HandleAsync(
             [FromQuery] String code,
@@ -55,7 +55,7 @@ namespace Gym.BFF.Controllers
             await _setTokensToClientSideSessionService
                 .HandleAsync(tokenResponseResult.Value.AccessToken, tokenResponseResult.Value.RefreshToken);
 
-            return base.Ok();
+            return base.Redirect(_spaOptions.Value.BaseUrl);
         }
     }
 

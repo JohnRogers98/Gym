@@ -25,6 +25,22 @@ namespace Gym.AuthorizationServer.Extensions
                 return services;
             }
 
+            public IServiceCollection AddCorsPolicy(String policyName, params String[] origins)
+            {
+                services.AddCors(options =>
+                {
+                    options.AddPolicy(policyName, policy =>
+                    {
+                        policy.WithOrigins(origins)
+                              .AllowAnyHeader()
+                              .AllowAnyMethod()
+                              .AllowCredentials();
+                    });
+                });
+
+                return services;
+            }
+
             public IServiceCollection AddAuthenticationSchemes()
             {
                 services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
