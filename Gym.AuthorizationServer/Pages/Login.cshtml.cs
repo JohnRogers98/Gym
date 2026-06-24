@@ -37,12 +37,12 @@ namespace Gym.AuthorizationServer.Pages
             if(userResult.IsFailed)
                 return Page();
 
-            await this.GenerateCookieAsync(userResult.Value.Id);
+            await this.GenerateClientSideSessionCookieAsync(userResult.Value.Id);
 
             return base.RedirectToPage("/approve", new { req_id = base.TempData["req_id"] });
         }
 
-        private async Task GenerateCookieAsync(String userId)
+        private async Task GenerateClientSideSessionCookieAsync(String userId)
         {
             var claims = new List<Claim>
             {

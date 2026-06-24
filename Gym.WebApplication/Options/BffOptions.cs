@@ -23,5 +23,8 @@ namespace Gym.WebApplication.Options
 
         public String UserInfoEndpoint { get; set; } = "/api/userinfo";
         public String FullUserInfoPath => $"{BaseUrl}{UserInfoEndpoint}";
+
+        public String LogoutEndpoint { get; set; } = "/logout";
+        public String FullLogoutPath => $"{BaseUrl}{LogoutEndpoint}";
     }
 }

@@ -16,7 +16,7 @@ namespace Gym.BFF.Services.Session
         {
             if (_httpContextAccessor.HttpContext is null)
                 return;
-            
+
             var claims = new List<Claim>
             {
                 new Claim(ExtendedClaimTypes.AccessToken, accessToken)

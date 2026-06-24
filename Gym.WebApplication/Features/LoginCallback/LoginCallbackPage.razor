@@ -8,7 +8,6 @@
 @code {
     protected override async Task OnInitializedAsync()
     {
-        await AuthStateProvider.ReloadAsync();
         NavigationManager.NavigateTo("/", forceLoad: false);
     }
 }

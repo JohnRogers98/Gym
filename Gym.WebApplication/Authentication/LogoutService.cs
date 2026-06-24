@@ -5,25 +5,19 @@ using Microsoft.Extensions.Options;
 
 namespace Gym.WebApplication.Authentication
 {
-    public interface ITelegramInitService
+    public interface ILogoutService
     {
-        Task<AsyncOperation> HandleAsync(String initData, CancellationToken cancellationToken = default);
+        Task<AsyncOperation> HandleAsync(CancellationToken cancellationToken = default);
     }
 
-    public class TelegramInitService(IHttpClientFactory _httpClientFactory, IOptions<BffOptions> _bffOptions) : ITelegramInitService
+    public class LogoutService(IHttpClientFactory _httpClientFactory, IOptions<BffOptions> _bffOptions) : ILogoutService
     {
-        public async Task<AsyncOperation> HandleAsync(String initData, CancellationToken cancellationToken = default)
+        public async Task<AsyncOperation> HandleAsync(CancellationToken cancellationToken = default)
         {
             using HttpClient httpClient = _httpClientFactory.CreateClient(_bffOptions.Value.ClientName);
 
-            var messageRequest = new HttpRequestMessage(HttpMethod.Post, _bffOptions.Value.TelegramInitEndpoint);
+            var messageRequest = new HttpRequestMessage(HttpMethod.Post, _bffOptions.Value.LogoutEndpoint);
             messageRequest.SetBrowserRequestCredentials(BrowserRequestCredentials.Include);
-
-            var formData = new Dictionary<String, String>{
-                { "initData", initData }
-            };
-            var content = new FormUrlEncodedContent(formData);
-            messageRequest.Content = content;
 
             var response = await httpClient.SendAsync(messageRequest, cancellationToken);
             if (response.IsSuccessStatusCode)

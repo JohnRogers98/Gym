@@ -99,6 +99,8 @@ namespace Gym.WebApplication.Extensions
             services.AddScoped<ITelegramInitService, TelegramInitService>();
             services.AddScoped<IUserInfoService, UserInfoService>();
 
+            services.AddScoped<ILogoutService, LogoutService>();
+
             return services;
         }
 

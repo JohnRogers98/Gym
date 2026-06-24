@@ -7,6 +7,7 @@ namespace Gym.WebApplication.Authentication
     {
         public required String UserId { get; init; }
         public required String Role { get; init; }
+        public String? Name { get; init; }
 
         public ClaimsPrincipal ToClaimsPrincipal()
         {
@@ -16,7 +17,32 @@ namespace Gym.WebApplication.Authentication
                new Claim(ClaimTypes.Role, Role)
             ], "OAuth2");
 
+            if (Name is not null)
+                identity.AddClaim(new Claim(JwtRegisteredClaimNames.Name, Name));
+
             return new ClaimsPrincipal(identity);
+        }
+
+        public static AuthClaims FromClaimsPrincipal(ClaimsPrincipal principal)
+        {
+            ArgumentNullException.ThrowIfNull(principal);
+
+            var userId = principal.FindFirst(JwtRegisteredClaimNames.Sub)?.Value 
+                ?? principal.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                ?? throw new InvalidOperationException("User ID claim not found");
+
+            var role = principal.FindFirst(ClaimTypes.Role)?.Value
+                ?? throw new InvalidOperationException("Role claim not found");
+
+            var name = principal.FindFirst(JwtRegisteredClaimNames.Name)?.Value
+                ?? principal.FindFirst(ClaimTypes.Name)?.Value;
+
+            return new AuthClaims
+            {
+                UserId = userId,
+                Role = role,
+                Name = name
+            };
         }
     }
 }

@@ -3,11 +3,11 @@
 @inject ITelegramInitService TelegramInitService
 @inject AuthStateProvider AuthStateProvider
 
+<MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Login" Color="Color.Primary" OnClick="AuthenticateAsync">Mocked tg login</MudButton>
 
-<MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Login" Color="Color.Primary" OnClick="Authenticate">Mocked tg login</MudButton>
 
 @code {
-    private async Task Authenticate()
+    private async Task AuthenticateAsync()
     {
         await TelegramInitService.HandleAsync(MockedWebAppInitData.Value);
         await AuthStateProvider.ReloadAsync();

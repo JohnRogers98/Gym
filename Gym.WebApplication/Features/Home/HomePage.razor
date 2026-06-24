@@ -2,47 +2,52 @@
 
 @using Gym.WebApplication.Authentication
 
-@inject NavigationManager Navigation
-@inject ITelegramInitService TelegramInitService
+@inject UserAuthState UserAuthState
 
 @attribute [Authorize]
 
-<MudContainer>
-    <MudText Align="Align.Center" Typo="Typo.h4">Make <MudText Typo="Typo.h4" Color="Color.Primary" Inline="true">gym-buddy</MudText> great again!</MudText>
+<AuthorizeView>
 
-    <MudGrid Justify="Justify.Center" Class="mt-10">
-        <MudItem xs="12" md="10">
-            <MudPaper Elevation="3" Class="video-container rounded-lg overflow-hidden">
-                <div class="video-wrapper">
-                    <iframe class="video-iframe"
-                            src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=0&mute=0&playsinline=1&rel=0&modestbranding=1"
-                            allow="autoplay; encrypted-media; picture-in-picture"
-                            allowfullscreen>
-                    </iframe>
-                </div>
-                <MudCardContent Class="pa-4">
-                    <MudText Typo="Typo.h6" Class="mb-1">
-                        <MudIcon Icon="@Icons.Material.Filled.PlayCircle" Size="Size.Small" Color="Color.Primary" Class="mr-1" />
-                        Welcome to gym-buddy
-                    </MudText>
-                </MudCardContent>
-            </MudPaper>
-        </MudItem>
-    </MudGrid>
+    <Authorized>
+        <MudContainer>
 
-</MudContainer>
+            @if (this.GetUserName() is not null)
+            {
+                <MudText Align="Align.Center" Typo="Typo.h4">Welcome, @(this.GetUserName())</MudText>
+            }
+            
+            <MudText Align="Align.Center" Typo="Typo.h4">Make <MudText Typo="Typo.h4" Color="Color.Primary" Inline="true">gym-buddy</MudText> great again!</MudText>
+
+            <MudGrid Justify="Justify.Center" Class="mt-10">
+                <MudItem xs="12" md="10">
+                    <MudPaper Elevation="3" Class="video-container rounded-lg overflow-hidden">
+                        <div class="video-wrapper">
+                            <iframe class="video-iframe"
+                                    src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=0&mute=0&playsinline=1&rel=0&modestbranding=1"
+                                    allow="autoplay; encrypted-media; picture-in-picture"
+                                    allowfullscreen>
+                            </iframe>
+                        </div>
+                        <MudCardContent Class="pa-4">
+                            <MudText Typo="Typo.h6" Class="mb-1">
+                                <MudIcon Icon="@Icons.Material.Filled.PlayCircle" Size="Size.Small" Color="Color.Primary" Class="mr-1" />
+                                Welcome to gym-buddy
+                            </MudText>
+                        </MudCardContent>
+                    </MudPaper>
+                </MudItem>
+            </MudGrid>
+
+        </MudContainer>
+    </Authorized>
+
+</AuthorizeView>
+
 
 @code{
 
-    protected override async Task OnInitializedAsync()
-    {
-        // Uri? uri = Navigation.ToAbsoluteUri(Navigation.Uri);
-        // String telegramData = uri.Fragment.TrimStart('#');
+    protected override async Task OnInitializedAsync() { }
 
-        // if (String.IsNullOrEmpty(telegramData) is false)
-        // {
-        //     await TelegramInitService.HandleAsync(telegramData);
-        // }
-    }
+    private String? GetUserName() => AuthClaims.FromClaimsPrincipal(UserAuthState.CurrentUser).Name;
 
 }

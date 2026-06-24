@@ -46,6 +46,7 @@ namespace Gym.WebApplication.Authentication
                     {
                         UserId = userInfoResult.Data!.UserId,
                         Role = userInfoResult.Data.Role,
+                        Name = userInfoResult.Data.Name
                     };
                     _userAuthState.CurrentUser = authClaims.ToClaimsPrincipal();
                     return new AuthenticationState(_userAuthState.CurrentUser);

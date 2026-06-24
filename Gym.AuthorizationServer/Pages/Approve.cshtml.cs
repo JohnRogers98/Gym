@@ -5,6 +5,8 @@ using Gym.AuthorizationServer.Infrastructure.Entities.UserConsents;
 using Gym.AuthorizationServer.Infrastructure.Entities.Users;
 using Gym.AuthorizationServer.Services;
 using Gym.OAuth.Extensions;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -44,6 +46,7 @@ namespace Gym.AuthorizationServer.Pages
                 String grantCode = _grantCodeGenerator.GenerateGrantCode();
                 await this.SaveGrantCodeAsync(grantCode, authorizeQuery, this.GetUserId(), targetProtectedResource!.Id, cancellationToken);
 
+                await this.ClearSessionsAsync();
                 return this.RedirectToClient(authorizeQuery.RedirectUri!, grantCode, authorizeQuery.State);
             }
 
@@ -83,6 +86,7 @@ namespace Gym.AuthorizationServer.Pages
                 targetProtectedResourceId,
                 cancellationToken);
 
+            await this.ClearSessionsAsync();
             return this.RedirectToClient(authorizeQuery.RedirectUri!, grantCode, authorizeQuery.State);
         }
 
@@ -121,6 +125,15 @@ namespace Gym.AuthorizationServer.Pages
         }
 
         private String GetUserId() => User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+
+        private async Task ClearSessionsAsync()
+        {
+            //client-side session
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
+            //server-side session clear
+            HttpContext.Session.Clear();
+        }
     }
 
     public class ScopeItem
