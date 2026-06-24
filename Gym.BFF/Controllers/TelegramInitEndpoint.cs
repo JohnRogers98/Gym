@@ -16,7 +16,6 @@ namespace Gym.BFF.Controllers
         IOAuthIdTokenValidator _idTokenValidator,
         ISetTokensToClientSideSessionService _setTokensToClientSideSessionService) : ControllerBase
     {
-        //TODO: redirect to SPA endpoint to properly handle errors and success.
         [HttpPost("telegram-init")]
         public async Task<IActionResult> HandleAsync([FromForm] String initData, CancellationToken cancellationToken)
         {

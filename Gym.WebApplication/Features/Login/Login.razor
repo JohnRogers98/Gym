@@ -1,13 +1,15 @@
-﻿@using Gym.WebApplication.Options
-@using Microsoft.Extensions.Options
-
+﻿
 @inject NavigationManager NavManager
 @inject IOptions<BffOptions> BffOptions
 
-<MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Login" Color="Color.Primary" OnClick="Authenticate">Login</MudButton>
+<AuthorizeView>
+
+    <NotAuthorized>
+        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Login" Color="Color.Primary" OnClick="Authenticate">Login</MudButton>
+    </NotAuthorized>
+
+</AuthorizeView>
 
 @code {
-
     private void Authenticate() => NavManager.NavigateTo(BffOptions.Value.FullLoginPath, forceLoad: true);
-
 }

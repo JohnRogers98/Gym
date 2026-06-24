@@ -20,4 +20,10 @@ public class UserInfo
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public String? FamilyName { get; set; }
     #endregion
+
+    #region Extensions
+    [JsonPropertyName("role")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public String? Role { get; set; }
+    #endregion
 }

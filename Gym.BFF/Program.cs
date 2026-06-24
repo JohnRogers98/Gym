@@ -19,6 +19,8 @@ builder.Services.AddCorsPolicy("BffCorsPolicy", builder.Configuration.GetRequire
 
 builder.Services.AddOptionsFromConfiguration(builder.Configuration);
 
+builder.Services.AddDelegatingHandlers();
+
 ClientCredentialsOptions clientCredentialsOptions = new();
 builder.Configuration.GetRequiredSection("ClientCredentials").Bind(clientCredentialsOptions);
 

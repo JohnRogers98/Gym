@@ -3,7 +3,7 @@ using Gym.OAuth.Extensions;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 
-namespace Gym.BFF.Services
+namespace Gym.AuthorizationServer.Client.Services
 {
     public interface IGetUserInfoService
     {
@@ -27,9 +27,12 @@ namespace Gym.BFF.Services
                 return HttpResult<UserInfo>.Success(userInfo!);
             }
 
-            var bodyErrorResponse = await userInfoResponse.Content.ReadFromJsonAsync<OAuthError>(cancellationToken);
-            if(bodyErrorResponse is not null)
-                return HttpResult<UserInfo>.Failure(bodyErrorResponse);
+            if (userInfoResponse.IsContentTypeJson())
+            {
+                var bodyErrorResponse = await userInfoResponse.Content.ReadFromJsonAsync<OAuthError>(cancellationToken);
+                if (bodyErrorResponse is not null)
+                    return HttpResult<UserInfo>.Failure(bodyErrorResponse);
+            }
             
             return HttpResult<UserInfo>.Failure(this.ParseWwwAuthenticateError(userInfoResponse.Headers.WwwAuthenticate)!);
         }

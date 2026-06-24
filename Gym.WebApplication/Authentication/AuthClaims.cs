@@ -1,9 +1,9 @@
-﻿using Gym.WebApplication.JSAdapters;
+﻿using Microsoft.IdentityModel.JsonWebTokens;
 using System.Security.Claims;
 
-namespace Gym.WebApplication.Features.Login.Services
+namespace Gym.WebApplication.Authentication
 {
-    public record StoredAuthClaims
+    public record AuthClaims
     {
         public required String UserId { get; init; }
         public required String Role { get; init; }
@@ -12,8 +12,9 @@ namespace Gym.WebApplication.Features.Login.Services
         {
             var identity = new ClaimsIdentity(
             [
-               new Claim(ClaimTypes.Role, Role),
-            ], "WebApp Authentication");
+               new Claim(JwtRegisteredClaimNames.Sub, UserId), 
+               new Claim(ClaimTypes.Role, Role)
+            ], "OAuth2");
 
             return new ClaimsPrincipal(identity);
         }

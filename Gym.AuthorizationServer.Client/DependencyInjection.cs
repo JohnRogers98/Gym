@@ -1,6 +1,5 @@
 ﻿using Gym.AuthorizationServer.Client.Options;
 using Gym.AuthorizationServer.Client.Services;
-using Gym.BFF.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 

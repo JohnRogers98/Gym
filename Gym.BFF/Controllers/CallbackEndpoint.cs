@@ -17,6 +17,7 @@ namespace Gym.BFF.Controllers
         IOAuthIdTokenValidator _idTokenValidator,
         ISetTokensToClientSideSessionService _setTokensToClientSideSessionService) : ControllerBase
     {
+        //TODO: redirect to SPA endpoint to properly handle errors.
         [HttpGet("callback")]
         public async Task<IActionResult> HandleAsync(
             [FromQuery] String code,
@@ -55,7 +56,7 @@ namespace Gym.BFF.Controllers
             await _setTokensToClientSideSessionService
                 .HandleAsync(tokenResponseResult.Value.AccessToken, tokenResponseResult.Value.RefreshToken);
 
-            return base.Redirect(_spaOptions.Value.BaseUrl);
+            return base.Redirect(_spaOptions.Value.FullCallbackPath);
         }
     }
 

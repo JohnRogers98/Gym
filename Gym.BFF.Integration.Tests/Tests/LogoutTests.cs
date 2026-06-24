@@ -1,7 +1,6 @@
 ﻿using Gym.AuthorizationServer.Client.Options;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using WireMock.Server;
@@ -26,10 +25,9 @@ namespace Gym.BFF.Integration.Tests.Tests
             String state = queryParams["state"]!;
 
             var callbackResponse = await httpClient.GetAsync($"/callback?code=test_code&state={state}", TestContext.Current.CancellationToken);
-            callbackResponse.EnsureSuccessStatusCode();
             #endregion
 
-            var request = new HttpRequestMessage(HttpMethod.Get, "api/check-session");
+            var request = new HttpRequestMessage(HttpMethod.Get, "/check-session");
             request.Headers.AddXStaticHeader();
 
             var checkSessionBeforeLogout = await httpClient.SendAsync(request, TestContext.Current.CancellationToken);
@@ -37,9 +35,9 @@ namespace Gym.BFF.Integration.Tests.Tests
             Assert.True(checkSessionBeforeLogoutResponse!.Authenticated);
 
             var logoutResponse = await httpClient.PostAsync("/logout", null, cancellationToken: TestContext.Current.CancellationToken);
-            callbackResponse.EnsureSuccessStatusCode();
+            logoutResponse.EnsureSuccessStatusCode();
 
-            request = new HttpRequestMessage(HttpMethod.Get, "api/check-session");
+            request = new HttpRequestMessage(HttpMethod.Get, "/check-session");
             request.Headers.AddXStaticHeader();
 
             var checkSessionAfterLogout = await httpClient.SendAsync(request, TestContext.Current.CancellationToken);

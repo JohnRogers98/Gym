@@ -1,9 +1,11 @@
 ﻿@page "/"
 
-@using Gym.WebApplication.Features.Login.Services
+@using Gym.WebApplication.Authentication
 
 @inject NavigationManager Navigation
-@inject IWebAppAuthService WebAppAuthService
+@inject ITelegramInitService TelegramInitService
+
+@attribute [Authorize]
 
 <MudContainer>
     <MudText Align="Align.Center" Typo="Typo.h4">Make <MudText Typo="Typo.h4" Color="Color.Primary" Inline="true">gym-buddy</MudText> great again!</MudText>
@@ -34,13 +36,13 @@
 
     protected override async Task OnInitializedAsync()
     {
-        Uri? uri = Navigation.ToAbsoluteUri(Navigation.Uri);
-        String telegramData = uri.Fragment.TrimStart('#');
+        // Uri? uri = Navigation.ToAbsoluteUri(Navigation.Uri);
+        // String telegramData = uri.Fragment.TrimStart('#');
 
-        if (String.IsNullOrEmpty(telegramData) is false)
-        {
-            await WebAppAuthService.HandleAsync(telegramData);      
-        }
+        // if (String.IsNullOrEmpty(telegramData) is false)
+        // {
+        //     await TelegramInitService.HandleAsync(telegramData);
+        // }
     }
 
 }

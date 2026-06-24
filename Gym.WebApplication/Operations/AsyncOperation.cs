@@ -1,5 +1,26 @@
 ﻿namespace Gym.WebApplication.Operations
 {
+    public class AsyncOperation
+    {
+        public Boolean Succeeded { get; }
+        public String? ErrorMessage { get; }
+        public ErrorType? ErrorType { get; }
+        public Int32? HttpStatusCode { get; }
+
+        private AsyncOperation(Boolean succeeded, String? errorMessage, ErrorType? errorType, Int32? httpStatusCode)
+        {
+            Succeeded = succeeded;
+            ErrorMessage = errorMessage;
+            ErrorType = errorType;
+            HttpStatusCode = httpStatusCode;
+        }
+
+        public static AsyncOperation Success() => new(true, null, null, null);
+
+        public static AsyncOperation Failure(String message, ErrorType errorType, Int32? httpStatusCode = null)
+            => new(false, message, errorType, httpStatusCode);
+    }
+
     public class AsyncOperation<T>
     {
         public Boolean Succeeded { get; }

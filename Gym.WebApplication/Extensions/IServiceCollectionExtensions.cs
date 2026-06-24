@@ -1,4 +1,5 @@
-﻿using Gym.WebApplication.Features._Common.Services;
+﻿using Gym.WebApplication.Authentication;
+using Gym.WebApplication.Features._Common.Services;
 using Gym.WebApplication.Features.Account.ChangePassword.Models.Forms;
 using Gym.WebApplication.Features.Account.ChangePassword.Services;
 using Gym.WebApplication.Features.Account.Details.Servises;
@@ -35,7 +36,6 @@ using Gym.WebApplication.Features.Instructor.CreatePersonalTrainingPage.Models;
 using Gym.WebApplication.Features.Instructor.CreatePersonalTrainingPage.Models.Forms;
 using Gym.WebApplication.Features.Instructor.CreatePersonalTrainingPage.Models.Results;
 using Gym.WebApplication.Features.Instructor.CreatePersonalTrainingPage.Services;
-using Gym.WebApplication.Features.Login.Services;
 using Gym.WebApplication.JSAdapters;
 using Gym.WebApplication.Operations;
 using Gym.WebApplication.Options;
@@ -78,13 +78,26 @@ namespace Gym.WebApplication.Extensions
             return services;
         }
 
+        public static IServiceCollection AddBffNamedClient(this IServiceCollection services, String key, String baseUrl)
+        {
+            services.AddHttpClient(key, client =>
+            {
+                client.BaseAddress = new Uri(baseUrl);
+                client.DefaultRequestHeaders.Add("X-Static-Header", "1");
+            });
+
+            return services;
+        }
+
         public static IServiceCollection AddAuthenticationServices(this IServiceCollection services)
         {
-            services.AddScoped<IWebAppAuthService, WebAppAuthService>();
-            services.AddScoped<IBasicAuthService, BasicAuthService>();
-            services.AddScoped<IMockedAdminAuthService, MockedAdminAuthService>();
             services.AddScoped<UserAuthState>();
-            services.AddScoped<AuthenticationStateProvider, AuthStateProvider>();
+            services.AddScoped<AuthStateProvider>();
+            services.AddScoped<AuthenticationStateProvider>(sp => sp.GetRequiredService<AuthStateProvider>());
+
+            services.AddScoped<ICheckSessionService, CheckSessionService>();
+            services.AddScoped<ITelegramInitService, TelegramInitService>();
+            services.AddScoped<IUserInfoService, UserInfoService>();
 
             return services;
         }
@@ -92,7 +105,6 @@ namespace Gym.WebApplication.Extensions
         public static IServiceCollection AddLocalStorage(this IServiceCollection services)
         {
             services.AddScoped<LocalStorageAdapter>();
-
             return services;
         }
 

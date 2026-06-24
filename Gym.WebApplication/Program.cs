@@ -14,6 +14,11 @@ builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnC
 
 builder.Services.AddOptionsFromConfiguration(builder.Configuration);
 
+builder.Services.AddBffNamedClient(
+    builder.Configuration.GetRequiredConfiguration("Bff:ClientName"),
+    builder.Configuration.GetRequiredConfiguration("Bff:BaseUrl")
+);
+
 builder.Services.AddAutoMapper(cfg => { }, typeof(Program).Assembly);
 
 builder.Services.AddMudServices(config =>

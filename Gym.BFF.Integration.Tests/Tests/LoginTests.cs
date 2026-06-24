@@ -4,6 +4,7 @@ using Gym.OAuth.Extensions;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using System.Net;
 using System.Security.Cryptography;
 using WireMock.Server;
 
@@ -26,7 +27,7 @@ public class LoginTests(BFFServerFixture _fixture, ITestOutputHelper _outputHelp
         String state = queryParams["state"]!;
 
         var callbackResponse = await httpClient.GetAsync($"/callback?code=test_code&state={state}", TestContext.Current.CancellationToken);
-        callbackResponse.EnsureSuccessStatusCode();
+        Assert.Equal(HttpStatusCode.Redirect, callbackResponse.StatusCode);
     }
 
     [Fact]
@@ -76,6 +77,6 @@ public class LoginTests(BFFServerFixture _fixture, ITestOutputHelper _outputHelp
         Fixture.AuthorizationServerMock.SetupExchageCodeToken(urls.TokenEndpoint, "test_access_token", "test_refresh_token", signedIdToken);
 
         var callbackResponse = await httpClient.GetAsync($"/callback?code=test_code&state={state}", TestContext.Current.CancellationToken);
-        callbackResponse.EnsureSuccessStatusCode();
+        Assert.Equal(HttpStatusCode.Redirect, callbackResponse.StatusCode);
     }
 }

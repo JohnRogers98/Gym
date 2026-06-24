@@ -1,0 +1,14 @@
+﻿@page "/login-callback"
+
+@using Gym.WebApplication.Authentication
+
+@inject AuthStateProvider AuthStateProvider
+@inject NavigationManager NavigationManager
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        await AuthStateProvider.ReloadAsync();
+        NavigationManager.NavigateTo("/", forceLoad: false);
+    }
+}

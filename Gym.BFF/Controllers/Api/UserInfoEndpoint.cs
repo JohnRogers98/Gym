@@ -1,5 +1,5 @@
-﻿using Gym.BFF.Options;
-using Gym.BFF.Services;
+﻿using Gym.AuthorizationServer.Client.Services;
+using Gym.BFF.Options;
 using Gym.OAuth.Extensions;
 using Microsoft.AspNetCore.Mvc;
 
