@@ -1,5 +1,6 @@
 using Gym.AuthorizationServer.Extensions;
 using Gym.AuthorizationServer.Infrastructure;
+using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.AspNetCore.HttpOverrides;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,6 +12,12 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
     options.ForwardedHeaders = ForwardedHeaders.All;
     //options.KnownProxies.Clear();
     //options.KnownIPNetworks.Clear();
+});
+
+builder.Services.AddHttpLogging(options =>
+{
+    options.LoggingFields = HttpLoggingFields.All;
+    options.RequestHeaders.Add("X-Static-Header");
 });
 
 builder.Services.AddControllers();
@@ -65,6 +72,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseHttpLogging();
 
 app.UseHttpsRedirection();
 

@@ -1,7 +1,8 @@
-using Gym.AuthorizationServer.Client.Options;
 using Gym.AuthorizationServer.Client;
+using Gym.AuthorizationServer.Client.Options;
 using Gym.BFF.Extensions;
 using Gym.BFF.Middlewares;
+using Microsoft.AspNetCore.HttpLogging;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,7 +10,6 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
-builder.Services.AddSwaggerGen();
 
 builder.Services.AddBffAuthentication();
 
@@ -18,6 +18,12 @@ builder.Services.AddServerSideSession();
 builder.Services.AddCorsPolicy("BffCorsPolicy", builder.Configuration.GetRequiredConfiguration("Urls:Spa:BaseUrl"));
 
 builder.Services.AddOptionsFromConfiguration(builder.Configuration);
+
+builder.Services.AddHttpLogging(options =>
+{
+    options.LoggingFields = HttpLoggingFields.All;
+    options.RequestHeaders.Add("X-Static-Header");
+});
 
 builder.Services.AddDelegatingHandlers();
 
@@ -47,9 +53,9 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
-    app.UseSwagger();
-    app.UseSwaggerUI();
 }
+
+app.UseHttpLogging();
 
 app.UseHttpsRedirection();
 

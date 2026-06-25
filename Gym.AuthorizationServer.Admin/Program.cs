@@ -2,6 +2,7 @@ using Gym.AuthorizationServer.Admin.Extensions;
 using Gym.AuthorizationServer.Client;
 using Gym.AuthorizationServer.Client.Options;
 using Gym.AuthorizationServer.Infrastructure;
+using Microsoft.AspNetCore.HttpLogging;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +13,12 @@ builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddHttpLogging(options =>
+{
+    options.LoggingFields = HttpLoggingFields.All;
+    options.RequestHeaders.Add("X-Static-Header");
+});
 
 builder.Services.AddProblemDetails();
 
@@ -53,6 +60,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseHttpLogging();
 
 app.UseHttpsRedirection();
 
