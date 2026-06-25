@@ -23,6 +23,7 @@ builder.Services.AddHttpLogging(options =>
 {
     options.LoggingFields = HttpLoggingFields.All;
     options.RequestHeaders.Add("X-Static-Header");
+    options.CombineLogs = true;
 });
 
 builder.Services.AddDelegatingHandlers();
