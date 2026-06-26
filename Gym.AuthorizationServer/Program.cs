@@ -39,7 +39,7 @@ builder.Services.AddSession(options =>
     options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
 });
 
-builder.Services.AddMongoOptions(builder.Configuration);
+builder.Services.AddConfigurationOptions(builder.Configuration);
 
 var mongoOptions = new MongoOptions();
 builder.Configuration.GetRequiredSection("MongoDb").Bind(mongoOptions);

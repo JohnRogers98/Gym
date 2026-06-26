@@ -1,4 +1,6 @@
-﻿using Gym.OAuth.Extensions;
+﻿using Gym.AuthorizationServer.Options;
+using Gym.OAuth.Extensions;
+using Microsoft.Extensions.Options;
 using System.Security.Cryptography;
 
 namespace Gym.AuthorizationServer.Services.Rsa
@@ -12,9 +14,9 @@ namespace Gym.AuthorizationServer.Services.Rsa
     {
         private readonly Jwk _jwk;
 
-        public RsaJwkService(IRsaKeyProvider rsaKeyService, IConfiguration configuration)
+        public RsaJwkService(IRsaKeyProvider rsaKeyService, IOptions<JwtOptions> jwtOptions)
         {
-            var keyId = configuration.GetRequiredConfiguration("Jwt:RsaKeyId");
+            var keyId = jwtOptions.Value.RsaKeyId;
 
             RSAParameters publicParams = rsaKeyService.GetRsa().ExportParameters(false);
             String n = Convert.ToBase64String(publicParams.Modulus!).ToUrlSafe();

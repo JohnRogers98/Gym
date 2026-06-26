@@ -1,4 +1,6 @@
-﻿using System.Security.Cryptography;
+﻿using Gym.AuthorizationServer.Options;
+using Microsoft.Extensions.Options;
+using System.Security.Cryptography;
 
 namespace Gym.AuthorizationServer.Services.Rsa
 {
@@ -11,9 +13,9 @@ namespace Gym.AuthorizationServer.Services.Rsa
     {
         private readonly RSA _rsa;
 
-        public RsaKeyProvider(IConfiguration configuration)
+        public RsaKeyProvider(IOptions<JwtOptions> jwtOptions)
         {
-            var keyPath = configuration.GetRequiredConfiguration("Jwt:RsaKeyPath");
+            var keyPath = jwtOptions.Value.RsaKeyPath;
 
             var privateKeyPem = File.ReadAllText(keyPath);
 

@@ -1,4 +1,6 @@
-﻿using Gym.OAuth.Extensions;
+﻿using Gym.AuthorizationServer.Options;
+using Gym.OAuth.Extensions;
+using Microsoft.Extensions.Options;
 
 namespace Gym.AuthorizationServer.Services.Tokens
 {
@@ -16,7 +18,7 @@ namespace Gym.AuthorizationServer.Services.Tokens
     public class IdTokenGeneratorHelper(
         IIdTokenGenerator _idTokenGenerator,
         IComputeOpenIdAtHashService _computeOpenIdAtHashService,
-        IHttpContextAccessor _httpContextAccessor) : IIdTokenGeneratorHelper
+        IOptions<JwtOptions> _jwtOptions) : IIdTokenGeneratorHelper
     {
         public String GenerateToken(
             String accessToken,
@@ -28,7 +30,7 @@ namespace Gym.AuthorizationServer.Services.Tokens
         {
             IdToken idToken = new()
             {
-                Issuer = _httpContextAccessor.HttpContext!.GetBaseUrl(),
+                Issuer = _jwtOptions.Value.Issuer,
                 Subject = userId,
                 Audience = clientId,
                 Expiration = DateTimeOffset.UtcNow.AddMinutes(2).ToUnixTimeSeconds(),

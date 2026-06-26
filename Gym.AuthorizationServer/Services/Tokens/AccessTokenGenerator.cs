@@ -1,5 +1,7 @@
 ﻿using Gym.AuthorizationServer.Infrastructure.Entities.UserConsents;
+using Gym.AuthorizationServer.Options;
 using Gym.AuthorizationServer.Services.Rsa;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
@@ -11,14 +13,14 @@ namespace Gym.AuthorizationServer.Services.Tokens
         String GenerateToken(UserConsentEntity userConsent);
     }
 
-    public class AccessTokenGenerator(IRsaSigningCredentialsProvider _rsaSigningService, IHttpContextAccessor _httpContextAccessor) : IAccessTokenGenerator
+    public class AccessTokenGenerator(IRsaSigningCredentialsProvider _rsaSigningService, IOptions<JwtOptions> _jwtOptions) : IAccessTokenGenerator
     {
         public const String TypHeader = "at+JWT";
 
         public String GenerateToken(UserConsentEntity userConsent)
         {
             var claimsIdentity = new ClaimsIdentity([
-                new Claim(JwtRegisteredClaimNames.Iss, _httpContextAccessor.HttpContext!.GetBaseUrl()),
+                new Claim(JwtRegisteredClaimNames.Iss, _jwtOptions.Value.Issuer),
                 new Claim(JwtRegisteredClaimNames.Sub, userConsent.UserId),
                 new Claim(JwtRegisteredClaimNames.Aud, userConsent.ClientId),
                 //new Claim(ClaimTypes.Role, String.Join(' ', userConsent.GrantedScopes))

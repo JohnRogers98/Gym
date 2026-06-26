@@ -1,4 +1,6 @@
-﻿using Microsoft.IdentityModel.Tokens;
+﻿using Gym.AuthorizationServer.Options;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Gym.AuthorizationServer.Services.Rsa
 {
@@ -11,11 +13,11 @@ namespace Gym.AuthorizationServer.Services.Rsa
     {
         private readonly RsaSecurityKey _securityKey;
 
-        public RsaSecurityKeyProvider(IRsaKeyProvider _rsaKeyService, IConfiguration configuration)
+        public RsaSecurityKeyProvider(IRsaKeyProvider _rsaKeyService, IOptions<JwtOptions> jwtOptions)
         {
             _securityKey = new RsaSecurityKey(_rsaKeyService.GetRsa())
             {
-                KeyId = configuration.GetRequiredConfiguration("Jwt:RsaKeyId"),
+                KeyId = jwtOptions.Value.RsaKeyId,
                 /*CryptoProviderFactory = new CryptoProviderFactory
                 {
                     CacheSignatureProviders = true

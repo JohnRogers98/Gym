@@ -205,7 +205,7 @@ namespace Gym.AuthorizationServer.Integration.Tests.Flows
             var validationParameters = new TokenValidationParameters
             {
                 ValidateIssuer = true,
-                ValidIssuer = TestServerFixture.DefaultHost,
+                ValidIssuer = TestServerFixture.DefaultTokenIssuer,
                 ValidateAudience = true,
                 ValidAudience = DatabaseShaper.DefaultClientId,
                 ValidateLifetime = true,

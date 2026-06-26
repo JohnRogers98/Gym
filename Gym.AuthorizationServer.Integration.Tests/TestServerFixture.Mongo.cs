@@ -18,6 +18,7 @@ namespace Gym.AuthorizationServer.Integration.Tests
     {
         public const String DefaultTestDatabase = "test-auth-server";
         public const String DefaultHost = "https://localhost";
+        public const String DefaultTokenIssuer = "https://localhost:7218";
 
         public async Task ClearDatabaseAsync()
         {

@@ -61,6 +61,7 @@ public static class IServiceCollectionExtensions
         }
         public IServiceCollection AddDelegatingHandlers()
         {
+            services.AddTransient<AddForwardHeadersHandler>();
             services.AddTransient<RefreshTokenHandler>();
             return services;
         }
@@ -71,11 +72,12 @@ public static class IServiceCollectionExtensions
             {
                 client.BaseAddress = new Uri(baseUrl);
             })
-            .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler   
+            .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
             {
                 UseCookies = false,
                 UseDefaultCredentials = false
             })
+            .AddHttpMessageHandler<AddForwardHeadersHandler>()
             .AddHttpMessageHandler<RefreshTokenHandler>();
 
             return services;
@@ -92,6 +94,7 @@ public static class IServiceCollectionExtensions
                 UseCookies = false,
                 UseDefaultCredentials = false
             })
+            .AddHttpMessageHandler<AddForwardHeadersHandler>()
             .AddHttpMessageHandler<RefreshTokenHandler>();
 
             return services;

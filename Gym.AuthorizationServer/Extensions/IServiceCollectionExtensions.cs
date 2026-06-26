@@ -1,5 +1,6 @@
 ﻿using Gym.AuthorizationServer.Infrastructure;
 using Gym.AuthorizationServer.Infrastructure.Entities.Users;
+using Gym.AuthorizationServer.Options;
 using Gym.AuthorizationServer.Services;
 using Gym.AuthorizationServer.Services.Flows;
 using Gym.AuthorizationServer.Services.Rsa;
@@ -9,119 +10,123 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.IdentityModel.Tokens;
 
-namespace Gym.AuthorizationServer.Extensions
+namespace Gym.AuthorizationServer.Extensions;
+
+public static class IServiceCollectionExtensions
 {
-    public static class IServiceCollectionExtensions
+    extension(IServiceCollection services)
     {
-        extension(IServiceCollection services)
+        public IServiceCollection AddConfigurationOptions(IConfiguration configuration)
         {
-            public IServiceCollection AddMongoOptions(IConfiguration configuration)
-            {
-                services.AddOptions<MongoOptions>()
-                  .Bind(configuration.GetRequiredSection("MongoDb"))
-                  .ValidateDataAnnotations()
-                  .ValidateOnStart();
+            services.AddOptions<MongoOptions>()
+              .Bind(configuration.GetRequiredSection("MongoDb"))
+              .ValidateDataAnnotations()
+              .ValidateOnStart();
 
-                return services;
-            }
+            services.AddOptions<JwtOptions>()
+              .Bind(configuration.GetRequiredSection(JwtOptions.SectionName))
+              .ValidateDataAnnotations()
+              .ValidateOnStart();
 
-            public IServiceCollection AddCorsPolicy(String policyName, params String[] origins)
+            return services;
+        }
+
+        public IServiceCollection AddCorsPolicy(String policyName, params String[] origins)
+        {
+            services.AddCors(options =>
             {
-                services.AddCors(options =>
+                options.AddPolicy(policyName, policy =>
                 {
-                    options.AddPolicy(policyName, policy =>
+                    policy.WithOrigins(origins)
+                          .AllowAnyHeader()
+                          .AllowAnyMethod()
+                          .AllowCredentials();
+                });
+            });
+
+            return services;
+        }
+
+        public IServiceCollection AddAuthenticationSchemes()
+        {
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddCookie(options =>
+                {
+                    options.Cookie.Name = "__Host-Gym.AuthorizationServer.Auth";
+                })
+                .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters
                     {
-                        policy.WithOrigins(origins)
-                              .AllowAnyHeader()
-                              .AllowAnyMethod()
-                              .AllowCredentials();
-                    });
+                        ValidateIssuer = false,
+                        ValidateAudience = false,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+                        RequireExpirationTime = true,
+                        ValidTypes = [AccessTokenGenerator.TypHeader]
+                    };
+                    options.MapInboundClaims = false;
+
+                    options.Events = new JwtBearerEvents
+                    {
+                        OnMessageReceived = async (context) =>
+                        {
+                            var rsaSecurityKeyProvider = context.HttpContext.RequestServices.GetRequiredService<IRsaSecurityKeyProvider>();
+                            context.Options.TokenValidationParameters.IssuerSigningKey = rsaSecurityKeyProvider.GetRsaSecurityKey();
+                        }
+                    };
                 });
 
-                return services;
-            }
+            return services;
+        }
 
-            public IServiceCollection AddAuthenticationSchemes()
-            {
-                services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-                    .AddCookie(options =>
-                    {
-                        options.Cookie.Name = "__Host-Gym.AuthorizationServer.Auth";
-                    })
-                    .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
-                    {
-                        options.TokenValidationParameters = new TokenValidationParameters
-                        {
-                            ValidateIssuer = false,
-                            ValidateAudience = false,
-                            ValidateLifetime = true,
-                            ValidateIssuerSigningKey = true,
-                            RequireExpirationTime = true,
-                            ValidTypes = [AccessTokenGenerator.TypHeader]
-                        };
-                        options.MapInboundClaims = false;
+        public IServiceCollection AddServices()
+        {
+            services.TryAddSingleton<IAccessTokenGenerator, AccessTokenGenerator>();
+            services.TryAddSingleton<IRandomBase64StringGenerator, RandomBase64StringGenerator>();
+            services.TryAddSingleton<IRefreshTokenGenerator, RefreshTokenGenerator>();
+            services.TryAddSingleton<IRequestIdGenerator, RequestIdGenerator>();
+            services.TryAddSingleton<IGrantCodeGenerator, GrantCodeGenerator>();
+            services.TryAddSingleton<IScopeChecker, ScopeChecker>();
+            services.TryAddScoped<IScopeGrantResolveService, ScopeGrantResolveService>();
+            services.TryAddSingleton<IClientSecretHashValidator, ClientSecretHashValidator>();
+            services.TryAddSingleton<ICodeChallangeVerifier, CodeChallangeVerifier>();
+            services.TryAddSingleton<ITelegramSignatureVerifier, TelegramSignatureVerifier>();
 
-                        options.Events = new JwtBearerEvents
-                        {
-                            OnMessageReceived = async (context) =>
-                            {
-                                var rsaSecurityKeyProvider = context.HttpContext.RequestServices.GetRequiredService<IRsaSecurityKeyProvider>();
-                                context.Options.TokenValidationParameters.IssuerSigningKey = rsaSecurityKeyProvider.GetRsaSecurityKey();
-                            }
-                        };
-                    });
+            services.TryAddSingleton<IComputeOpenIdAtHashService, ComputeOpenIdAtHashService>();
+            services.TryAddSingleton<IIdTokenGenerator, IdTokenGenerator>();
+            services.TryAddSingleton<IIdTokenGeneratorHelper, IdTokenGeneratorHelper>();
 
-                return services;
-            }
+            services.TryAddScoped<IUpsertUserConsentService, UpsertUserConsentService>();
+            services.TryAddScoped<IConsentEvaluationService, ConsentEvaluationService>();
 
-            public IServiceCollection AddServices()
-            {
-                services.TryAddSingleton<IAccessTokenGenerator, AccessTokenGenerator>();
-                services.TryAddSingleton<IRandomBase64StringGenerator, RandomBase64StringGenerator>();
-                services.TryAddSingleton<IRefreshTokenGenerator, RefreshTokenGenerator>();
-                services.TryAddSingleton<IRequestIdGenerator, RequestIdGenerator>();
-                services.TryAddSingleton<IGrantCodeGenerator, GrantCodeGenerator>();
-                services.TryAddSingleton<IScopeChecker, ScopeChecker>();
-                services.TryAddScoped<IScopeGrantResolveService, ScopeGrantResolveService>();
-                services.TryAddSingleton<IClientSecretHashValidator, ClientSecretHashValidator>();
-                services.TryAddSingleton<ICodeChallangeVerifier, CodeChallangeVerifier>();
-                services.TryAddSingleton<ITelegramSignatureVerifier, TelegramSignatureVerifier>();
+            services.TryAddScoped<ITokenFlowCoordinator, TokenFlowCoordinator>();
+            services.TryAddScoped<IAuthorizationCodeFlowService, AuthorizationCodeFlowService>();
+            services.TryAddScoped<IRefreshTokenFlowService, RefreshTokenFlowService>();
+            services.TryAddScoped<ITelegramAssertionFlowService, TelegramAssertionFlowService>();
 
-                services.TryAddSingleton<IComputeOpenIdAtHashService, ComputeOpenIdAtHashService>();
-                services.TryAddSingleton<IIdTokenGenerator, IdTokenGenerator>();
-                services.TryAddSingleton<IIdTokenGeneratorHelper, IdTokenGeneratorHelper>();
+            services.TryAddScoped<IUserByUsernameAndPasswordFinder, UserByUsernameAndPasswordFinder>();
 
-                services.TryAddScoped<IUpsertUserConsentService, UpsertUserConsentService>();
-                services.TryAddScoped<IConsentEvaluationService, ConsentEvaluationService>();
+            return services;
+        }
 
-                services.TryAddScoped<ITokenFlowCoordinator, TokenFlowCoordinator>();
-                services.TryAddScoped<IAuthorizationCodeFlowService, AuthorizationCodeFlowService>();
-                services.TryAddScoped<IRefreshTokenFlowService, RefreshTokenFlowService>();
-                services.TryAddScoped<ITelegramAssertionFlowService, TelegramAssertionFlowService>();
+        public IServiceCollection AddTelegramBotToken(IConfiguration configuration)
+        {
+            var tgBotToken = configuration["TelegramBot:Token"]
+                ?? throw new InvalidOperationException("TelegramBot:Token is not configured");
 
-                services.TryAddScoped<IUserByUsernameAndPasswordFinder, UserByUsernameAndPasswordFinder>();
+            services.TryAddSingleton<TelegramBotToken>(_ => new TelegramBotToken(tgBotToken));
 
-                return services;
-            }
+            return services;
+        }
 
-            public IServiceCollection AddTelegramBotToken(IConfiguration configuration)
-            {
-                var tgBotToken = configuration["TelegramBot:Token"]
-                    ?? throw new InvalidOperationException("TelegramBot:Token is not configured");
-
-                services.TryAddSingleton<TelegramBotToken>(_ => new TelegramBotToken(tgBotToken));
-
-                return services;
-            }
-
-            public IServiceCollection AddRsaSigningService(IConfiguration configuration)
-            {
-                services.TryAddSingleton<IRsaKeyProvider, RsaKeyProvider>();
-                services.TryAddSingleton<IRsaSecurityKeyProvider, RsaSecurityKeyProvider>();
-                services.TryAddSingleton<IRsaSigningCredentialsProvider, RsaSigningCredentialsProvider>();
-                services.TryAddSingleton<IRsaJwkService, RsaJwkService>();
-                return services;
-            }
+        public IServiceCollection AddRsaSigningService(IConfiguration configuration)
+        {
+            services.TryAddSingleton<IRsaKeyProvider, RsaKeyProvider>();
+            services.TryAddSingleton<IRsaSecurityKeyProvider, RsaSecurityKeyProvider>();
+            services.TryAddSingleton<IRsaSigningCredentialsProvider, RsaSigningCredentialsProvider>();
+            services.TryAddSingleton<IRsaJwkService, RsaJwkService>();
+            return services;
         }
     }
 }
