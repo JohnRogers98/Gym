@@ -16,7 +16,7 @@ namespace Gym.WebApplication.Authentication
         {
             using HttpClient httpClient = _httpClientFactory.CreateClient(_bffOptions.Value.ClientName);
 
-            var messageRequest = new HttpRequestMessage(HttpMethod.Post, _bffOptions.Value.TelegramInitEndpoint);
+            using var messageRequest = new HttpRequestMessage(HttpMethod.Post, _bffOptions.Value.TelegramInitEndpoint);
             messageRequest.SetBrowserRequestCredentials(BrowserRequestCredentials.Include);
 
             var formData = new Dictionary<String, String>{

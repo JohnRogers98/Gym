@@ -5,12 +5,17 @@ using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using MudBlazor;
 using MudBlazor.Services;
+using MudExtensions.Services;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
 builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: false);
+
+builder.Logging.AddDebug();
+builder.Logging.AddConfiguration(builder.Configuration.GetSection("Logging"));
+builder.Logging.SetMinimumLevel(LogLevel.Trace);
 
 builder.Services.AddOptionsFromConfiguration(builder.Configuration);
 
@@ -34,6 +39,8 @@ builder.Services.AddMudServices(config =>
     config.SnackbarConfiguration.SnackbarVariant = Variant.Filled;
 });
 
+builder.Services.AddMudExtensions();
+
 builder.Services.AddScoped<IAppSnackbarNotifier, AppSnackbarNotifier>();
 
 builder.Services.AddAuthorizationCore();
@@ -44,6 +51,10 @@ builder.Services.AddHttpClient(builder.Configuration);
 builder.Services.AddAuthenticationServices();
 
 builder.Services.AddLocalStorage();
+
+builder.Services.AddBffServices();
+
+builder.Services.AddFormValidators();
 
 builder.Services.AddCalendarEventServices();
 

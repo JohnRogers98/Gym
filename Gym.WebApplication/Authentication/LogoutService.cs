@@ -16,7 +16,7 @@ namespace Gym.WebApplication.Authentication
         {
             using HttpClient httpClient = _httpClientFactory.CreateClient(_bffOptions.Value.ClientName);
 
-            var messageRequest = new HttpRequestMessage(HttpMethod.Post, _bffOptions.Value.LogoutEndpoint);
+            using var messageRequest = new HttpRequestMessage(HttpMethod.Post, _bffOptions.Value.LogoutEndpoint);
             messageRequest.SetBrowserRequestCredentials(BrowserRequestCredentials.Include);
 
             var response = await httpClient.SendAsync(messageRequest, cancellationToken);

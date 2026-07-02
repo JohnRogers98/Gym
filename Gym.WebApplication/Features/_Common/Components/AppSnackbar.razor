@@ -30,7 +30,6 @@
     
     public void Dispose()
     {
-        // Отписываемся, если сервис реализует IDisposable
         if (SnackbarNotifier is IDisposable disposable)
         {
             disposable.Dispose();

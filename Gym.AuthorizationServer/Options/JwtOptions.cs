@@ -11,6 +11,9 @@ namespace Gym.AuthorizationServer.Options
         public String Issuer { get; set; } = default!;
 
         [Required]
+        public String Audience { get; set; } = default!;
+
+        [Required]
         public String RsaKeyId { get; set; } = default!;
 
         [Required]

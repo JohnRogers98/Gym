@@ -25,7 +25,7 @@ namespace Gym.WebApplication.Features.Admin.CalendarEvents.Creation.Models.Forms
 
         public Int32? MaxClientCount { get; set; }
 
-        public IEnumerable<String> Instructors { get; set; } = [];
+        public IReadOnlyCollection<String> Instructors { get; set; } = [];
 
         public CreatePollFormModel? PollFormModel { get; set;  }
     }

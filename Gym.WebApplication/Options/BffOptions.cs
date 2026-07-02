@@ -26,5 +26,9 @@ namespace Gym.WebApplication.Options
 
         public String LogoutEndpoint { get; set; } = "/logout";
         public String FullLogoutPath => $"{BaseUrl}{LogoutEndpoint}";
+
+        public String ListRolesEndpoint { get; set; } = "/api/user-roles";
+        public String CreateUserEndpoint { get; set; } = "/api/users";
+        public String CheckUsernameEndpoint { get; set; } = "api/users/check-username";
     }
 }

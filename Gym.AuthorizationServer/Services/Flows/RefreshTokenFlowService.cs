@@ -20,7 +20,8 @@ namespace Gym.AuthorizationServer.Services.Flows
         IUserConsentRepository _userConsentRepository,
         IAccessTokenGenerator _accessTokenGenerator,
         IRefreshTokenGenerator _refreshTokenGenerator,
-        IIdTokenGeneratorHelper _idTokenGeneratorHelper) : IRefreshTokenFlowService
+        IIdTokenGeneratorHelper _idTokenGeneratorHelper,
+        IUserRoleByUserIdFinder _userRoleByUserIdFinder) : IRefreshTokenFlowService
     {
         public async Task<Result<RefreshTokenResponse>> HandleAsync(RefreshTokenRequest request, CancellationToken cancellationToken)
         {
@@ -44,7 +45,19 @@ namespace Gym.AuthorizationServer.Services.Flows
             if (userConsent is null)
                 return Result<RefreshTokenResponse>.Failure("invalid_grant", "User has no consent");
 
-            String accessToken = _accessTokenGenerator.GenerateToken(userConsent);
+            var findUserRoleResult = await _userRoleByUserIdFinder.FindAsync(userConsent.UserId, cancellationToken);
+            if (findUserRoleResult.IsFailed)
+                return Result<RefreshTokenResponse>.Failure(findUserRoleResult.ErrorCode, findUserRoleResult.ErrorDescription);
+
+            AccessTokenClaimsMetadata accessTokenClaimsMetadata = new()
+            {
+                ClientId = userConsent.ClientId,
+                UserId = userConsent.UserId,
+                GrantedScopes = userConsent.GrantedScopes,
+                UserRole = findUserRoleResult.Value.Name
+            };
+
+            String accessToken = _accessTokenGenerator.GenerateToken(accessTokenClaimsMetadata);
             AccessTokenEntity newAccessTokenEntity = new()
             {
                 Token = accessToken,

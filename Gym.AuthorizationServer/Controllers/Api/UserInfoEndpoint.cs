@@ -3,6 +3,7 @@ using Gym.AuthorizationServer.Extensions;
 using Gym.AuthorizationServer.Infrastructure.Entities.Roles;
 using Gym.AuthorizationServer.Infrastructure.Entities.Users;
 using Gym.OAuth.Extensions;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,7 +11,7 @@ namespace Gym.AuthorizationServer.Controllers.Api
 {
     [Route("userinfo")]
     [ApiController]
-    [Authorize(AuthenticationSchemes = "Bearer")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class UserInfoEndpoint(IUserRepository _userRepository, IRoleRepository _roleRepository) : EndpointBaseAsync.WithoutRequest.WithActionResult<UserInfo>
     {
         [HttpGet, HttpPost]

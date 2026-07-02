@@ -17,9 +17,9 @@ namespace Gym.AuthorizationServer.Client.Services
     {
         public async Task<HttpResult<TokenResponse>> HandleAsync(String refreshToken, String? resource = null, CancellationToken cancellationToken = default)
         {
-            HttpClient httpClient = _httpClientFactory.CreateClient(_authorizationServerOptions.ClientName);
+            using HttpClient httpClient = _httpClientFactory.CreateClient(_authorizationServerOptions.ClientName);
 
-            var requestMessage = new HttpRequestMessage(HttpMethod.Post, _authorizationServerOptions.TokenEndpoint);
+            using var requestMessage = new HttpRequestMessage(HttpMethod.Post, _authorizationServerOptions.TokenEndpoint);
 
             requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Basic", _clientCredentials.GetCredentialsInBase64());
 

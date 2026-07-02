@@ -200,7 +200,7 @@ namespace Gym.AuthorizationServer.Integration.Tests
 
             var accessTokenCode = _serviceScope.ServiceProvider
                 .GetRequiredService<IAccessTokenGenerator>()
-                .GenerateToken(userConsent!);
+                .GenerateToken(userConsent!.ToAccessTokenClaimsMetadata());
 
             AccessTokenEntity accessTokenEntity = new()
             {

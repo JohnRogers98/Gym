@@ -13,7 +13,7 @@ public static class ControllerBaseExtensions
             HttpRequestMessage httpRequestMessage = new HttpRequestMessage
             {
                 Method = new HttpMethod(controllerBase.Request.Method),
-                RequestUri = new Uri(url)
+                RequestUri = new Uri(url, UriKind.Relative)
             };
 
             //Header
@@ -35,7 +35,8 @@ public static class ControllerBaseExtensions
                 if (!String.IsNullOrEmpty(body))
                 {
                     var contentType = controllerBase.Request.ContentType ?? "application/json";
-                    httpRequestMessage.Content = new StringContent(body, Encoding.UTF8, contentType);
+                    var mediaType = MediaTypeHeaderValue.Parse(contentType);
+                    httpRequestMessage.Content = new StringContent(body, Encoding.UTF8, mediaType);
                 }
             }
 
@@ -45,19 +46,14 @@ public static class ControllerBaseExtensions
         public async Task<ActionResult> CreateProxyResponseAsync(HttpResponseMessage sourceResponse, CancellationToken cancellationToken = default)
         {
             controllerBase.Response.StatusCode = (Int32)sourceResponse.StatusCode;
+            
+            var contentType = sourceResponse.Content.Headers.ContentType?.ToString() ?? "application/json";
+            controllerBase.Response.ContentType = contentType;
 
-            var content = await sourceResponse.Content.ReadAsByteArrayAsync(cancellationToken);
+            await using var sourceStream = await sourceResponse.Content.ReadAsStreamAsync(cancellationToken);
+            await sourceStream.CopyToAsync(controllerBase.Response.Body, cancellationToken);
 
-            var contentType = sourceResponse.Content.Headers.ContentType?.ToString() ?? "application/octet-stream";
-
-            // Если это JSON, можно вернуть как ObjectResult
-            //if (contentType.Contains("json"))
-            //{
-            //    var json = Encoding.UTF8.GetString(content);
-            //    return controllerBase.Content(json, contentType, Encoding.UTF8);
-            //}
-
-            return controllerBase.File(content, contentType);
+            return new EmptyResult();
         }
 
         public Boolean IsAccessTokenPresent()

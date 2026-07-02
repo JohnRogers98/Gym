@@ -1,5 +1,4 @@
 ﻿using Gym.AuthorizationServer.Admin.Services;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -12,7 +11,7 @@ public static class IServiceCollectionExtensions
     {
         public IServiceCollection AddAuthenticationSchemes(String validIssuer, String validAudience)
         {
-            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
                 {
                     options.TokenValidationParameters = new TokenValidationParameters
@@ -32,9 +31,18 @@ public static class IServiceCollectionExtensions
                     {
                         OnMessageReceived = async (context) =>
                         {
-                            var token = context.Token;
-                            if (String.IsNullOrEmpty(token))
+                            var authHeader = context.Request.Headers.Authorization.FirstOrDefault();
+                            if (String.IsNullOrEmpty(authHeader) || !authHeader.StartsWith("Bearer "))
+                            {
                                 return;
+                            }
+
+                            var token = authHeader.Substring("Bearer ".Length).Trim();
+                            if (String.IsNullOrEmpty(token))
+                            {
+                                return;
+                            }
+                            context.Token = token;
 
                             var jwtToken = new JwtSecurityTokenHandler().ReadJwtToken(token);
                             var kid = jwtToken.Header.Kid;

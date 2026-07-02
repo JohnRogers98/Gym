@@ -50,6 +50,8 @@ builder.Services.AddAuthorizationServerNamedClient(authorizationServerOptions.Cl
 
 builder.Services.SetupOAuthProtectedResourceConfiguration(authorizationServerOptions);
 
+builder.Services.AddServices();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

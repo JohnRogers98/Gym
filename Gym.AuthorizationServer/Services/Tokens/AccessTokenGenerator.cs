@@ -10,24 +10,28 @@ namespace Gym.AuthorizationServer.Services.Tokens
 {
     public interface IAccessTokenGenerator
     {
-        String GenerateToken(UserConsentEntity userConsent);
+        String GenerateToken(AccessTokenClaimsMetadata accessTokenClaimsMetadata);
     }
 
     public class AccessTokenGenerator(IRsaSigningCredentialsProvider _rsaSigningService, IOptions<JwtOptions> _jwtOptions) : IAccessTokenGenerator
     {
         public const String TypHeader = "at+JWT";
 
-        public String GenerateToken(UserConsentEntity userConsent)
+        public String GenerateToken(AccessTokenClaimsMetadata accessTokenClaimsMetadata)
         {
             var claimsIdentity = new ClaimsIdentity([
                 new Claim(JwtRegisteredClaimNames.Iss, _jwtOptions.Value.Issuer),
-                new Claim(JwtRegisteredClaimNames.Sub, userConsent.UserId),
-                new Claim(JwtRegisteredClaimNames.Aud, userConsent.ClientId),
-                //new Claim(ClaimTypes.Role, String.Join(' ', userConsent.GrantedScopes))
-                ]);
+                new Claim(JwtRegisteredClaimNames.Aud, _jwtOptions.Value.Audience),
+                new Claim(JwtRegisteredClaimNames.Sub, accessTokenClaimsMetadata.UserId)
+            ]);
 
-            if (userConsent.GrantedScopes is not null && userConsent.GrantedScopes.Any())
-                claimsIdentity.AddClaim(new Claim("scope", String.Join(' ', userConsent.GrantedScopes.Select(aScope => aScope.Name))));
+            if(!String.IsNullOrEmpty(accessTokenClaimsMetadata.UserRole))
+            {
+                claimsIdentity.AddClaim(new Claim(ClaimTypes.Role, accessTokenClaimsMetadata.UserRole));
+            }
+
+            if (accessTokenClaimsMetadata.GrantedScopes is not null && accessTokenClaimsMetadata.GrantedScopes.Any())
+                claimsIdentity.AddClaim(new Claim("scope", String.Join(' ', accessTokenClaimsMetadata.GrantedScopes.Select(aScope => aScope.Name))));
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {
@@ -39,5 +43,15 @@ namespace Gym.AuthorizationServer.Services.Tokens
 
             return new JsonWebTokenHandler().CreateToken(tokenDescriptor);
         }
+    }
+
+    public record AccessTokenClaimsMetadata
+    {
+        public required String UserId { get; init; }
+        public String? UserRole { get; init; }
+        
+        public required String ClientId { get; init; }
+
+        public required ICollection<ScopeInfo> GrantedScopes { get; init; }
     }
 }

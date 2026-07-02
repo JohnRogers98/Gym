@@ -39,8 +39,12 @@
                     <MudNumericField @bind-Value="@_formModel.MaxClientCount" HelperText="Max client count" Variant="Variant.Text"
                                      Step="1" Min="0" For="@(() => _formModel.MaxClientCount)" />
 
-                    <MudSelect MultiSelection="true" @bind-SelectedValues="@_formModel.Instructors" Clearable="true" HelperText="Choose instructors"
-                        MultiSelectionTextFunc="@(new Func<IReadOnlyList<String>, String>(GetMultiSelectionText))">
+                    <MudSelect T="String"
+                               MultiSelection="true"
+                               @bind-SelectedValues="@_formModel.Instructors"
+                               Clearable="true"
+                               HelperText="Choose instructors"
+                               MultiSelectionTextFunc="@(new Func<IReadOnlyList<String>, String>(GetMultiSelectionText))">
                         @foreach (var instructor in _instructors)
                         {
                             <MudSelectItem T="String" Value="@instructor.Id">

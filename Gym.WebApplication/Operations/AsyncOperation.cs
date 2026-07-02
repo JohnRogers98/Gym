@@ -1,5 +1,6 @@
 ﻿namespace Gym.WebApplication.Operations
 {
+#nullable disable warnings
     public class AsyncOperation
     {
         public Boolean Succeeded { get; }
@@ -24,7 +25,7 @@
     public class AsyncOperation<T>
     {
         public Boolean Succeeded { get; }
-        public T? Data { get; }
+        public T Data { get; }
         public String? ErrorMessage { get; }
         public ErrorType? ErrorType { get; }
         public Int32? HttpStatusCode { get; }
@@ -44,6 +45,8 @@
             => new(false, default, message, errorType, httpStatusCode);
     }
 
+#nullable restore warnings
+
     public enum ErrorType
     {
         Validation,
@@ -54,6 +57,7 @@
         Timeout,
         Network,
         ServerError,
+        Deserialization,
         Unknown
     }
 }

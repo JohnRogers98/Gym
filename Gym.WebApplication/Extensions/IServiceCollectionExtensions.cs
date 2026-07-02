@@ -1,4 +1,6 @@
-﻿using Gym.WebApplication.Authentication;
+﻿using FluentValidation;
+using Gym.WebApplication.Authentication;
+using Gym.WebApplication.BffRequestHandlers;
 using Gym.WebApplication.Features._Common.Services;
 using Gym.WebApplication.Features.Account.ChangePassword.Models.Forms;
 using Gym.WebApplication.Features.Account.ChangePassword.Services;
@@ -10,9 +12,6 @@ using Gym.WebApplication.Features.Admin.CalendarEvents.Creation.Models.Results;
 using Gym.WebApplication.Features.Admin.CalendarEvents.Creation.Services;
 using Gym.WebApplication.Features.Admin.CalendarEvents.TableView.Models;
 using Gym.WebApplication.Features.Admin.CalendarEvents.TableView.Services;
-using Gym.WebApplication.Features.Admin.Clients.Creation.Models.Forms;
-using Gym.WebApplication.Features.Admin.Clients.Creation.Models.Results;
-using Gym.WebApplication.Features.Admin.Clients.Creation.Services;
 using Gym.WebApplication.Features.Admin.Clients.TableView.Models;
 using Gym.WebApplication.Features.Admin.Clients.TableView.Models.Forms;
 using Gym.WebApplication.Features.Admin.Clients.TableView.Models.Results;
@@ -107,6 +106,47 @@ namespace Gym.WebApplication.Extensions
         public static IServiceCollection AddLocalStorage(this IServiceCollection services)
         {
             services.AddScoped<LocalStorageAdapter>();
+            return services;
+        }
+
+        public static IServiceCollection AddBffServices(this IServiceCollection services)
+        {
+            RequestHandlerRegistration
+               .WithRequest<ListUserRoles>
+               .WithResponse<ListUserRolesResult>
+               .For<ListUserRolesService>
+               .In(services)
+               .DecorateWithResilience()
+               .DecorateWithHttpExceptionCatcher()
+               .DecorateWithFailSnackbar();
+
+            services.AddOperationStateNotifier<CreateClientFormModel, CreateClientResult>();
+            RequestHandlerRegistration
+               .WithRequest<CreateClientFormModel>
+               .WithResponse<CreateClientResult>
+               .For<CreateClientService>
+               .In(services)
+               .DecorateWithResilience()
+               .DecorateWithHttpExceptionCatcher()
+               .DecorateWithFailSnackbar()
+               .DecorateWithNotifier();
+
+            RequestHandlerRegistration
+               .WithRequest<CheckUsernameExistence>
+               .WithResponse<CheckUsernameExistenceResult>
+               .For<CheckUsernameExistenceService>
+               .In(services)
+               .DecorateWithResilience()
+               .DecorateWithHttpExceptionCatcher()
+               .DecorateWithFailSnackbar();
+
+            return services;
+        }
+
+        public static IServiceCollection AddFormValidators(this IServiceCollection services)
+        {
+            services.AddScoped<IValidator<CreateClientFormModel>, CreateClientFormModel.Validator>();
+
             return services;
         }
 
@@ -315,17 +355,6 @@ namespace Gym.WebApplication.Extensions
                 .WithRequest<ChargeClientFormModel>
                 .WithResponse<ChargeClientResult>
                 .For<ChargeClientService>
-                .In(services)
-                .DecorateWithResilience()
-                .DecorateWithHttpExceptionCatcher()
-                .DecorateWithFailSnackbar()
-                .DecorateWithNotifier();
-
-            services.AddOperationStateNotifier<CreateClientFormModel, CreateClientResult>();
-            RequestHandlerRegistration
-                .WithRequest<CreateClientFormModel>
-                .WithResponse<CreateClientResult>
-                .For<CreateClientService>
                 .In(services)
                 .DecorateWithResilience()
                 .DecorateWithHttpExceptionCatcher()

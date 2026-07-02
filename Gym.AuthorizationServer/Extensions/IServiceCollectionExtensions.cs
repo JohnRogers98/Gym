@@ -106,6 +106,7 @@ public static class IServiceCollectionExtensions
             services.TryAddScoped<ITelegramAssertionFlowService, TelegramAssertionFlowService>();
 
             services.TryAddScoped<IUserByUsernameAndPasswordFinder, UserByUsernameAndPasswordFinder>();
+            services.TryAddScoped<IUserRoleByUserIdFinder, UserRoleByUserIdFinder>();
 
             return services;
         }

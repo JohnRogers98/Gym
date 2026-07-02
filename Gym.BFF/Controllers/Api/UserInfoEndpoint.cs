@@ -12,7 +12,6 @@ namespace Gym.BFF.Controllers.Api
         public async Task<ActionResult<UserInfo>> HandleAsync(CancellationToken cancellationToken)
         {
             var accessToken = User.FindFirst(ExtendedClaimTypes.AccessToken)?.Value;
-
             if (String.IsNullOrEmpty(accessToken))
                 return Unauthorized();
 

@@ -30,7 +30,8 @@ namespace Gym.AuthorizationServer.Services.Flows
         IAccessTokenRepository _accessTokenRepository,
         IRefreshTokenGenerator _refreshTokenGenerator,
         IRefreshTokenRepository _refreshTokenRepository,
-        IIdTokenGeneratorHelper _idTokenGeneratorHelper) : ITelegramAssertionFlowService
+        IIdTokenGeneratorHelper _idTokenGeneratorHelper,
+        IUserRoleByUserIdFinder _userRoleByUserIdFinder) : ITelegramAssertionFlowService
     {
         public async Task<Result<TelegramAssertionResponse>> HandleAsync(TelegramAssertionRequest request, CancellationToken cancellationToken)
         {
@@ -72,7 +73,19 @@ namespace Gym.AuthorizationServer.Services.Flows
                 targetProtectedResource.Id,
                 cancellationToken);
 
-            String accessToken = _accessTokenGenerator.GenerateToken(userConsent);
+            var findUserRoleResult = await _userRoleByUserIdFinder.FindAsync(userConsent.UserId, cancellationToken);
+            if (findUserRoleResult.IsFailed)
+                return Result<TelegramAssertionResponse>.Failure(findUserRoleResult.ErrorCode, findUserRoleResult.ErrorDescription);
+
+            AccessTokenClaimsMetadata accessTokenClaimsMetadata = new()
+            {
+                ClientId = userConsent.ClientId,
+                UserId = userConsent.UserId,
+                GrantedScopes = userConsent.GrantedScopes,
+                UserRole = findUserRoleResult.Value.Name
+            };
+
+            String accessToken = _accessTokenGenerator.GenerateToken(accessTokenClaimsMetadata);
             AccessTokenEntity accessTokenEntity = new()
             {
                 Token = accessToken,

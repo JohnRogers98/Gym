@@ -14,9 +14,9 @@ namespace Gym.AuthorizationServer.Client.Services
     {
         public async Task<HttpResult<UserInfo>> HandleAsync(String accessToken, CancellationToken cancellationToken = default)
         {
-            HttpClient httpClient = _httpClientFactory.CreateClient(_authorizationServerOptions.ClientName);
+            using HttpClient httpClient = _httpClientFactory.CreateClient(_authorizationServerOptions.ClientName);
 
-            var requestMessage = new HttpRequestMessage(HttpMethod.Get, _authorizationServerOptions.UserInfoEndpoint);
+            using var requestMessage = new HttpRequestMessage(HttpMethod.Get, _authorizationServerOptions.UserInfoEndpoint);
 
             requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
 

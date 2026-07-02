@@ -1,4 +1,4 @@
-﻿@using Gym.WebApplication.Features.Admin.Clients.Creation
+﻿@using Gym.WebApplication.Features.Admin.Clients.Create
 @using Gym.WebApplication.Features.Admin.Clients.TableView
 @using Gym.WebApplication.Features.Admin.Clients.TableView.Models.Forms
 @using Gym.WebApplication.Features.Admin.Clients.TableView.Models.Results
@@ -10,12 +10,12 @@
 
 @implements IDisposable
 
-<MudExpansionPanel Text="Current clients">
+@* <MudExpansionPanel Text="Current clients">
     <ClientTableView></ClientTableView>
-</MudExpansionPanel>
+</MudExpansionPanel> *@
 
 <MudExpansionPanel Text="Register client">
-    <ClientCreationForm></ClientCreationForm>
+    <CreateClientForm></CreateClientForm>
 </MudExpansionPanel>
 
 @code {

@@ -13,9 +13,9 @@ namespace Gym.AuthorizationServer.Client.Services
     {
         public async Task<HttpResult<Jwk>> GetKeyAsync(CancellationToken cancellationToken = default)
         {
-            HttpClient httpClient = _httpClientFactory.CreateClient(_authorizationServerOptions.ClientName);
+            using HttpClient httpClient = _httpClientFactory.CreateClient(_authorizationServerOptions.ClientName);
 
-            var requestMessage = new HttpRequestMessage(HttpMethod.Get, _authorizationServerOptions.JwksEndpoint);
+            using var requestMessage = new HttpRequestMessage(HttpMethod.Get, _authorizationServerOptions.JwksEndpoint);
 
             var jwksResponse = await httpClient.SendAsync(requestMessage, cancellationToken);
 
