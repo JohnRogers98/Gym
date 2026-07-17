@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Gym.WebApi.Controllers.Api.Clients.AdminOnly
 {
     [ApiController]
-    [Authorize(Policy = nameof(SecurityPolicy.AdminOnly))]
+    [Authorize(Policy = nameof(SecurityPolicy.Admin))]
     public class ListClientsEndpoint(IMediator _mediator, IMapper _mapper) : EndpointBaseAsync
         .WithoutRequest
         .WithActionResult<ListResponse<ClientDto>>

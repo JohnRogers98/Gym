@@ -1,4 +1,5 @@
 using Gym.AuthorizationServer.Admin.Extensions;
+using Gym.AuthorizationServer.Admin.HostedServices;
 using Gym.AuthorizationServer.Client;
 using Gym.AuthorizationServer.Client.Options;
 using Gym.AuthorizationServer.Infrastructure;
@@ -36,6 +37,8 @@ builder.Services.AddAuthenticationSchemes(
     );
 builder.Services.AddAuthorizationPolicies();
 
+builder.Services.AddMessageBus(builder.Configuration);
+
 var mongoOptions = new MongoOptions();
 builder.Configuration.GetRequiredSection("MongoDb").Bind(mongoOptions);
 builder.Services.AddMongoInfrastructure(mongoOptions);
@@ -51,6 +54,8 @@ builder.Services.AddAuthorizationServerNamedClient(authorizationServerOptions.Cl
 builder.Services.SetupOAuthProtectedResourceConfiguration(authorizationServerOptions);
 
 builder.Services.AddServices();
+
+builder.Services.AddHostedService<RabbitMQTopologyInitializer>();
 
 var app = builder.Build();
 
@@ -69,6 +74,8 @@ app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseUnitOfWork();
 
 app.MapControllers();
 

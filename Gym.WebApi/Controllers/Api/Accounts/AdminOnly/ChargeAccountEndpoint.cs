@@ -18,7 +18,7 @@ using static Gym.WebApi.Controllers.Api.Accounts.AdminOnly.ChargeAccountEndpoint
 namespace Gym.WebApi.Controllers.Api.Accounts.AdminOnly
 {
     [ApiController]
-    [Authorize(Policy = nameof(SecurityPolicy.AdminOnly))]
+    [Authorize(Policy = nameof(SecurityPolicy.Admin))]
     public class ChargeAccountEndpoint(IMediator _mediator, IMapper _mapper) : EndpointBaseAsync
         .WithRequest<ChargeAccountContainer>
         .WithActionResult<ChargeAccountResponse>

@@ -9,11 +9,12 @@ using Gym.WebDto.Responses.PersonalTraining;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace Gym.WebApi.Controllers.Api.PersonalTrainings.InstructorOnly
 {
     [ApiController]
-    [Authorize(Policy = nameof(SecurityPolicy.InstructorOnly))]
+    [Authorize(Policy = nameof(SecurityPolicy.Instructor))]
     public class CreatePersonalTrainingEndpoint(IMediator _mediator) : EndpointBaseAsync
         .WithRequest<CreatePersonalTrainingRequest>
         .WithActionResult<CreatePersonalTrainingResponse>

@@ -14,7 +14,7 @@ using static Gym.WebApi.Controllers.Api.Accounts.AdminOnly.GetAccountHistoryEndp
 namespace Gym.WebApi.Controllers.Api.Accounts.AdminOnly
 {
     [ApiController]
-    [Authorize(Policy = nameof(SecurityPolicy.AdminOnly))]
+    [Authorize(Policy = nameof(SecurityPolicy.Admin))]
     public class GetAccountHistoryEndpoint(IMediator _mediator, IMapper _mapper) : EndpointBaseAsync
         .WithRequest<GetAccountHistoryContainer>
         .WithActionResult<ListResponse<AccountHistoryDto>>

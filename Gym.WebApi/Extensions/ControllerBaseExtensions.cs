@@ -1,10 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿namespace Microsoft.AspNetCore.Mvc;
 
-namespace Gym.WebApi.Extensions
+public static class ControllerBaseExtensions
 {
-    public static class ControllerBaseExtensions
+    extension(ControllerBase controller)
     {
-        public static ObjectResult InternalErrorProblem(this ControllerBase controller, String detail) 
+        public ObjectResult InternalErrorProblem(String detail)
         {
             var problemDetails = new ProblemDetails
             {
@@ -18,7 +18,7 @@ namespace Gym.WebApi.Extensions
             return controller.StatusCode(StatusCodes.Status500InternalServerError, problemDetails);
         }
 
-        public static ObjectResult BadRequestProblem(this ControllerBase controller, String detail)
+        public ObjectResult BadRequestProblem(String detail)
         {
             var problemDetails = new ProblemDetails
             {
@@ -32,7 +32,7 @@ namespace Gym.WebApi.Extensions
             return controller.BadRequest(problemDetails);
         }
 
-        public static ObjectResult ConflictProblem(this ControllerBase controller, String detail)
+        public ObjectResult ConflictProblem(String detail)
         {
             var problemDetails = new ProblemDetails
             {
@@ -46,4 +46,5 @@ namespace Gym.WebApi.Extensions
             return controller.Conflict(problemDetails);
         }
     }
+   
 }

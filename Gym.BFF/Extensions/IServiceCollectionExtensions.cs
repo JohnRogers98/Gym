@@ -59,6 +59,7 @@ public static class IServiceCollectionExtensions
 
             return services;
         }
+
         public IServiceCollection AddDelegatingHandlers()
         {
             services.AddTransient<AddForwardHeadersHandler>();
@@ -100,6 +101,23 @@ public static class IServiceCollectionExtensions
             return services;
         }
 
+        public IServiceCollection AddWebApiNamedClient(String key, String baseUrl)
+        {
+            services.AddHttpClient(key, client =>
+            {
+                client.BaseAddress = new Uri(baseUrl);
+            })
+            .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+            {
+                UseCookies = false,
+                UseDefaultCredentials = false
+            })
+            .AddHttpMessageHandler<AddForwardHeadersHandler>()
+            .AddHttpMessageHandler<RefreshTokenHandler>();
+
+            return services;
+        }
+
         public IServiceCollection AddOptionsFromConfiguration(IConfiguration configuration)
         {
             services.AddOptions<StaticHeaderCheckOptions>()
@@ -119,6 +137,11 @@ public static class IServiceCollectionExtensions
 
             services.AddOptions<SpaOptions>()
                 .Bind(configuration.GetRequiredSection(SpaOptions.SectionName))
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
+
+            services.AddOptions<WebApiOptions>()
+                .Bind(configuration.GetRequiredSection(WebApiOptions.SectionName))
                 .ValidateDataAnnotations()
                 .ValidateOnStart();
 

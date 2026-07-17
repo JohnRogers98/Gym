@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Gym.Application\Gym.Application.csproj" />
+    <ProjectReference Include="..\Gym.AuthorizationServer.Client\Gym.AuthorizationServer.Client.csproj" />
     <ProjectReference Include="..\Gym.CompositionRoot\Gym.CompositionRoot.csproj" />
     <ProjectReference Include="..\Gym.WebDto\Gym.WebDto.csproj" />
   </ItemGroup>

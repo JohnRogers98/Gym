@@ -41,6 +41,11 @@ builder.Services.AddAuthorizationServerAdminApiNamedClient(
     builder.Configuration.GetRequiredConfiguration("Urls:AuthorizationServerAdminApi:BaseUrl")
 );
 
+builder.Services.AddWebApiNamedClient(
+    builder.Configuration.GetRequiredConfiguration("Urls:WebApi:ClientName"),
+    builder.Configuration.GetRequiredConfiguration("Urls:WebApi:BaseUrl")
+);
+
 builder.Services.SetupOAuthClientConfiguration(clientCredentialsOptions, authorizationServerOptions);
 
 builder.Services.AddServices();

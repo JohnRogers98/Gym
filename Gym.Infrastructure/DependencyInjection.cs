@@ -51,6 +51,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
+using RabbitMQ.Client;
 using System.Net;
 using System.Runtime.CompilerServices;
 using Telegram.Bot;
@@ -76,7 +77,10 @@ namespace Gym.Infrastructure
                 ?? throw new ArgumentNullException("No configuration provided for proxy setup.");
             services.TryAddSingleton<ProxyOptions>(_ => proxyOptions);
 
-            services.AddMongoInfrastructure(mongoDbOptions ?? MongoDbOptions.Default);
+            RabbitMQOptions rabbitMQOptions = configuration.GetSection("RabbitMQ").Get<RabbitMQOptions>() ?? RabbitMQOptions.Default;
+            services.TryAddSingleton<RabbitMQOptions>(_ => rabbitMQOptions);
+
+            services.AddMongoInfrastructure(mongoDbOptions);
             services.AddMessagePublisher();
             services.AddRepositories();
             services.AddProjections();
@@ -87,6 +91,8 @@ namespace Gym.Infrastructure
 
             services.AddBackgroundWorkers();
             services.AddHostedServices();
+
+            services.AddRabbitMQInfrastructure(rabbitMQOptions);
 
             if (configuration["TG_BOT_TOKEN"] is not null)
             {
@@ -298,6 +304,28 @@ namespace Gym.Infrastructure
         private static IServiceCollection AddHostedServices(this IServiceCollection services)
         {
             services.AddHostedService<ConfigurationLogger>();
+            return services;
+        }
+
+        private static IServiceCollection AddRabbitMQInfrastructure(this IServiceCollection services, RabbitMQOptions rabbitMQOptions)
+        {
+            services.AddSingleton<IConnection>(sp =>
+            {
+                var factory = new ConnectionFactory
+                {
+                    HostName = rabbitMQOptions.Hostname,
+                    UserName = rabbitMQOptions.Username,
+                    Password = rabbitMQOptions.Password,
+                    AutomaticRecoveryEnabled = true,
+                    NetworkRecoveryInterval = TimeSpan.FromSeconds(5)
+                };
+
+                return factory.CreateConnectionAsync().GetAwaiter().GetResult();
+            });
+
+            services.AddHostedService<RabbitMQTopologyInitializer>();
+            services.AddHostedService<UserCreatedMessagesConsumer>();
+
             return services;
         }
     }

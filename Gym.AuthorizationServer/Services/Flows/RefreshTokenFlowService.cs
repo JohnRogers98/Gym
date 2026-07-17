@@ -1,10 +1,10 @@
-﻿using Gym.AuthorizationServer.Extensions;
+﻿using Gym.AuthorizationServer.Abstractions;
+using Gym.AuthorizationServer.Extensions;
 using Gym.AuthorizationServer.Infrastructure.Entities.AccessTokens;
 using Gym.AuthorizationServer.Infrastructure.Entities.ProtectedResources;
 using Gym.AuthorizationServer.Infrastructure.Entities.RefreshTokens;
 using Gym.AuthorizationServer.Infrastructure.Entities.UserConsents;
 using Gym.AuthorizationServer.Services.Tokens;
-using Gym.AuthorizationServer.Shared.Abstractions;
 
 namespace Gym.AuthorizationServer.Services.Flows
 {

@@ -13,6 +13,7 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.1" />
     <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.1" />
     <PackageReference Include="MongoDB.Driver" Version="3.8.1" />
+    <PackageReference Include="RabbitMQ.Client" Version="7.2.1" />
     <PackageReference Include="Scrutor" Version="7.0.0" />
     <PackageReference Include="SharpCompress" Version="0.48.0" />
     <PackageReference Include="Telegram.Bot" Version="22.7.6" />
@@ -21,6 +22,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Gym.Abstractions.MessageBus\Gym.MessageBus.csproj" />
     <ProjectReference Include="..\Gym.Abstractions.Query\Gym.Abstractions.Query.csproj" />
+    <ProjectReference Include="..\Gym.Application\Gym.Application.csproj" />
     <ProjectReference Include="..\Gym.Domain\Gym.Domain.csproj" />
   </ItemGroup>
 

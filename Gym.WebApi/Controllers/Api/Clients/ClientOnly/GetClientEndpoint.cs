@@ -8,11 +8,12 @@ using Gym.WebDto.Responses.Clients;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace Gym.WebApi.Controllers.Api.Clients.ClientOnly
 {
     [ApiController]
-    [Authorize(Policy = nameof(SecurityPolicy.ClientOnly))]
+    [Authorize(Policy = nameof(SecurityPolicy.Client))]
     public class GetClientEndpoint(IMediator _mediator, IMapper _mapper) : EndpointBaseAsync
         .WithoutRequest
         .WithActionResult<Response<ClientDto>>

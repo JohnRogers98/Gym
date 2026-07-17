@@ -2,6 +2,7 @@
 using Gym.AuthorizationServer.Infrastructure.Entities.Users;
 using Gym.AuthorizationServer.Options;
 using Gym.AuthorizationServer.Services;
+using Gym.AuthorizationServer.Services.Events;
 using Gym.AuthorizationServer.Services.Flows;
 using Gym.AuthorizationServer.Services.Rsa;
 using Gym.AuthorizationServer.Services.Tokens;
@@ -9,6 +10,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.IdentityModel.Tokens;
+using RabbitMQ.Client;
 
 namespace Gym.AuthorizationServer.Extensions;
 
@@ -25,6 +27,11 @@ public static class IServiceCollectionExtensions
 
             services.AddOptions<JwtOptions>()
               .Bind(configuration.GetRequiredSection(JwtOptions.SectionName))
+              .ValidateDataAnnotations()
+              .ValidateOnStart();
+
+            services.AddOptions<RabbitMQOptions>()
+              .Bind(configuration.GetRequiredSection(RabbitMQOptions.SectionName))
               .ValidateDataAnnotations()
               .ValidateOnStart();
 
@@ -108,6 +115,8 @@ public static class IServiceCollectionExtensions
             services.TryAddScoped<IUserByUsernameAndPasswordFinder, UserByUsernameAndPasswordFinder>();
             services.TryAddScoped<IUserRoleByUserIdFinder, UserRoleByUserIdFinder>();
 
+            services.TryAddSingleton<IUserCreatedEventService, UserCreatedEventService>();
+
             return services;
         }
 
@@ -127,6 +136,25 @@ public static class IServiceCollectionExtensions
             services.TryAddSingleton<IRsaSecurityKeyProvider, RsaSecurityKeyProvider>();
             services.TryAddSingleton<IRsaSigningCredentialsProvider, RsaSigningCredentialsProvider>();
             services.TryAddSingleton<IRsaJwkService, RsaJwkService>();
+            return services;
+        }
+
+        public IServiceCollection AddMessageBus(IConfiguration configuration)
+        {
+            services.AddSingleton<IConnection>(sp =>
+            {
+                var factory = new ConnectionFactory
+                {
+                    HostName = configuration.GetRequiredConfiguration("RabbitMQ:Hostname"),
+                    UserName = configuration.GetRequiredConfiguration("RabbitMQ:Username"),
+                    Password = configuration.GetRequiredConfiguration("RabbitMQ:Password"),
+                    AutomaticRecoveryEnabled = true,
+                    NetworkRecoveryInterval = TimeSpan.FromSeconds(5)
+                };
+
+                return factory.CreateConnectionAsync().GetAwaiter().GetResult();
+            });
+
             return services;
         }
     }

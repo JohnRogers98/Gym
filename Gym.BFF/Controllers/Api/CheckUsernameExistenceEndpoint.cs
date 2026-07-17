@@ -14,9 +14,9 @@ namespace Gym.BFF.Controllers.Api
             if (this.IsAccessTokenPresent() is false)
                 return Unauthorized();
 
-            var adminApiClient = _httpClientFactory.CreateClient(_adminApiOptions.Value.ClientName);
-            var proxyRequestMessage = await this.CreateProxyRequestAsync("/api/users/check-username", cancellationToken: cancellationToken);
-            var response = await adminApiClient.SendAsync(proxyRequestMessage, cancellationToken);
+            using var adminApiClient = _httpClientFactory.CreateClient(_adminApiOptions.Value.ClientName);
+            using var proxyRequestMessage = await this.CreateProxyRequestAsync("/api/users/check-username", cancellationToken: cancellationToken);
+            using var response = await adminApiClient.SendAsync(proxyRequestMessage, cancellationToken);
 
             return await this.CreateProxyResponseAsync(response, cancellationToken);
         }

@@ -1,6 +1,6 @@
-﻿using Gym.AuthorizationServer.Infrastructure.Entities.Scopes;
+﻿using Gym.AuthorizationServer.Abstractions;
+using Gym.AuthorizationServer.Infrastructure.Entities.Scopes;
 using Gym.AuthorizationServer.Infrastructure.Entities.UserConsents;
-using Gym.AuthorizationServer.Shared.Abstractions;
 
 namespace Gym.AuthorizationServer.Services
 {

@@ -14,7 +14,7 @@ namespace Gym.WebApi.Controllers.Api.CalendarEvents.AdminOnly
 {
     [Route("api/admin-calendar-events/{id}")]
     [ApiController]
-    [Authorize(Policy = nameof(SecurityPolicy.AdminOnly))]
+    [Authorize(Policy = nameof(SecurityPolicy.Admin))]
     public class GetCalendarEventEndpoint(IMediator _mediator, IMapper _mapper) : EndpointBaseAsync
         .WithRequest<GetCalendarEventByIdContainer>
         .WithActionResult<Response<AdminCalendarEventDto>>

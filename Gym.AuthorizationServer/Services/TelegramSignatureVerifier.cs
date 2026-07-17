@@ -1,4 +1,4 @@
-﻿using Gym.AuthorizationServer.Shared.Abstractions;
+﻿using Gym.AuthorizationServer.Abstractions;
 using System.Collections.Specialized;
 using System.Security.Cryptography;
 using System.Text;

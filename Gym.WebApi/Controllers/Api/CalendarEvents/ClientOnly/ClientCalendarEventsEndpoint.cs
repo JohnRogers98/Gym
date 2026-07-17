@@ -8,11 +8,12 @@ using Gym.WebDto.Responses.CalendarEvent;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace Gym.WebApi.Controllers.Api.CalendarEvents.ClientOnly
 {
     [ApiController]
-    [Authorize(Policy = nameof(SecurityPolicy.ClientOnly))]
+    [Authorize(Policy = nameof(SecurityPolicy.Client))]
     public class ClientCalendarEventsEndpoint(IMediator _mediator, IMapper _mapper) : EndpointBaseAsync
         .WithoutRequest
         .WithActionResult<ListResponse<ClientCalendarEventDto>>

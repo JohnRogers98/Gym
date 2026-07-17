@@ -9,11 +9,12 @@ using Gym.WebDto.Responses.Account;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace Gym.WebApi.Controllers.Api.Accounts.AuthenticatedOnly
 {
     [ApiController]
-    [Authorize(Policy = nameof(SecurityPolicy.ClientOnly))]
+    [Authorize(Policy = nameof(SecurityPolicy.Client))]
     public class GetAccountHistoryEndpoint(IMediator _mediator, IMapper _mapper) : EndpointBaseAsync
         .WithRequest<GetAccountHistoryRequest>
         .WithActionResult<ListResponse<AccountHistoryDto>>

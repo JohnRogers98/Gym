@@ -1,6 +1,8 @@
-﻿using Gym.AuthorizationServer.Admin.Services;
+﻿using Gym.AuthorizationServer.Admin.Application;
+using Gym.AuthorizationServer.Admin.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using RabbitMQ.Client;
 using System.IdentityModel.Tokens.Jwt;
 
 namespace Gym.AuthorizationServer.Admin.Extensions;
@@ -80,6 +82,27 @@ public static class IServiceCollectionExtensions
                 UseCookies = false,
                 UseDefaultCredentials = false
             });
+
+            return services;
+        }
+
+        public IServiceCollection AddMessageBus(IConfiguration configuration)
+        {
+            services.AddSingleton<IConnection>(sp =>
+            {
+                var factory = new ConnectionFactory
+                {
+                    HostName = configuration.GetRequiredConfiguration("RabbitMQ:Hostname"),
+                    UserName = configuration.GetRequiredConfiguration("RabbitMQ:Username"),
+                    Password = configuration.GetRequiredConfiguration("RabbitMQ:Password"),
+                    AutomaticRecoveryEnabled = true,
+                    NetworkRecoveryInterval = TimeSpan.FromSeconds(5)
+                };
+
+                return factory.CreateConnectionAsync().GetAwaiter().GetResult();
+            });
+
+            services.AddSingleton<RabbitMQExchange>(_ => new RabbitMQExchange(configuration.GetRequiredConfiguration("RabbitMQ:Exchange")));
 
             return services;
         }

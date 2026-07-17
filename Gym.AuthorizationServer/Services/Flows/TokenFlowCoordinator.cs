@@ -1,4 +1,4 @@
-﻿using Gym.AuthorizationServer.Shared.Abstractions;
+﻿using Gym.AuthorizationServer.Abstractions;
 
 namespace Gym.AuthorizationServer.Services.Flows
 {

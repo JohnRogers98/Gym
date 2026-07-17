@@ -15,7 +15,7 @@ using static Gym.WebApi.Controllers.Api.CalendarEvents.AdminOnly.CancelCalendarE
 namespace Gym.WebApi.Controllers.Api.CalendarEvents.AdminOnly
 {
     [ApiController]
-    [Authorize(Policy = nameof(SecurityPolicy.AdminOnly))]
+    [Authorize(Policy = nameof(SecurityPolicy.Admin))]
     public class CancelCalendarEventEndpoint(IMediator _mediator, IMapper _mapper) : EndpointBaseAsync
         .WithRequest<CancelCalendarEventContainer>
         .WithActionResult<CancelCalendarEventResponse>

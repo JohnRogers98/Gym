@@ -20,11 +20,11 @@ public class CreateClientService(IHttpClientFactory _httpClientFactory, IOptions
 
         CreateUserRequest createUser = new()
         {
-            Username = request.Username,
-            Password = request.Password,
-            FirstName = request.FirstName,
-            LastName = request.LastName,
-            RoleId = request.RoleId
+            Username = request.Username!,
+            Password = request.Password!,
+            FirstName = request.FirstName!,
+            LastName = request.LastName!,
+            RoleId = request.RoleId!
         };
         using HttpRequestMessage createClientRequest = this.CreatePostRequestWithJson(_bffOptions.Value.CreateUserEndpoint, createUser);
 
@@ -78,7 +78,7 @@ public class CreateClientFormModel
                 .MustAsync(async (username, cancellation) =>
                 {
                     var result = await checkUsernameService.HandleAsync(
-                        new CheckUsernameExistence(username), cancellation);
+                        new CheckUsernameExistence(username!), cancellation);
                     return result.Succeeded && !result.Data.IsExist;
                 })
                 .WithMessage("Username is already taken");

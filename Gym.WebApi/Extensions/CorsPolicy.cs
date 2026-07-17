@@ -4,7 +4,7 @@ namespace Gym.WebApi.Extensions
 {
     public enum CorsPolicy
     {
-        [Description("Allow web applciation")]
-        AllowWebApplication
+        [Description("Allow Bff")]
+        AllowBff
     }
 }

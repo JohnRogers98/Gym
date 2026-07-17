@@ -1,4 +1,5 @@
-﻿using Gym.AuthorizationServer.Extensions;
+﻿using Gym.AuthorizationServer.Abstractions;
+using Gym.AuthorizationServer.Extensions;
 using Gym.AuthorizationServer.Infrastructure.Entities.AccessTokens;
 using Gym.AuthorizationServer.Infrastructure.Entities.Clients;
 using Gym.AuthorizationServer.Infrastructure.Entities.ProtectedResources;
@@ -7,8 +8,8 @@ using Gym.AuthorizationServer.Infrastructure.Entities.Roles;
 using Gym.AuthorizationServer.Infrastructure.Entities.UserConsents;
 using Gym.AuthorizationServer.Infrastructure.Entities.Users;
 using Gym.AuthorizationServer.Infrastructure.Entities.Users.TelegramCredentials;
+using Gym.AuthorizationServer.Services.Events;
 using Gym.AuthorizationServer.Services.Tokens;
-using Gym.AuthorizationServer.Shared.Abstractions;
 
 namespace Gym.AuthorizationServer.Services.Flows
 {
@@ -31,7 +32,8 @@ namespace Gym.AuthorizationServer.Services.Flows
         IRefreshTokenGenerator _refreshTokenGenerator,
         IRefreshTokenRepository _refreshTokenRepository,
         IIdTokenGeneratorHelper _idTokenGeneratorHelper,
-        IUserRoleByUserIdFinder _userRoleByUserIdFinder) : ITelegramAssertionFlowService
+        IUserRoleByUserIdFinder _userRoleByUserIdFinder,
+        IUserCreatedEventService _userCreatedEventService) : ITelegramAssertionFlowService
     {
         public async Task<Result<TelegramAssertionResponse>> HandleAsync(TelegramAssertionRequest request, CancellationToken cancellationToken)
         {
@@ -61,6 +63,9 @@ namespace Gym.AuthorizationServer.Services.Flows
                     UserId = newUser.Id
                 };
                 await _telegramCredentialRepository.AddAsync(telegramCredential, cancellationToken);
+
+                UserCreatedEvent userCreatedEvent = new(newUser.Id, newUser.FirstName, newUser.LastName, clientRole.Name);
+                await _userCreatedEventService.PublishAsync(userCreatedEvent, cancellationToken);
             }
 
             var user = await _userRepository.GetByIdAsync(telegramCredential.UserId, cancellationToken);

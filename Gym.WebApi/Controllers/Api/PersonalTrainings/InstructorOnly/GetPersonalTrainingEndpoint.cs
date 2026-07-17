@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Gym.WebApi.Controllers.Api.PersonalTrainings.InstructorOnly
 {
     [ApiController]
-    [Authorize(Policy = nameof(SecurityPolicy.InstructorOnly))]
+    [Authorize(Policy = nameof(SecurityPolicy.Instructor))]
     public class GetPersonalTrainingEndpoint(IMediator _mediator, IMapper _mapper) : EndpointBaseAsync
         .WithRequest<GetPersonalTrainingByIdContainer>
         .WithActionResult<Response<PersonalTrainingDto>>
