@@ -3,6 +3,8 @@ using Gym.AuthorizationServer.Infrastructure.Entities.Roles;
 using Gym.AuthorizationServer.Infrastructure.Entities.Users;
 using Gym.AuthorizationServer.Infrastructure.Entities.Users.FormCredentials;
 using Gym.AuthorizationServer.Infrastructure.Services;
+using Gym.RabbitMQ.Topology.Messages;
+using Gym.RabbitMQ.Topology.Services;
 using MediatR;
 
 namespace Gym.AuthorizationServer.Admin.Application.Services.UserApi.CreateUser
@@ -12,7 +14,7 @@ namespace Gym.AuthorizationServer.Admin.Application.Services.UserApi.CreateUser
         IRoleRepository _roleRepository,
         IFormCredentialRepository _formCredentialRepository,
         IPasswordHasher _passwordHasher,
-        IMediator _mediator) : IRequestHandler<CreateUser, Result<CreateUserResult>>
+        IUserCreatedEventService _userCreatedEventService) : IRequestHandler<CreateUser, Result<CreateUserResult>>
     {
         public async Task<Result<CreateUserResult>> Handle(CreateUser request, CancellationToken cancellationToken)
         {
@@ -40,8 +42,14 @@ namespace Gym.AuthorizationServer.Admin.Application.Services.UserApi.CreateUser
             };
             await _formCredentialRepository.AddAsync(formCredential, cancellationToken);
 
-            UserCreatedNotification userCreatedNotification = new(userEntity.Id, userEntity.FirstName, userEntity.LastName, userRole.Name);
-            await _mediator.Publish(userCreatedNotification);
+            UserCreatedMessage userCreatedMessage = new()
+            {
+                UserId = userEntity.Id,
+                Role = userRole.Name,
+                FirstName = userEntity.FirstName,
+                LastName= userEntity.LastName,
+            };
+            await _userCreatedEventService.PublishAsync(userCreatedMessage, cancellationToken);
 
             return Result<CreateUserResult>.Success(new(userEntity.Id));
         }

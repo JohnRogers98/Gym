@@ -53,6 +53,7 @@ namespace Gym.AuthorizationServer.Integration.Tests
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
             builder.ConfigureAntiforgeryTokenResource()
+                .ReplaceConfigurationSettings()
                 .ReplaceServicesWithFakes()   
                 .ConfigureLogging((loggingBuilder) => loggingBuilder.ClearProviders().AddXUnit());
         }

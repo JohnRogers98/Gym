@@ -1,6 +1,4 @@
 using Gym.AuthorizationServer.Extensions;
-using Gym.AuthorizationServer.HostedServices;
-using Gym.AuthorizationServer.Infrastructure;
 using Microsoft.AspNetCore.HttpOverrides;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -42,21 +40,13 @@ builder.Services.AddSession(options =>
 
 builder.Services.AddConfigurationOptions(builder.Configuration);
 
-builder.Services.AddMessageBus(builder.Configuration);
-
-var mongoOptions = new MongoOptions();
-builder.Configuration.GetRequiredSection("MongoDb").Bind(mongoOptions);
-builder.Services.AddMongoInfrastructure(mongoOptions);
-
-builder.Services.AddRepositories();
-builder.Services.AddPasswordHashingServices();
+builder.Services.AddDatabaseInfrastructure(builder.Configuration);
+builder.Services.AddMessageBusInfstrastructure(builder.Configuration);
 
 builder.Services.AddTelegramBotToken(builder.Configuration);
 builder.Services.AddRsaSigningService(builder.Configuration);
 builder.Services.AddServices();
 builder.Services.AddAuthenticationSchemes();
-
-builder.Services.AddHostedService<RabbitMQTopologyInitializer>();
 
 var app = builder.Build();
 

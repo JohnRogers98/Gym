@@ -1,5 +1,3 @@
-using Gym.AuthorizationServer.Client;
-using Gym.AuthorizationServer.Client.Options;
 using Gym.BFF.Extensions;
 using Gym.BFF.Middlewares;
 using Microsoft.AspNetCore.HttpLogging;
@@ -12,6 +10,10 @@ builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
 builder.Services.AddBffAuthentication();
+
+builder.Services.AddMemoryCache();
+
+builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddServerSideSession();
 
@@ -28,30 +30,12 @@ builder.Services.AddHttpLogging(options =>
 
 builder.Services.AddDelegatingHandlers();
 
-ClientCredentialsOptions clientCredentialsOptions = new();
-builder.Configuration.GetRequiredSection("ClientCredentials").Bind(clientCredentialsOptions);
-
-AuthorizationServerOptions authorizationServerOptions = new();
-builder.Configuration.GetRequiredSection("Urls:AuthorizationServer").Bind(authorizationServerOptions);
-
-builder.Services.AddAuthorizationServerNamedClient(authorizationServerOptions.ClientName, authorizationServerOptions.BaseUrl);
-
-builder.Services.AddAuthorizationServerAdminApiNamedClient(
-    builder.Configuration.GetRequiredConfiguration("Urls:AuthorizationServerAdminApi:ClientName"),
-    builder.Configuration.GetRequiredConfiguration("Urls:AuthorizationServerAdminApi:BaseUrl")
-);
-
-builder.Services.AddWebApiNamedClient(
-    builder.Configuration.GetRequiredConfiguration("Urls:WebApi:ClientName"),
-    builder.Configuration.GetRequiredConfiguration("Urls:WebApi:BaseUrl")
-);
-
-builder.Services.SetupOAuthClientConfiguration(clientCredentialsOptions, authorizationServerOptions);
+builder.Services
+    .AddAuthorizationServerClient(builder.Configuration)
+    .AddAuthorizationServerAdminApiNamedClient(builder.Configuration)
+    .AddWebApiNamedClient(builder.Configuration);
 
 builder.Services.AddServices();
-
-builder.Services.AddMemoryCache();
-builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
 

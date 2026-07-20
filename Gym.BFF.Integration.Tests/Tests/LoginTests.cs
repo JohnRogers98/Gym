@@ -18,7 +18,7 @@ public class LoginTests(BFFServerFixture _fixture, ITestOutputHelper _outputHelp
     {
         var httpClient = Fixture.CreateClient();
 
-        var urls = Fixture.Services.GetRequiredService<AuthorizationServerOptions>();
+        var urls = Fixture.Services.GetRequiredOption<AuthorizationServerOptions>();
 
         Fixture.AuthorizationServerMock.SetupExchageCodeToken(urls.TokenEndpoint, "test_access_token", "test_refresh_token");
 
@@ -35,8 +35,8 @@ public class LoginTests(BFFServerFixture _fixture, ITestOutputHelper _outputHelp
     {
         var httpClient = Fixture.CreateClient();
 
-        var urls = Fixture.Services.GetRequiredService<AuthorizationServerOptions>();
-        var clientCredentials = Fixture.Services.GetRequiredService<ClientCredentialsOptions>();
+        var urls = Fixture.Services.GetRequiredOption<AuthorizationServerOptions>();
+        var clientCredentials = Fixture.Services.GetRequiredOption<ClientCredentialsOptions>();
         
         var rsaKeyProvider = Fixture.Services.GetRequiredService<FakeRsaKeyProvider>();
 

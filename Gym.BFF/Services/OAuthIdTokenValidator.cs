@@ -1,4 +1,5 @@
 ﻿using Gym.AuthorizationServer.Client.Options;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -11,8 +12,8 @@ namespace Gym.BFF.Services
     }
 
     public class OAuthIdTokenValidator(
-        ClientCredentialsOptions _clientCredentialsOptions,
-        AuthorizationServerOptions _authorizationServerOptions,
+        IOptions<ClientCredentialsOptions> _clientCredentialsOptions,
+        IOptions<AuthorizationServerOptions> _authorizationServerOptions,
         IRsaSecurityKeyProvider _rsaSecurityKeyProvider,
         IComputeOpenIdAtHashService _computeOpenIdAtHashService) : IOAuthIdTokenValidator
     {
@@ -25,10 +26,10 @@ namespace Gym.BFF.Services
             TokenValidationParameters tokenValidationParameters = new()
             {
                 ValidateIssuer = true,
-                ValidIssuer = _authorizationServerOptions.BaseUrl,
+                ValidIssuer = _authorizationServerOptions.Value.BaseUrl,
 
                 ValidateAudience = true,
-                ValidAudience = _clientCredentialsOptions.ClientId,
+                ValidAudience = _clientCredentialsOptions.Value.ClientId,
 
                 ValidateLifetime = true,
                 ClockSkew = TimeSpan.FromMinutes(1),

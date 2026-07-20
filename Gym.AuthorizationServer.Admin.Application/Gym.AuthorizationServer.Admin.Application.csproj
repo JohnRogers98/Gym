@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Gym.AuthorizationServer.Infrastructure\Gym.AuthorizationServer.Infrastructure.csproj" />
+    <ProjectReference Include="..\Gym.RabbitMQ.Topology\Gym.RabbitMQ.Topology.csproj" />
   </ItemGroup>
 
 </Project>

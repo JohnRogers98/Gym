@@ -2,6 +2,7 @@
 using Gym.AuthorizationServer.Client.Services;
 using Gym.OAuth.Extensions;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Cryptography;
 
@@ -15,7 +16,7 @@ namespace Gym.BFF.Services
 
     public class RsaSecurityKeyProvider(
         IJwkKeyProvider _jwkKeyProvider,
-        AuthorizationServerOptions _authorizationServerOptions,
+        IOptions<AuthorizationServerOptions> _authorizationServerOptions,
         IMemoryCache _cache) : IRsaSecurityKeyProvider
     {
         private readonly TimeSpan _cacheTtl = TimeSpan.FromHours(1);
@@ -23,7 +24,7 @@ namespace Gym.BFF.Services
 
         public async Task<RsaSecurityKey> GetKeyAsync(CancellationToken cancellationToken)
         {
-            return await this.GetKeyAsync(_authorizationServerOptions.Kid, cancellationToken);
+            return await this.GetKeyAsync(_authorizationServerOptions.Value.Kid, cancellationToken);
         }
 
         public async Task<RsaSecurityKey> GetKeyAsync(String kid, CancellationToken cancellationToken)

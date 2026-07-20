@@ -1,8 +1,4 @@
 using Gym.AuthorizationServer.Admin.Extensions;
-using Gym.AuthorizationServer.Admin.HostedServices;
-using Gym.AuthorizationServer.Client;
-using Gym.AuthorizationServer.Client.Options;
-using Gym.AuthorizationServer.Infrastructure;
 using Microsoft.AspNetCore.HttpLogging;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -37,25 +33,13 @@ builder.Services.AddAuthenticationSchemes(
     );
 builder.Services.AddAuthorizationPolicies();
 
-builder.Services.AddMessageBus(builder.Configuration);
+builder.Services.AddDatabaseInfrastructure(builder.Configuration);
+builder.Services.AddMessageBusInfstrastructure(builder.Configuration);
 
-var mongoOptions = new MongoOptions();
-builder.Configuration.GetRequiredSection("MongoDb").Bind(mongoOptions);
-builder.Services.AddMongoInfrastructure(mongoOptions);
-
-builder.Services.AddRepositories();
-builder.Services.AddPasswordHashingServices();
-
-AuthorizationServerOptions authorizationServerOptions = new();
-builder.Configuration.GetRequiredSection("AuthorizationServer").Bind(authorizationServerOptions);
-
-builder.Services.AddAuthorizationServerNamedClient(authorizationServerOptions.ClientName, authorizationServerOptions.BaseUrl);
-
-builder.Services.SetupOAuthProtectedResourceConfiguration(authorizationServerOptions);
+builder.Services.AddAuthorizationServerClient(builder.Configuration);
 
 builder.Services.AddServices();
 
-builder.Services.AddHostedService<RabbitMQTopologyInitializer>();
 
 var app = builder.Build();
 

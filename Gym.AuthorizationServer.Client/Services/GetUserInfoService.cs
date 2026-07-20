@@ -1,5 +1,6 @@
 ﻿using Gym.AuthorizationServer.Client.Options;
 using Gym.OAuth.Extensions;
+using Microsoft.Extensions.Options;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 
@@ -10,13 +11,13 @@ namespace Gym.AuthorizationServer.Client.Services
         Task<HttpResult<UserInfo>> HandleAsync(String accessToken, CancellationToken cancellationToken = default); 
     }
 
-    internal class GetUserInfoService(IHttpClientFactory _httpClientFactory, AuthorizationServerOptions _authorizationServerOptions) : IGetUserInfoService
+    internal class GetUserInfoService(IHttpClientFactory _httpClientFactory, IOptions<AuthorizationServerOptions> _authorizationServerOptions) : IGetUserInfoService
     {
         public async Task<HttpResult<UserInfo>> HandleAsync(String accessToken, CancellationToken cancellationToken = default)
         {
-            using HttpClient httpClient = _httpClientFactory.CreateClient(_authorizationServerOptions.ClientName);
+            using HttpClient httpClient = _httpClientFactory.CreateClient(_authorizationServerOptions.Value.ClientName);
 
-            using var requestMessage = new HttpRequestMessage(HttpMethod.Get, _authorizationServerOptions.UserInfoEndpoint);
+            using var requestMessage = new HttpRequestMessage(HttpMethod.Get, _authorizationServerOptions.Value.UserInfoEndpoint);
 
             requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
 

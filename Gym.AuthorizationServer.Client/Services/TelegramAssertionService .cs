@@ -1,5 +1,6 @@
 ﻿using Gym.AuthorizationServer.Client.Options;
 using Gym.OAuth.Extensions;
+using Microsoft.Extensions.Options;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 
@@ -12,22 +13,22 @@ namespace Gym.AuthorizationServer.Client.Services
 
     internal class TelegramAssertionService(
         IHttpClientFactory _httpClientFactory,
-        ClientCredentialsOptions _clientCredentials,
-        AuthorizationServerOptions _authorizationServerOptions) : ITelegramAssertionService
+        IOptions<ClientCredentialsOptions> _clientCredentialsOptions,
+        IOptions<AuthorizationServerOptions> _authorizationServerOptions) : ITelegramAssertionService
     {
         public async Task<HttpResult<TokenResponse>> HandleAsync(String initData, String resource, CancellationToken cancellationToken = default)
         {
-            using HttpClient httpClient = _httpClientFactory.CreateClient(_authorizationServerOptions.ClientName);
+            using HttpClient httpClient = _httpClientFactory.CreateClient(_authorizationServerOptions.Value.ClientName);
 
-            using var requestMessage = new HttpRequestMessage(HttpMethod.Post, _authorizationServerOptions.TokenEndpoint);
+            using var requestMessage = new HttpRequestMessage(HttpMethod.Post, _authorizationServerOptions.Value.TokenEndpoint);
 
-            requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Basic", _clientCredentials.GetCredentialsInBase64());
+            requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Basic", _clientCredentialsOptions.Value.GetCredentialsInBase64());
 
             TokenRequest tokenRequest = new()
             {
                 GrantType = GrantTypes.TelegramAssertion,
-                RedirectUri = _clientCredentials.RedirectUri,
-                Scope = _clientCredentials.Scope,
+                RedirectUri = _clientCredentialsOptions.Value.RedirectUri,
+                Scope = _clientCredentialsOptions.Value.Scope,
                 Resource = resource,
                 Assertion = initData
             };

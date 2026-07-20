@@ -3,6 +3,7 @@ using Gym.WebApi.Providers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
+using Gym.AuthorizationServer.Client;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
@@ -87,8 +88,10 @@ public static class IServiceCollectionExtensions
             return services;
         }
 
-        public IServiceCollection AddAuthorizationServerNamedClient(String key, String baseUrl)
+        public IServiceCollection AddAuthorizationServerClient(IConfiguration configuration)
         {
+            var key = configuration.GetRequiredConfiguration("AuthorizationServer:ClientName");
+            var baseUrl = configuration.GetRequiredConfiguration("AuthorizationServer:BaseUrl");
             services.AddHttpClient(key, client =>
             {
                 client.BaseAddress = new Uri(baseUrl);
@@ -97,6 +100,13 @@ public static class IServiceCollectionExtensions
             {
                 UseCookies = false,
                 UseDefaultCredentials = false
+            });
+
+            services.SetupOAuthProtectedResourceConfiguration(options =>
+            {
+                options.ClientName = configuration.GetRequiredConfiguration("AuthorizationServer:ClientName");
+                options.BaseUrl = configuration.GetRequiredConfiguration("AuthorizationServer:BaseUrl");
+                options.Kid = configuration.GetRequiredConfiguration("AuthorizationServer:Kid");
             });
 
             return services;

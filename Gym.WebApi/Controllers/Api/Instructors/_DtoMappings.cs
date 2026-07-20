@@ -1,7 +1,5 @@
 ﻿using AutoMapper;
 using Gym.Abstractions.Query.Instructors;
-using Gym.Application.Services.InstructorApi.CreateInstructor;
-using Gym.WebDto.Requests.Instructor;
 using Gym.WebDto.Responses.Instructor;
 
 namespace Gym.WebApi.Controllers.Api.Instructors
@@ -10,9 +8,6 @@ namespace Gym.WebApi.Controllers.Api.Instructors
     {
         public _DtoMappings()
         {
-            CreateMap<CreateInstructorRequest, CreateInstructor>();
-            CreateMap<CreateInstructorResult, CreateInstructorResponse>();
-
             CreateMap<InstructorProjection, InstructorDto>();
         }
     }

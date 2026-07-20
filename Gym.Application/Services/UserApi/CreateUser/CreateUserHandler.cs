@@ -68,7 +68,16 @@ namespace Gym.Application.Services.UserApi.CreateClient
                 lastName = lastNameResult.Data!;
             }
 
-            User newUser = User.Create(userIdResult.Data!, userRole, firstNameResult.Data!, lastName);
+            TelegramId? telegramId = null;
+            if (createUser.TelegramId is not null)
+            {
+                var telegramIdResult = TelegramId.From(createUser.TelegramId.Value);
+                if (telegramIdResult.Success is false)
+                    return Result<User>.Fail(telegramIdResult.Error!);
+                telegramId = telegramIdResult.Data!;
+            }
+
+            User newUser = User.Create(userIdResult.Data!, userRole, firstNameResult.Data!, lastName, telegramId);
             await _userRepository.SaveAsync(newUser, cancellationToken);
 
             return Result<User>.Ok(newUser);

@@ -8,8 +8,9 @@ using Gym.AuthorizationServer.Infrastructure.Entities.Roles;
 using Gym.AuthorizationServer.Infrastructure.Entities.UserConsents;
 using Gym.AuthorizationServer.Infrastructure.Entities.Users;
 using Gym.AuthorizationServer.Infrastructure.Entities.Users.TelegramCredentials;
-using Gym.AuthorizationServer.Services.Events;
 using Gym.AuthorizationServer.Services.Tokens;
+using Gym.RabbitMQ.Topology.Messages;
+using Gym.RabbitMQ.Topology.Services;
 
 namespace Gym.AuthorizationServer.Services.Flows
 {
@@ -64,7 +65,14 @@ namespace Gym.AuthorizationServer.Services.Flows
                 };
                 await _telegramCredentialRepository.AddAsync(telegramCredential, cancellationToken);
 
-                UserCreatedEvent userCreatedEvent = new(newUser.Id, newUser.FirstName, newUser.LastName, clientRole.Name);
+                UserCreatedMessage userCreatedEvent = new()
+                {
+                    UserId = newUser.Id,
+                    Role = clientRole.Name,
+                    FirstName = newUser.FirstName,
+                    LastName = newUser.LastName,
+                    TelegramId = verificationResult.Value.Id
+                };
                 await _userCreatedEventService.PublishAsync(userCreatedEvent, cancellationToken);
             }
 

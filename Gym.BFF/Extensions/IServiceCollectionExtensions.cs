@@ -4,6 +4,7 @@ using Gym.BFF.Services;
 using Gym.BFF.Services.Session;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Session;
+using Gym.AuthorizationServer.Client;
 
 namespace Gym.BFF.Extensions;
 
@@ -67,57 +68,6 @@ public static class IServiceCollectionExtensions
             return services;
         }
 
-        public IServiceCollection AddAuthorizationServerNamedClient(String key, String baseUrl)
-        {
-            services.AddHttpClient(key, client =>
-            {
-                client.BaseAddress = new Uri(baseUrl);
-            })
-            .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
-            {
-                UseCookies = false,
-                UseDefaultCredentials = false
-            })
-            .AddHttpMessageHandler<AddForwardHeadersHandler>()
-            .AddHttpMessageHandler<RefreshTokenHandler>();
-
-            return services;
-        }
-
-        public IServiceCollection AddAuthorizationServerAdminApiNamedClient(String key, String baseUrl)
-        {
-            services.AddHttpClient(key, client =>
-            {
-                client.BaseAddress = new Uri(baseUrl);
-            })
-            .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
-            {
-                UseCookies = false,
-                UseDefaultCredentials = false
-            })
-            .AddHttpMessageHandler<AddForwardHeadersHandler>()
-            .AddHttpMessageHandler<RefreshTokenHandler>();
-
-            return services;
-        }
-
-        public IServiceCollection AddWebApiNamedClient(String key, String baseUrl)
-        {
-            services.AddHttpClient(key, client =>
-            {
-                client.BaseAddress = new Uri(baseUrl);
-            })
-            .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
-            {
-                UseCookies = false,
-                UseDefaultCredentials = false
-            })
-            .AddHttpMessageHandler<AddForwardHeadersHandler>()
-            .AddHttpMessageHandler<RefreshTokenHandler>();
-
-            return services;
-        }
-
         public IServiceCollection AddOptionsFromConfiguration(IConfiguration configuration)
         {
             services.AddOptions<StaticHeaderCheckOptions>()
@@ -158,6 +108,77 @@ public static class IServiceCollectionExtensions
             services.AddSingleton<IRsaSecurityKeyProvider, RsaSecurityKeyProvider>();
             services.AddSingleton<IOAuthIdTokenValidator, OAuthIdTokenValidator>();
             services.AddSingleton<ISetTokensToClientSideSessionService, SetTokensToClientSideSessionService>();
+
+            return services;
+        }
+
+        public IServiceCollection AddAuthorizationServerClient(IConfiguration configuration)
+        {
+            var key = configuration.GetRequiredConfiguration("Urls:AuthorizationServer:ClientName");
+            var baseUrl = configuration.GetRequiredConfiguration("Urls:AuthorizationServer:BaseUrl");
+            services.AddHttpClient(key, client =>
+            {
+                client.BaseAddress = new Uri(baseUrl);
+            })
+            .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+            {
+                UseCookies = false,
+                UseDefaultCredentials = false
+            });
+
+            services.SetupOAuthClientConfiguration(
+                clientOptions =>
+                {
+                    clientOptions.ClientId = configuration.GetRequiredConfiguration("ClientCredentials:ClientId");
+                    clientOptions.ClientSecret = configuration.GetRequiredConfiguration("ClientCredentials:ClientSecret");
+                    clientOptions.RedirectUri = configuration.GetRequiredConfiguration("ClientCredentials:RedirectUri");
+                    clientOptions.Scope = configuration.GetRequiredConfiguration("ClientCredentials:Scope");
+                },
+                authServerOptions =>
+                {
+                    authServerOptions.ClientName = configuration.GetRequiredConfiguration("Urls:AuthorizationServer:ClientName");
+                    authServerOptions.BaseUrl = configuration.GetRequiredConfiguration("Urls:AuthorizationServer:BaseUrl");
+                    authServerOptions.Kid = configuration.GetRequiredConfiguration("Urls:AuthorizationServer:Kid");
+                }
+            );
+
+            return services;
+        }
+
+        public IServiceCollection AddAuthorizationServerAdminApiNamedClient(IConfiguration configuration)
+        {
+            var key = configuration.GetRequiredConfiguration("Urls:AuthorizationServerAdminApi:ClientName");
+            var baseUrl = configuration.GetRequiredConfiguration("Urls:AuthorizationServerAdminApi:BaseUrl");
+            services.AddHttpClient(key, client =>
+            {
+                client.BaseAddress = new Uri(baseUrl);
+            })
+            .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+            {
+                UseCookies = false,
+                UseDefaultCredentials = false
+            })
+            .AddHttpMessageHandler<AddForwardHeadersHandler>()
+            .AddHttpMessageHandler<RefreshTokenHandler>();
+
+            return services;
+        }
+
+        public IServiceCollection AddWebApiNamedClient(IConfiguration configuration)
+        {
+            var key = configuration.GetRequiredConfiguration("Urls:WebApi:ClientName");
+            var baseUrl = configuration.GetRequiredConfiguration("Urls:WebApi:BaseUrl");
+            services.AddHttpClient(key, client =>
+            {
+                client.BaseAddress = new Uri(baseUrl);
+            })
+            .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+            {
+                UseCookies = false,
+                UseDefaultCredentials = false
+            })
+            .AddHttpMessageHandler<AddForwardHeadersHandler>()
+            .AddHttpMessageHandler<RefreshTokenHandler>();
 
             return services;
         }

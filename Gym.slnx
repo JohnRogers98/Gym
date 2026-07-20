@@ -23,6 +23,7 @@
   </Folder>
   <Project Path="Gym.BFF.Integration.Tests/Gym.BFF.Integration.Tests.csproj" Id="4560fcb8-d71a-45cd-8b54-0bd73b799803" />
   <Project Path="Gym.BFF/Gym.BFF.csproj" Id="be3ffeed-ab4d-4c52-beb8-19ac91e4d601" />
+  <Project Path="Gym.RabbitMQ.Topology/Gym.RabbitMQ.Topology.csproj" Id="17742eec-e1a5-456a-ac60-f0df06308af7" />
   <Project Path="Gym.WebApplication/Gym.WebApplication.csproj" Id="6196cc29-cb9a-468d-bfda-dbcd84bef184" />
   <Project Path="Gym.WebDto/Gym.WebDto.csproj" Id="19f12ed8-27b8-49a8-8d3c-4cf93619a012" />
 </Solution>

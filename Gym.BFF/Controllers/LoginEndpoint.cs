@@ -9,8 +9,8 @@ namespace Gym.BFF.Controllers
 {
     [ApiController]
     public class LoginEndpoint(
-        ClientCredentialsOptions _clientCredentialsOptions,
-        AuthorizationServerOptions _authorizationServerOptions,
+        IOptions<ClientCredentialsOptions> _clientCredentialsOptions,
+        IOptions<AuthorizationServerOptions> _authorizationServerOptions,
         IOptions<ResourceUrisOptions> _resourceUrisOptions,
         IOAuthStateGenerator _stateGenerator,
         IOAuthNonceGenerator _nonceGenerator,
@@ -30,10 +30,10 @@ namespace Gym.BFF.Controllers
 
             AuthorizeQuery authorizeQuery = new()
             {
-                ClientId = _clientCredentialsOptions.ClientId,
+                ClientId = _clientCredentialsOptions.Value.ClientId,
                 ResponseType = "code",
-                RedirectUri = _clientCredentialsOptions.RedirectUri,
-                Scope = _clientCredentialsOptions.Scope,
+                RedirectUri = _clientCredentialsOptions.Value.RedirectUri,
+                Scope = _clientCredentialsOptions.Value.Scope,
                 State = state,
                 Nonce = nonce,
                 CodeChallengeMethod = codeChallengePair.CodeChallengeMethod,
@@ -41,7 +41,7 @@ namespace Gym.BFF.Controllers
                 Resource = _resourceUrisOptions.Value.Api
             };
 
-            return base.Redirect($"{_authorizationServerOptions.FullAuthorizeUrl}{authorizeQuery.ToQueryString()}");
+            return base.Redirect($"{_authorizationServerOptions.Value.FullAuthorizeUrl}{authorizeQuery.ToQueryString()}");
         }
     }
 

@@ -1,6 +1,4 @@
-﻿using Gym.AuthorizationServer.Client.Options;
-using Gym.AuthorizationServer.Client;
-using Gym.CompositionRoot.Extensions;
+﻿using Gym.CompositionRoot.Extensions;
 using Gym.WebApi.Converters;
 using Gym.WebApi.Extensions;
 using Gym.Abstractions.MessageBus;
@@ -29,12 +27,7 @@ builder.Services.AddAuthenticationSchemes(
 
 builder.Services.AddAuthorizationPolicies();
 
-AuthorizationServerOptions authorizationServerOptions = new();
-builder.Configuration.GetRequiredSection("AuthorizationServer").Bind(authorizationServerOptions);
-
-builder.Services.AddAuthorizationServerNamedClient(authorizationServerOptions.ClientName, authorizationServerOptions.BaseUrl);
-
-builder.Services.SetupOAuthProtectedResourceConfiguration(authorizationServerOptions);
+builder.Services.AddAuthorizationServerClient(builder.Configuration);
 
 builder.Services.AddMessageBus(builder.Configuration);
 

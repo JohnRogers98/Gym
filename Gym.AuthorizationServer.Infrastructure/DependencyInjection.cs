@@ -13,73 +13,90 @@ using Gym.AuthorizationServer.Infrastructure.Entities.Users.TelegramCredentials;
 using Gym.AuthorizationServer.Infrastructure.Services;
 using Gym.AuthorizationServer.Infrastructure.Session;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 
-namespace Microsoft.Extensions.DependencyInjection
+namespace Microsoft.Extensions.DependencyInjection;
+
+public static class DependencyInjection
 {
-    public static class DependencyInjection
+    extension(IServiceCollection services)
     {
-        extension(IServiceCollection services)
+        public IServiceCollection AddMongoInfrastructure(Action<MongoOptions> configureOptions)
         {
-            public IServiceCollection AddRepositories()
+            services.TryAddSingleton<IMongoClient>(sp => 
             {
-                services.TryAddScoped<IUserRepository, UserRepository>();
-                services.TryAddScoped<IFormCredentialRepository, FormCredentialRepository>();
-                services.TryAddScoped<ITelegramCredentialRepository, TelegramCredentialRepository>();
-                services.TryAddScoped<IUserConsentRepository, UserConsentRepository>();
-                services.TryAddScoped<IRoleRepository, UserRoleRepository>();
+                var options = sp.GetRequiredService<IOptions<MongoOptions>>().Value;
+                return new MongoClient(options.ConnectionString);
+            });
 
-                services.TryAddScoped<IClientRepository, ClientRepository>();
-                services.TryAddScoped<IProtectedResourceRepository, ProtectedResourceRepository>();
-                services.TryAddScoped<IScopeRepository, ScopeRepository>();
-                services.TryAddScoped<IGrantCodeRepository, GrantCodeRepository>();
-                services.TryAddScoped<IAccessTokenRepository, AccessTokenRepository>();
-                services.TryAddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
-
-                return services;
-            }
-
-            public IServiceCollection AddPasswordHashingServices()
+            services.TryAddSingleton<IMongoDatabase>(sp =>
             {
-                services.TryAddSingleton<IPasswordHasher, PasswordHasher>();
-                services.TryAddSingleton<IPasswordHashValidator, PasswordHashValidator>();
+                var options = sp.GetRequiredService<IOptions<MongoOptions>>().Value;
+                return sp.GetRequiredService<IMongoClient>().GetDatabase(options.DatabaseName);
+            });
 
-                return services;
-            }
+            services.TryAddScoped<MongoUnitOfWork>();
+            services.TryAddScoped<IUnitOfWork>(sp => sp.GetRequiredService<MongoUnitOfWork>());
 
-            public IServiceCollection AddMongoInfrastructure(MongoOptions mongoOptions)
+            services
+                .AddMongoCollection<UserEntity>(options => options.Collections.Users)
+                .AddMongoCollection<FormCredentialEntity>(options => options.Collections.FormCredentials)
+                .AddMongoCollection<TelegramCredentialEntity>(options => options.Collections.TelegramCredentials)
+                .AddMongoCollection<ClientEntity>(options => options.Collections.Clients)
+                .AddMongoCollection<UserConsentEntity>(options => options.Collections.UserConsents)
+                .AddMongoCollection<GrantCodeEntity>(options => options.Collections.GrantCodes)
+                .AddMongoCollection<AccessTokenEntity>(options => options.Collections.AccessTokens)
+                .AddMongoCollection<RefreshTokenEntity>(options => options.Collections.RefreshTokens)
+                .AddMongoCollection<UserRoleEntity>(options => options.Collections.Roles)
+                .AddMongoCollection<ScopeEntity>(options => options.Collections.Scopes)
+                .AddMongoCollection<ProtectedResourceEntity>(options => options.Collections.ProtectedResources);
+
+            services.AddRepositories();
+
+            services.AddPasswordHashingServices();
+
+            return services;
+        }
+
+        private IServiceCollection AddMongoCollection<T>(Func<MongoOptions, String> collectionNameFunc)
+        {
+            services.TryAddSingleton<IMongoCollection<T>>(sp =>
             {
-                services.TryAddSingleton<IMongoClient>(_ => new MongoClient(mongoOptions.ConnectionString));
-                services.TryAddSingleton<IMongoDatabase>(sp => sp.GetRequiredService<IMongoClient>().GetDatabase(mongoOptions.DatabaseName));
+                var options = sp.GetRequiredService<IOptions<MongoOptions>>().Value;
+                var collectionName = collectionNameFunc(options);
 
-                services.TryAddScoped<MongoUnitOfWork>();
-                services.TryAddScoped<IUnitOfWork>(sp => sp.GetRequiredService<MongoUnitOfWork>());
+                var database = sp.GetRequiredService<IMongoDatabase>();
+                return database.GetCollection<T>(collectionName);
+            });
 
-                services.AddMongoCollection<UserEntity>(mongoOptions.Collections.Users);
-                services.AddMongoCollection<FormCredentialEntity>(mongoOptions.Collections.FormCredentials);
-                services.AddMongoCollection<TelegramCredentialEntity>(mongoOptions.Collections.TelegramCredentials);
-                services.AddMongoCollection<ClientEntity>(mongoOptions.Collections.Clients);
-                services.AddMongoCollection<UserConsentEntity>(mongoOptions.Collections.UserConsents);
-                services.AddMongoCollection<GrantCodeEntity>(mongoOptions.Collections.GrantCodes);
-                services.AddMongoCollection<AccessTokenEntity>(mongoOptions.Collections.AccessTokens);
-                services.AddMongoCollection<RefreshTokenEntity>(mongoOptions.Collections.RefreshTokens);
-                services.AddMongoCollection<UserRoleEntity>(mongoOptions.Collections.Roles);
-                services.AddMongoCollection<ScopeEntity>(mongoOptions.Collections.Scopes);
-                services.AddMongoCollection<ProtectedResourceEntity>(mongoOptions.Collections.ProtectedResources);
+            return services;
+        }
 
-                return services;
-            }
+        private IServiceCollection AddRepositories()
+        {
+            services.TryAddScoped<IUserRepository, UserRepository>();
+            services.TryAddScoped<IFormCredentialRepository, FormCredentialRepository>();
+            services.TryAddScoped<ITelegramCredentialRepository, TelegramCredentialRepository>();
+            services.TryAddScoped<IUserConsentRepository, UserConsentRepository>();
+            services.TryAddScoped<IRoleRepository, UserRoleRepository>();
 
-            private IServiceCollection AddMongoCollection<T>(String collectionName)
-            {
-                services.TryAddSingleton<IMongoCollection<T>>(sp =>
-                {
-                    var database = sp.GetRequiredService<IMongoDatabase>();
-                    return database.GetCollection<T>(collectionName);
-                });
+            services.TryAddScoped<IClientRepository, ClientRepository>();
+            services.TryAddScoped<IProtectedResourceRepository, ProtectedResourceRepository>();
+            services.TryAddScoped<IScopeRepository, ScopeRepository>();
+            services.TryAddScoped<IGrantCodeRepository, GrantCodeRepository>();
+            services.TryAddScoped<IAccessTokenRepository, AccessTokenRepository>();
+            services.TryAddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 
-                return services;
-            }
+            return services;
+        }
+
+        private IServiceCollection AddPasswordHashingServices()
+        {
+            services.TryAddSingleton<IPasswordHasher, PasswordHasher>();
+            services.TryAddSingleton<IPasswordHashValidator, PasswordHashValidator>();
+
+            return services;
         }
     }
 }

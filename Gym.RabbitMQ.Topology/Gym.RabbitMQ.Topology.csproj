@@ -7,16 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-	<PackageReference Include="MediatR" Version="14.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.10" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.10" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Gym.Abstractions.MessageBus\Gym.MessageBus.csproj" />
-    <ProjectReference Include="..\Gym.Application\Gym.Application.csproj" />
-    <ProjectReference Include="..\Gym.Domain\Gym.Domain.csproj" />
-    <ProjectReference Include="..\Gym.Infrastructure\Gym.Infrastructure.csproj" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="10.0.10" />
+    <PackageReference Include="Microsoft.Extensions.Options.DataAnnotations" Version="10.0.10" />
+    <PackageReference Include="RabbitMQ.Client" Version="7.2.1" />
   </ItemGroup>
 
 </Project>

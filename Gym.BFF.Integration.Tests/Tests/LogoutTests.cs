@@ -16,7 +16,7 @@ namespace Gym.BFF.Integration.Tests.Tests
             #region Given
             var httpClient = Fixture.CreateClient();
 
-            var urls = Fixture.Services.GetRequiredService<AuthorizationServerOptions>();
+            var urls = Fixture.Services.GetRequiredOption<AuthorizationServerOptions>();
 
             Fixture.AuthorizationServerMock.SetupExchageCodeToken(urls.TokenEndpoint, "test_access_token", "test_refresh_token");
 

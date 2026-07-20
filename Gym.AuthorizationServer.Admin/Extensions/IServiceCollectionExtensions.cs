@@ -1,9 +1,9 @@
-﻿using Gym.AuthorizationServer.Admin.Application;
+﻿using Gym.AuthorizationServer.Admin.HostedServices;
 using Gym.AuthorizationServer.Admin.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using RabbitMQ.Client;
 using System.IdentityModel.Tokens.Jwt;
+using Gym.AuthorizationServer.Client;
 
 namespace Gym.AuthorizationServer.Admin.Extensions;
 
@@ -71,8 +71,10 @@ public static class IServiceCollectionExtensions
             return services;
         }
 
-        public IServiceCollection AddAuthorizationServerNamedClient(String key, String baseUrl)
+        public IServiceCollection AddAuthorizationServerClient(IConfiguration configuration)
         {
+            var key = configuration.GetRequiredConfiguration("AuthorizationServer:ClientName");
+            var baseUrl = configuration.GetRequiredConfiguration("AuthorizationServer:BaseUrl");
             services.AddHttpClient(key, client =>
             {
                 client.BaseAddress = new Uri(baseUrl);
@@ -83,26 +85,38 @@ public static class IServiceCollectionExtensions
                 UseDefaultCredentials = false
             });
 
+            services.SetupOAuthProtectedResourceConfiguration(options =>
+            {
+                options.ClientName = configuration.GetRequiredConfiguration("AuthorizationServer:ClientName");
+                options.BaseUrl = configuration.GetRequiredConfiguration("AuthorizationServer:BaseUrl");
+                options.Kid = configuration.GetRequiredConfiguration("AuthorizationServer:Kid");
+            });
+
             return services;
         }
 
-        public IServiceCollection AddMessageBus(IConfiguration configuration)
+        public IServiceCollection AddDatabaseInfrastructure(IConfiguration configuration)
         {
-            services.AddSingleton<IConnection>(sp =>
+            services.AddMongoInfrastructure(options =>
             {
-                var factory = new ConnectionFactory
-                {
-                    HostName = configuration.GetRequiredConfiguration("RabbitMQ:Hostname"),
-                    UserName = configuration.GetRequiredConfiguration("RabbitMQ:Username"),
-                    Password = configuration.GetRequiredConfiguration("RabbitMQ:Password"),
-                    AutomaticRecoveryEnabled = true,
-                    NetworkRecoveryInterval = TimeSpan.FromSeconds(5)
-                };
-
-                return factory.CreateConnectionAsync().GetAwaiter().GetResult();
+                options.ConnectionString = configuration.GetRequiredConfiguration("MongoDb:ConnectionString");
+                options.DatabaseName = configuration.GetRequiredConfiguration("MongoDb:DatabaseName");
             });
 
-            services.AddSingleton<RabbitMQExchange>(_ => new RabbitMQExchange(configuration.GetRequiredConfiguration("RabbitMQ:Exchange")));
+            return services;
+        }
+
+        public IServiceCollection AddMessageBusInfstrastructure(IConfiguration configuration)
+        {
+            services.AddRabbitMQConnection(options =>
+            {
+                options.Hostname = configuration.GetRequiredConfiguration("RabbitMQ:Hostname");
+                options.Username = configuration.GetRequiredConfiguration("RabbitMQ:Username");
+                options.Password = configuration.GetRequiredConfiguration("RabbitMQ:Password");
+                options.Vhost = configuration.GetRequiredConfiguration("RabbitMQ:Vhost");
+            });
+
+            services.AddHostedService<MessageBusInitializer>();
 
             return services;
         }

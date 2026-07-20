@@ -1,7 +1,6 @@
 ﻿using Gym.AuthorizationServer.Client.Options;
 using Gym.AuthorizationServer.Client.Services;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Gym.AuthorizationServer.Client;
 
@@ -9,10 +8,19 @@ public static class DependencyInjection
 {
     extension(IServiceCollection services)
     {
-        public IServiceCollection SetupOAuthClientConfiguration(ClientCredentialsOptions clientCredentialsOptions, AuthorizationServerOptions authorizationServerOptions)
+        public IServiceCollection SetupOAuthClientConfiguration(
+            Action<ClientCredentialsOptions> clientConfigureOptions,
+            Action<AuthorizationServerOptions> authorizationServerConfigureOptions)
         {
-            services.TryAddSingleton(_ => clientCredentialsOptions);
-            services.TryAddSingleton(_ => authorizationServerOptions);
+            services.AddOptions<ClientCredentialsOptions>()
+                .Configure(clientConfigureOptions)
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
+
+            services.AddOptions<AuthorizationServerOptions>()
+                .Configure(authorizationServerConfigureOptions)
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
 
             AddOAuthClientServices(services);
 
@@ -29,9 +37,12 @@ public static class DependencyInjection
             return services;
         }
 
-        public IServiceCollection SetupOAuthProtectedResourceConfiguration(AuthorizationServerOptions authorizationServerOptions)
+        public IServiceCollection SetupOAuthProtectedResourceConfiguration(Action<AuthorizationServerOptions> authorizationServerConfigureOptions)
         {
-            services.TryAddSingleton(_ => authorizationServerOptions);
+            services.AddOptions<AuthorizationServerOptions>()
+                .Configure(authorizationServerConfigureOptions)
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
 
             AddOAuthProtectedResourceServices(services);
 
@@ -44,7 +55,5 @@ public static class DependencyInjection
 
             return services;
         }
-
-
     }
 }

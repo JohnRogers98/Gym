@@ -1,10 +1,11 @@
 ﻿using Gym.AuthorizationServer.Integration.Tests;
 using Gym.AuthorizationServer.Integration.Tests.Antiforgery;
 using Gym.AuthorizationServer.Integration.Tests.Fakes;
-using Gym.AuthorizationServer.Services.Events;
 using Gym.AuthorizationServer.Services.Rsa;
+using Gym.RabbitMQ.Topology.Services;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using MongoDB.Driver;
 using System.ComponentModel;
 
@@ -25,6 +26,22 @@ namespace Microsoft.Extensions.DependencyInjection
             });
         }
 
+        public static IWebHostBuilder ReplaceConfigurationSettings(this IWebHostBuilder builder)
+        {
+            if (builder == null)
+                throw new ArgumentNullException(nameof(builder));
+
+            builder.ConfigureAppConfiguration((context, config) =>
+            {
+                config.AddInMemoryCollection(new Dictionary<String, String?>
+                {
+                    ["RabbitMQ:Vhost"] = "/test"
+                });
+            });
+
+            return builder;
+        }
+
         public static IWebHostBuilder ReplaceServicesWithFakes(this IWebHostBuilder builder)
         {
             if (builder == null)
@@ -37,9 +54,7 @@ namespace Microsoft.Extensions.DependencyInjection
                     .ReplaceService<IRsaKeyProvider, FakeRsaKeyProvider>()
                     .ReplaceService<IHttpContextAccessor, FakeHttpContextAccessor>()
                     .ReplaceService<IUserCreatedEventService, FakeUserCreatedEventService>();
-            }); 
-
-            builder.UseEnvironment("Development");
+            });
 
             return builder;
         }
