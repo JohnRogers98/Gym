@@ -6,16 +6,16 @@ namespace Gym.WebApplication.Authentication
     {
         private readonly UserAuthState _userAuthState;
         private readonly ICheckSessionService _checkSessionService;
-        private readonly IUserInfoService _userInfoService;
+        private readonly ISessionInfoService _sessionInfoService;
 
         private Task<AuthenticationState> _authenticationState;
 
         public AuthStateProvider(
             UserAuthState userAuthState,
             ICheckSessionService checkSessionService,
-            IUserInfoService userInfoService)
+            ISessionInfoService userInfoService)
         {
-            (_userAuthState, _checkSessionService, _userInfoService) = (userAuthState, checkSessionService, userInfoService);
+            (_userAuthState, _checkSessionService, _sessionInfoService) = (userAuthState, checkSessionService, userInfoService);
 
             _authenticationState = this.LoadAuthenticationStateAsync();
 
@@ -39,20 +39,21 @@ namespace Gym.WebApplication.Authentication
             var checkSessionResult = await _checkSessionService.HandleAsync();
             if (checkSessionResult.Succeeded)
             {
-                var userInfoResult = await _userInfoService.HandleAsync();
-                if (userInfoResult.Succeeded)
+                var sessionInfoResult = await _sessionInfoService.HandleAsync();
+                if (sessionInfoResult.Succeeded)
                 {
                     AuthClaims authClaims = new()
                     {
-                        UserId = userInfoResult.Data!.UserId,
-                        Role = userInfoResult.Data.Role,
-                        Name = userInfoResult.Data.Name
+                        UserId = sessionInfoResult.Data.UserId,
+                        Role = sessionInfoResult.Data.Role,
+                        Name = sessionInfoResult.Data.Name,
+                        AuthenticationMethod = sessionInfoResult.Data.AuthenticationMethod,
                     };
+
                     _userAuthState.CurrentUser = authClaims.ToClaimsPrincipal();
                     return new AuthenticationState(_userAuthState.CurrentUser);
                 }
             }
-
             return new AuthenticationState(new());
         }
 

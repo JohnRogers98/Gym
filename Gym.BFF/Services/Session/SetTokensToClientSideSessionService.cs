@@ -7,12 +7,12 @@ namespace Gym.BFF.Services.Session
 {
     public interface ISetTokensToClientSideSessionService
     {
-        Task HandleAsync(String accessToken, String? refreshToken);
+        Task HandleAsync(String accessToken, String? refreshToken, String? idToken = null);
     }
 
     public class SetTokensToClientSideSessionService(IHttpContextAccessor _httpContextAccessor) : ISetTokensToClientSideSessionService
     {
-        public async Task HandleAsync(String accessToken, String? refreshToken)
+        public async Task HandleAsync(String accessToken, String? refreshToken, String? idToken = null)
         {
             if (_httpContextAccessor.HttpContext is null)
                 return;
@@ -24,6 +24,9 @@ namespace Gym.BFF.Services.Session
 
             if(refreshToken is not null)
                 claims.Add(new Claim(ExtendedClaimTypes.RefreshToken, refreshToken));
+
+            if (idToken is not null)
+                claims.Add(new Claim(ExtendedClaimTypes.IdToken, idToken));
 
             var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
             var principal = new ClaimsPrincipal(identity);

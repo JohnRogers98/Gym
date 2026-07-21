@@ -4,7 +4,7 @@ namespace Gym.AuthorizationServer.Infrastructure.Services
 {
     public interface IPasswordHasher
     {
-        String HashPassword(String pssword);
+        String HashPassword(String password);
     }
 
     public class PasswordHasher : IPasswordHasher

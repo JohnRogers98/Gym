@@ -1,7 +1,4 @@
 ﻿@page "/account"
-@using Gym.WebApplication.Features.Client.Account.ChangePassword
-@using Gym.WebApplication.Features.Client.Account.Details
-@using Gym.WebApplication.Features.Client.Account.History
 
 @attribute [Authorize(Roles = "Client")]
 
@@ -18,9 +15,11 @@
                     <AccountHistory></AccountHistory>
                 </MudTabPanel>
 
-                <MudTabPanel Text="Password">
-                    <ChangePassword></ChangePassword>
-                </MudTabPanel>
+                <AuthorizeView Policy="HasBasicAuth">
+                    <MudTabPanel Text="Password">
+                        <ChangePassword></ChangePassword>
+                    </MudTabPanel>
+                </AuthorizeView>
 
             </MudTabs>
         </div>
@@ -37,9 +36,11 @@
                 <AccountHistory></AccountHistory>
             </MudTabPanel>
 
-            <MudTabPanel Text="Password">
-                <ChangePassword></ChangePassword>
-            </MudTabPanel>
+            <AuthorizeView Policy="HasBasicAuth">
+                <MudTabPanel Text="Password">
+                    <ChangePassword></ChangePassword>
+                </MudTabPanel>
+            </AuthorizeView>
 
         </MudTabs>
     </MudHidden>

@@ -10,25 +10,25 @@ namespace Gym.WebApplication.Options
         [Url]
         public String BaseUrl { get; set; } = default!;
 
-        public String ClientName { get; set; } = "bff-client";
+        [Required] public String ClientName { get; set; } = default!;
 
-        public String LoginEndpoint { get; set; } = "/login";
-        public String FullLoginPath => $"{BaseUrl}{LoginEndpoint}";
+        [Required] public String LoginEndpoint { get; set; } = default!;
 
-        public String TelegramInitEndpoint { get; set; } = "/telegram-init";
-        public String FullTelegramInitPath => $"{BaseUrl}{TelegramInitEndpoint}";
+        [Required] public String TelegramInitEndpoint { get; set; } = default!;
 
-        public String CheckSessionEndpoint { get; set; } = "/check-session";
-        public String FullCheckSessionPath => $"{BaseUrl}{CheckSessionEndpoint}";
+        [Required] public String CheckSessionEndpoint { get; set; } = default!;
 
-        public String UserInfoEndpoint { get; set; } = "/api/userinfo";
-        public String FullUserInfoPath => $"{BaseUrl}{UserInfoEndpoint}";
+        [Required] public String SessionInfoEndpoint { get; set; } = default!;
 
-        public String LogoutEndpoint { get; set; } = "/logout";
-        public String FullLogoutPath => $"{BaseUrl}{LogoutEndpoint}";
+        [Required] public String LogoutEndpoint { get; set; } = default!;
 
-        public String ListRolesEndpoint { get; set; } = "/api/user-roles";
-        public String CreateUserEndpoint { get; set; } = "/api/users";
-        public String CheckUsernameEndpoint { get; set; } = "api/users/check-username";
+        [Required] public String ListRolesEndpoint { get; set; } = default!;
+        [Required] public String CreateUserEndpoint { get; set; } = default!;
+        [Required] public String CheckUsernameEndpoint { get; set; } = default!;
+        [Required] public String ChangePasswordEndpoint { get; set; } = default!;
+
+
+        [Required] public String GetClientDetailsEndpoint { get; set; } = default!;
+        [Required] public String GetAccountHistoryEndpoint { get; set; } = default!;
     }
 }

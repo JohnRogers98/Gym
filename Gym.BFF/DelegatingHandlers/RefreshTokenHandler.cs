@@ -27,7 +27,7 @@ public class RefreshTokenHandler(
                 if(newTokensResponseResult.IsSuccess)
                 {
                     await _setTokensToClientSideSessionService
-                        .HandleAsync(newTokensResponseResult.Value.AccessToken, newTokensResponseResult.Value.RefreshToken);
+                        .HandleAsync(newTokensResponseResult.Value.AccessToken, newTokensResponseResult.Value.RefreshToken, newTokensResponseResult.Value.IdToken);
                     
                     request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", newTokensResponseResult.Value.AccessToken);
                     response = await base.SendAsync(request, cancellationToken);

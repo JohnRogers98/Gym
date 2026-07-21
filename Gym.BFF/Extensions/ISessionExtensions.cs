@@ -26,7 +26,7 @@ public static class ISessionExtensions
             var value = session.GetString("oauth_code_verifier");
             session.Remove("oauth_code_verifier");
             return value;
-        } 
+        }
     }
 
 }

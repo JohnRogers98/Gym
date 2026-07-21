@@ -11,10 +11,10 @@ namespace Gym.AuthorizationServer.Admin.Controllers.Api.Users
 {
     [ApiController]
     [Authorize(Policy = nameof(SecurityPolicy.AdminOnly))]
-    public class CheckUsernameExistingEndpoint(IMediator _mediator) : EndpointBaseAsync.WithRequest<CheckUsernameExistenceRequest>.WithActionResult
+    public class CheckUsernameExistingEndpoint(IMediator _mediator) : EndpointBaseAsync.WithRequest<CheckUsernameExistenceRequest>.WithActionResult<CheckUsernameExistenceResponse>
     {
         [HttpPost("api/users/check-username")]
-        public async override Task<ActionResult> HandleAsync(CheckUsernameExistenceRequest request, CancellationToken cancellationToken = default)
+        public async override Task<ActionResult<CheckUsernameExistenceResponse>> HandleAsync(CheckUsernameExistenceRequest request, CancellationToken cancellationToken = default)
         {
             var usernameExistResult = await _mediator.Send(new CheckUsernameExistence(request.Username), cancellationToken);
 

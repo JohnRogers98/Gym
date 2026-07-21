@@ -11,5 +11,5 @@
 </AuthorizeView>
 
 @code {
-    private void Authenticate() => NavManager.NavigateTo(BffOptions.Value.FullLoginPath, forceLoad: true);
+    private void Authenticate() => NavManager.NavigateTo($"{BffOptions.Value.BaseUrl}{BffOptions.Value.LoginEndpoint}", forceLoad: true);
 }

@@ -1,4 +1,6 @@
-﻿namespace Gym.WebApplication.Features._Common.Services
+﻿using Gym.WebApplication.Operations;
+
+namespace Gym.WebApplication.Features._Common.Services
 {
     public class RequestHandlerRegistration
     {
@@ -45,6 +47,7 @@
 
                     public For<TService> DecorateWithNotifier()
                     {
+                        _services.AddScoped<AsyncOperationStateNotifier<TRequest, TResponse>>();
                         _services.Decorate<IRequestHandler<TRequest, TResponse>, NotifyDecorator<TRequest, TResponse>>();
                         return this;
                     }

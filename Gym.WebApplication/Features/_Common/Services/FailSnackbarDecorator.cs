@@ -13,7 +13,7 @@ namespace Gym.WebApplication.Features._Common.Services
 
             if(result.Succeeded is false)
             {
-                _appSnackbarNotifier.ShowMessage($"{result.ErrorMessage}", MessageSeverity.Error);
+                _appSnackbarNotifier.ShowMessage(String.IsNullOrWhiteSpace(result.ErrorMessage) ? "Error" : $"{result.ErrorMessage}", MessageSeverity.Error);
             }
 
             return result;

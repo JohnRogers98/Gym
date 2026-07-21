@@ -6,7 +6,7 @@ using Microsoft.Extensions.Options;
 namespace Gym.BFF.Controllers.Api
 {
     [ApiController]
-    public class CreateUserEndpoint(IOptions<AuthorizationServerAdminApiOptions> _adminApiOptions, IHttpClientFactory _httpClientFactory) : ControllerBase
+    public class CreateUserEndpoint(IHttpClientFactory _httpClientFactory, IOptions<AuthorizationServerAdminApiOptions> _adminApiOptions) : ControllerBase
     {
         [HttpPost("api/users")]
         public async Task<ActionResult<CreateUserResponse>> HandleAsync(CancellationToken cancellationToken)

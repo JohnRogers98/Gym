@@ -3,6 +3,7 @@ using Gym.WebApplication.Extensions;
 using Gym.WebApplication.Features._Common.States;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+using Microsoft.IdentityModel.JsonWebTokens;
 using MudBlazor;
 using MudBlazor.Services;
 using MudExtensions.Services;
@@ -43,7 +44,15 @@ builder.Services.AddMudExtensions();
 
 builder.Services.AddScoped<IAppSnackbarNotifier, AppSnackbarNotifier>();
 
-builder.Services.AddAuthorizationCore();
+builder.Services.AddAuthorizationCore(options => 
+{
+    options.AddPolicy("HasBasicAuth", policy =>
+      policy.RequireAssertion(context =>
+      {
+          var acr = context.User.FindFirst(JwtRegisteredClaimNames.Acr)?.Value;
+          return acr == "1fa";
+      }));
+});
 builder.Services.AddCascadingAuthenticationState();
 
 builder.Services.AddHttpClient(builder.Configuration);
@@ -57,8 +66,6 @@ builder.Services.AddBffServices();
 builder.Services.AddFormValidators();
 
 builder.Services.AddCalendarEventServices();
-
-builder.Services.AddAccountServices();
 
 builder.Services.AddInstructorServices();
 

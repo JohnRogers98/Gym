@@ -8,6 +8,7 @@ namespace Gym.WebApplication.Authentication
         public required String UserId { get; init; }
         public required String Role { get; init; }
         public String? Name { get; init; }
+        public String? AuthenticationMethod { get; init; }
 
         public ClaimsPrincipal ToClaimsPrincipal()
         {
@@ -19,6 +20,9 @@ namespace Gym.WebApplication.Authentication
 
             if (Name is not null)
                 identity.AddClaim(new Claim(JwtRegisteredClaimNames.Name, Name));
+
+            if (AuthenticationMethod is not null)
+                identity.AddClaim(new Claim(JwtRegisteredClaimNames.Acr, AuthenticationMethod));
 
             return new ClaimsPrincipal(identity);
         }
@@ -37,11 +41,14 @@ namespace Gym.WebApplication.Authentication
             var name = principal.FindFirst(JwtRegisteredClaimNames.Name)?.Value
                 ?? principal.FindFirst(ClaimTypes.Name)?.Value;
 
+            var acr = principal.FindFirst(JwtRegisteredClaimNames.Acr)?.Value;
+
             return new AuthClaims
             {
                 UserId = userId,
                 Role = role,
-                Name = name
+                Name = name,
+                AuthenticationMethod = acr
             };
         }
     }

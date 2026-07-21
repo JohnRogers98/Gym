@@ -54,10 +54,9 @@ namespace Gym.BFF.Controllers
             }
 
             await _setTokensToClientSideSessionService
-                .HandleAsync(tokenResponseResult.Value.AccessToken, tokenResponseResult.Value.RefreshToken);
+                .HandleAsync(tokenResponseResult.Value.AccessToken, tokenResponseResult.Value.RefreshToken, tokenResponseResult.Value.IdToken);
 
             return base.Redirect(_spaOptions.Value.FullCallbackPath);
         }
     }
-
 }
