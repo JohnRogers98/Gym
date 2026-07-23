@@ -1,18 +1,7 @@
-﻿@using Gym.WebApplication.Features.Admin.Clients.Create
-@using Gym.WebApplication.Features.Admin.Clients.TableView
-@using Gym.WebApplication.Features.Admin.Clients.TableView.Models.Forms
-@using Gym.WebApplication.Features.Admin.Clients.TableView.Models.Results
-@using Gym.WebApplication.Features._Common.States
-@using Gym.WebApplication.Operations
-
-@inject IAppSnackbarNotifier SnackbarNotifier
-@inject AsyncOperationStateNotifier<ChargeClientFormModel, ChargeClientResult> ClientChargingState
-
-@implements IDisposable
-
-@* <MudExpansionPanel Text="Current clients">
+﻿
+<MudExpansionPanel Text="Current clients">
     <ClientTableView></ClientTableView>
-</MudExpansionPanel> *@
+</MudExpansionPanel>
 
 <MudExpansionPanel Text="Register client">
     <CreateClientForm></CreateClientForm>
@@ -20,18 +9,4 @@
 
 @code {
 
-    protected override async Task OnInitializedAsync()
-    {
-        ClientChargingState.Executed += ShowAccountChargingInSnackbar;
-    }
-
-    private void ShowAccountChargingInSnackbar(AsyncOperation<ChargeClientResult> accountChargingResult)
-    {
-        if (accountChargingResult.Succeeded)
-        {
-            SnackbarNotifier.ShowMessage($"Client account has - {accountChargingResult.Data!.AvailableTrainingsCount} available trainings.", MessageSeverity.Success);
-        }
-    }
-
-    public void Dispose() => ClientChargingState.Executed -= ShowAccountChargingInSnackbar;
 }

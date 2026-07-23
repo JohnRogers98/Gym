@@ -21,7 +21,7 @@ namespace Gym.WebApi.Controllers.Api.CalendarEvents.ClientOnly
         .WithRequest<BookTrainingEventRequest>
         .WithActionResult<BookTrainingEventResponse>
     {
-        [HttpPost("api/client-calendar-events/actions/book")]
+        [HttpPost("api/client-calendar-events/book")]
         public override async Task<ActionResult<BookTrainingEventResponse>> HandleAsync(BookTrainingEventRequest request, CancellationToken cancellationToken = default)
         {
             var bookTrainingEvent = new BookTrainingEvent(

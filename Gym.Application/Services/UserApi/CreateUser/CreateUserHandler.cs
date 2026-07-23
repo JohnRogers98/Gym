@@ -4,6 +4,8 @@ using Gym.Domain.AccountContext;
 using Gym.Domain.AccountContext.ValueObjects;
 using Gym.Domain.ClientContext;
 using Gym.Domain.ClientContext.ValueObjects;
+using Gym.Domain.InstructorContext;
+using Gym.Domain.InstructorContext.ValueObjects;
 using Gym.Domain.UserContext;
 using Gym.Domain.UserContext.Errors;
 using Gym.Domain.UserContext.ValueObjects;
@@ -14,7 +16,8 @@ namespace Gym.Application.Services.UserApi.CreateClient
     internal class CreateUserHandler(
         IUserRepository _userRepository,
         IClientRepository _clientRepository,
-        IAccountRepository _accountRepository) : IRequestHandler<CreateUser, Result>
+        IAccountRepository _accountRepository,
+        IInstructorRepository _instructorRepository) : IRequestHandler<CreateUser, Result>
     {
         public async Task<Result> Handle(CreateUser request, CancellationToken cancellationToken)
         {
@@ -33,6 +36,14 @@ namespace Gym.Application.Services.UserApi.CreateClient
                         var createAccountResult = await this.CreateAccountAsync(createdUserResult.Data!.Id, cancellationToken);
                         if (createAccountResult.Success is false)
                             return Result.Fail(createAccountResult.Error!);
+
+                        break;
+                    }
+                case UserRole.Instructor:
+                    {
+                        var createInstructorResult = await this.CreateInstructorAsync(createdUserResult.Data!.Id, cancellationToken);
+                        if (createInstructorResult.Success is false)
+                            return Result.Fail(createInstructorResult.Error!);
 
                         break;
                     }
@@ -95,6 +106,13 @@ namespace Gym.Application.Services.UserApi.CreateClient
             Account account = Account.Create(AccountId.From(userId), userId);
             await _accountRepository.SaveAsync(account, cancellationToken);
             return Result<Account>.Ok(account);
+        }
+
+        private async Task<Result<Instructor>> CreateInstructorAsync(UserId userId, CancellationToken cancellationToken)
+        {
+            Instructor instructor = Instructor.Create(InstructorId.From(userId), userId);
+            await _instructorRepository.SaveAsync(instructor, cancellationToken);
+            return Result<Instructor>.Ok(instructor);
         }
     }
 }

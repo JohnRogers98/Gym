@@ -1,19 +1,10 @@
 ﻿using AutoMapper;
-using Gym.WebApplication.Features.Admin.CalendarEvents.Creation.Models.Forms;
-using Gym.WebApplication.Features.Admin.CalendarEvents.Creation.Models.Results;
-using Gym.WebApplication.Features.Admin.Clients.TableView.Models.Results;
-using Gym.WebApplication.Features.Admin.Instructors.Registration.Models.Forms;
-using Gym.WebApplication.Features.Admin.Instructors.Registration.Models.Results;
-using Gym.WebApplication.Features.Admin.Trainings.Creation.Models.Forms;
-using Gym.WebApplication.Features.Admin.Trainings.Creation.Models.Results;
-using Gym.WebApplication.Features.Calendar.Models;
 using Gym.WebApplication.Features.Instructor.CreatePersonalTrainingPage.Models.Forms;
 using Gym.WebApplication.Features.Instructor.CreatePersonalTrainingPage.Models.Results;
+using Gym.WebApplication.RequestHandlers;
 using Gym.WebApplication.ViewModels;
 using Gym.WebDto.Requests.CalendarEvent;
-using Gym.WebDto.Requests.Instructor;
 using Gym.WebDto.Requests.PersonalTraining;
-using Gym.WebDto.Requests.Training;
 using Gym.WebDto.Responses.Account;
 using Gym.WebDto.Responses.Bookings;
 using Gym.WebDto.Responses.CalendarEvent;
@@ -31,17 +22,11 @@ namespace Gym.WebApplication.Mappings
             #region Training
             base.CreateMap<TrainingDto, TrainingViewModel>();
             base.CreateMap<TrainingInfo, TrainingViewModel>();
-
-            base.CreateMap<CreateTrainingFormModel, CreateTrainingRequest>();
-            base.CreateMap<CreateTrainingResponse, CreateTrainingResult>();
             #endregion
 
             #region Instructor
             base.CreateMap<InstructorDto, InstructorViewModel>();
             base.CreateMap<WebDto.Responses.Instructor.InstructorInfo, InstructorViewModel>();
-
-            base.CreateMap<InstructorRegistrationFormModel, CreateInstructorRequest>();
-            base.CreateMap<CreateInstructorResponse, CreateInstructorResult>();
             #endregion
 
             #region CalendarEvent

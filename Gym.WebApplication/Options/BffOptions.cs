@@ -30,5 +30,36 @@ namespace Gym.WebApplication.Options
 
         [Required] public String GetClientDetailsEndpoint { get; set; } = default!;
         [Required] public String GetAccountHistoryEndpoint { get; set; } = default!;
+        [Required] public String ListAvailableClientCalendarEventsEndpoint { get; set; } = default!;
+        [Required] public String BookCalendarEventEndpoint { get; set; } = default!;
+        [Required] public String ListSessionClientCalendarEventsEndpoint { get; set; } = default!;
+        [Required] public String ListSessionClientPersonalTrainingsEndpoint { get; set; } = default!;
+
+        [Required] public String ListClientsForAdminEndpoint { get; set; } = default!;
+        [Required] public String ChargeClientEndpoint { get; set; } = default!;
+        [Required] public String CreateCalendarEventEndpoint { get; set; } = default!;
+        [Required] public String CancelCalendarEventEndpoint { get; set; } = default!;
+        [Required] public String CreateTrainingEndpoint { get; set; } = default!;
+
+        [Required] public String ListInstructorsEndpoint { get; set; } = default!;
+        [Required] public String ListTrainingsEndpoint { get; set; } = default!;
+        [Required] public String ListCalendarEventsForAdminEndpoint { get; set; } = default!;
+    }
+
+    public static class UrlHelper
+    {
+        public static string ReplacePathVariables(String template, Dictionary<String, String> parameters)
+        {
+            var result = template;
+            foreach (var param in parameters)
+            {
+                if (!template.Contains($"{{{param.Key}}}"))
+                {
+                    throw new ArgumentException($"Parameter '{param.Key}' not found in template");
+                }
+                result = result.Replace($"{{{param.Key}}}", param.Value);
+            }
+            return result;
+        }
     }
 }

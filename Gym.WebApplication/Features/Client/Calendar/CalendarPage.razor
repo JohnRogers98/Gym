@@ -1,15 +1,10 @@
 ﻿@page "/client-calendar"
-@using Gym.WebApplication.Features.Calendar.Models
-@using Gym.WebApplication.Features.Calendar.Services
-@using System.Collections.ObjectModel
-@using System.Collections.Specialized
-@using Gym.WebApplication.Features.Client.Calendar.Models
 @using Gym.WebApplication.Features._Common.Components
 @using Gym.WebApplication.Features._Common.Services
 
 @attribute [Authorize(Roles = "Client")]
 
-@inject IRequestHandler<GetAllCalendarItems, IEnumerable<CalendarEventForClientViewModel>> GetAllCalendarItemsService
+@inject IRequestHandler<ListAvailableClientCalendarItems, IEnumerable<CalendarEventForClientViewModel>> ListAvailableCalendarItemsService
 @inject IRequestHandler<BookCalendarItem, BookCalendarItemResult> BookCalendarItemService
 
 @inject IDialogService DialogService
@@ -22,7 +17,7 @@ else
 {
     <DatePicker OnDatePicked="@this.DatePicked"></DatePicker>
     
-    <ItemsContainer CalendarItems="@_selectedItems" OnSelectedCalendarItem="@this.BookEvent"></ItemsContainer>
+    <ItemsContainer CalendarItems="@_selectedItems" OnSelectedCalendarItem="@this.BookEventAsync"></ItemsContainer>
 }
 
 
@@ -35,7 +30,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        var loadedCalendarEvents = await GetAllCalendarItemsService.HandleAsync(new GetAllCalendarItems());
+        var loadedCalendarEvents = await ListAvailableCalendarItemsService.HandleAsync(new ListAvailableClientCalendarItems());
         if (loadedCalendarEvents.Succeeded)
             _calendarItems = new List<CalendarEventForClientViewModel>(loadedCalendarEvents.Data!);
 
@@ -49,7 +44,7 @@ else
         this.RefreshSelectedItems();
     }
 
-    private async void BookEvent(CalendarEventForClientViewModel selectdCalendarEvent)
+    private async Task BookEventAsync(CalendarEventForClientViewModel selectdCalendarEvent)
     {
         PollResponse? pollResponse = null;
         if (selectdCalendarEvent.Poll is not null)

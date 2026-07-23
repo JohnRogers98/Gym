@@ -67,10 +67,6 @@ builder.Services.AddFormValidators();
 
 builder.Services.AddCalendarEventServices();
 
-builder.Services.AddInstructorServices();
-
-builder.Services.AddTrainingServices();
-
 builder.Services.AddClientServices();
 
 builder.Services.AddPersonalTrainingServices();

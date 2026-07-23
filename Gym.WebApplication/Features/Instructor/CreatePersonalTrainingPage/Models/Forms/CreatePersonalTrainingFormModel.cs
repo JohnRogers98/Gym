@@ -1,5 +1,4 @@
-﻿using Gym.WebApplication.Features.Admin.CalendarEvents.Creation.Models.Forms;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace Gym.WebApplication.Features.Instructor.CreatePersonalTrainingPage.Models.Forms
 {
@@ -8,7 +7,7 @@ namespace Gym.WebApplication.Features.Instructor.CreatePersonalTrainingPage.Mode
         [Required]
         public String? ClientId { get; set; }
 
-        [Required, FromToday]
+        [Required, /*FromToday*/]
         public DateTime? LocalStartDateTime { get; set; }
 
         [Required]

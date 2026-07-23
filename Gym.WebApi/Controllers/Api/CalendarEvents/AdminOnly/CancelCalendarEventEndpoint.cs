@@ -20,7 +20,7 @@ namespace Gym.WebApi.Controllers.Api.CalendarEvents.AdminOnly
         .WithRequest<CancelCalendarEventContainer>
         .WithActionResult<CancelCalendarEventResponse>
     {
-        [HttpPost("api/admin-calendar-events/{id}/actions/cancel")]
+        [HttpPost("api/admin-calendar-events/{id}/cancel")]
         public override async Task<ActionResult<CancelCalendarEventResponse>> HandleAsync(CancelCalendarEventContainer request, CancellationToken cancellationToken = default)
         {
             Result<CancelCalendarEventResult> cancelCalendarEventResult = await _mediator.Send(new CancelCalendarEvent(request.Id), cancellationToken);

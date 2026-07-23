@@ -2,26 +2,6 @@
 using Gym.WebApplication.Authentication;
 using Gym.WebApplication.RequestHandlers;
 using Gym.WebApplication.Features._Common.Services;
-using Gym.WebApplication.Features.Admin.CalendarEvents.Creation.Models.Forms;
-using Gym.WebApplication.Features.Admin.CalendarEvents.Creation.Models.Results;
-using Gym.WebApplication.Features.Admin.CalendarEvents.Creation.Services;
-using Gym.WebApplication.Features.Admin.CalendarEvents.TableView.Models;
-using Gym.WebApplication.Features.Admin.CalendarEvents.TableView.Services;
-using Gym.WebApplication.Features.Admin.Clients.TableView.Models;
-using Gym.WebApplication.Features.Admin.Clients.TableView.Models.Forms;
-using Gym.WebApplication.Features.Admin.Clients.TableView.Models.Results;
-using Gym.WebApplication.Features.Admin.Clients.TableView.Services;
-using Gym.WebApplication.Features.Admin.Instructors.Registration.Models.Forms;
-using Gym.WebApplication.Features.Admin.Instructors.Registration.Models.Results;
-using Gym.WebApplication.Features.Admin.Instructors.Registration.Services;
-using Gym.WebApplication.Features.Admin.Shared.Models;
-using Gym.WebApplication.Features.Admin.Shared.Services;
-using Gym.WebApplication.Features.Admin.Trainings.Creation.Models.Forms;
-using Gym.WebApplication.Features.Admin.Trainings.Creation.Models.Results;
-using Gym.WebApplication.Features.Admin.Trainings.Creation.Services;
-using Gym.WebApplication.Features.Calendar.Services;
-using Gym.WebApplication.Features.Client.Calendar.Models;
-using Gym.WebApplication.Features.Client.Schedule.Services;
 using Gym.WebApplication.Features.Instructor.Calendar.Services;
 using Gym.WebApplication.Features.Instructor.CreatePersonalTrainingPage.Models;
 using Gym.WebApplication.Features.Instructor.CreatePersonalTrainingPage.Models.Forms;
@@ -106,6 +86,11 @@ public static class IServiceCollectionExtensions
     {
         services.AddScoped<IValidator<CreateClientFormModel>, CreateClientFormModel.Validator>();
         services.AddScoped<IValidator<ChangePasswordFormModel>, ChangePasswordFormModel.Validator>();
+        services.AddScoped<IValidator<ChargeClientFormModel>, ChargeClientFormModel.Validator>();
+        services.AddScoped<IValidator<CreatePollFormModel>, CreatePollFormModel.Validator>();
+        services.AddScoped<IValidator<CreateCalendarEventFormModel>, CreateCalendarEventFormModel.Validator>();
+        services.AddScoped<IValidator<CreateTrainingFormModel>, CreateTrainingFormModel.Validator>();
+        services.AddScoped<IValidator<CreateInstructorFormModel>, CreateInstructorFormModel.Validator>();
 
         return services;
     }
@@ -113,32 +98,32 @@ public static class IServiceCollectionExtensions
     public static IServiceCollection AddBffServices(this IServiceCollection services)
     {
         RequestHandlerRegistration
-           .WithRequest<ListUserRoles>
-           .WithResponse<ListUserRolesResult>
-           .For<ListUserRolesService>
-           .In(services)
-           .DecorateWithResilience()
-           .DecorateWithHttpExceptionCatcher()
-           .DecorateWithFailSnackbar();
+            .WithRequest<ListUserRoles>
+            .WithResponse<ListUserRolesResult>
+            .For<ListUserRolesService>
+            .In(services)
+            .DecorateWithResilience()
+            .DecorateWithHttpExceptionCatcher()
+            .DecorateWithFailSnackbar();
 
         RequestHandlerRegistration
-           .WithRequest<CreateClientFormModel>
-           .WithResponse<CreateClientResult>
-           .For<CreateClientService>
-           .In(services)
-           .DecorateWithResilience()
-           .DecorateWithHttpExceptionCatcher()
-           .DecorateWithFailSnackbar()
-           .DecorateWithNotifier();
+            .WithRequest<CreateClientFormModel>
+            .WithResponse<CreateClientResult>
+            .For<CreateClientService>
+            .In(services)
+            .DecorateWithResilience()
+            .DecorateWithHttpExceptionCatcher()
+            .DecorateWithFailSnackbar()
+            .DecorateWithNotifier();
 
         RequestHandlerRegistration
-           .WithRequest<CheckUsernameExistence>
-           .WithResponse<CheckUsernameExistenceResult>
-           .For<CheckUsernameExistenceService>
-           .In(services)
-           .DecorateWithResilience()
-           .DecorateWithHttpExceptionCatcher()
-           .DecorateWithFailSnackbar();
+            .WithRequest<CheckUsernameExistence>
+            .WithResponse<CheckUsernameExistenceResult>
+            .For<CheckUsernameExistenceService>
+            .In(services)
+            .DecorateWithResilience()
+            .DecorateWithHttpExceptionCatcher()
+            .DecorateWithFailSnackbar();
 
         RequestHandlerRegistration
             .WithRequest<GetClientDetails>
@@ -167,18 +152,11 @@ public static class IServiceCollectionExtensions
            .DecorateWithFailSnackbar()
            .DecorateWithNotifier();
 
-        return services;
-    }
-
-
-
-    public static IServiceCollection AddCalendarEventServices(this IServiceCollection services)
-    {
         RequestHandlerRegistration
-           .WithRequest<GetAllCalendarItems>
+           .WithRequest<ListAvailableClientCalendarItems>
            .WithResponse<IEnumerable<CalendarEventForClientViewModel>>
-           .For<GetAllCalendarItemsService>
-           .In(services)                
+           .For<ListAvailableClientCalendarItemsService>
+           .In(services)
            .DecorateWithResilience()
            .DecorateWithHttpExceptionCatcher()
            .DecorateWithFailSnackbar();
@@ -190,159 +168,18 @@ public static class IServiceCollectionExtensions
            .In(services)
            .DecorateWithResilience()
            .DecorateWithHttpExceptionCatcher()
-           .DecorateWithFailSnackbar();
+           .DecorateWithFailSnackbar()
+           .DecorateWithNotifier();
 
         RequestHandlerRegistration
-           .WithRequest<GetAllCalendarEventsForAdmin>
-           .WithResponse<IEnumerable<CalendarEventForAdminViewModel>>
-           .For<GetAllCalendarEventsForAdminService>
-           .In(services)
-           .DecorateWithResilience()
-           .DecorateWithHttpExceptionCatcher()
-           .DecorateWithFailSnackbar();
-
-        RequestHandlerRegistration
-           .WithRequest<GetCalendarEventByIdForAdmin>
-           .WithResponse<CalendarEventForAdminViewModel>
-           .For<GetCalendarEventByIdForAdminService>
-           .In(services)
-           .DecorateWithResilience()
-           .DecorateWithHttpExceptionCatcher()
-           .DecorateWithFailSnackbar();
-
-        services.AddOperationStateNotifier<CreateCalendarEventFormModel, CreateCalendarEventResult>();
-        RequestHandlerRegistration
-         .WithRequest<CreateCalendarEventFormModel>
-         .WithResponse<CreateCalendarEventResult>
-         .For<CreateCalendarEventService>
-         .In(services)
-         .DecorateWithResilience()
-         .DecorateWithHttpExceptionCatcher()
-         .DecorateWithFailSnackbar()
-         .DecorateWithNotifier();
-
-        services.AddOperationStateNotifier<CancelCalendarEvent, CancelCalendarEventResult>();
-        RequestHandlerRegistration
-         .WithRequest<CancelCalendarEvent>
-         .WithResponse<CancelCalendarEventResult>
-         .For<CancelCalendarEventService>
-         .In(services)
-         .DecorateWithResilience()
-         .DecorateWithHttpExceptionCatcher()
-         .DecorateWithFailSnackbar()
-         .DecorateWithNotifier();
-
-        RequestHandlerRegistration
-           .WithRequest<GetInstructorCalendarEvents>
-           .WithResponse<IEnumerable<CalendarEventForAdminViewModel>>
-           .For<GetInstructorCalendarEventsService>
-           .In(services)
-           .DecorateWithResilience()
-           .DecorateWithHttpExceptionCatcher()
-           .DecorateWithFailSnackbar();
-
-        RequestHandlerRegistration
-           .WithRequest<GetClientCalendarEvents>
-           .WithResponse<IEnumerable<CalendarEventForClientViewModel>>
-           .For<GetClientCalendarEventsService>
-           .In(services)
-           .DecorateWithResilience()
-           .DecorateWithHttpExceptionCatcher()
-           .DecorateWithFailSnackbar();
-
-        return services;
-    }
-
-    public static IServiceCollection AddInstructorServices(this IServiceCollection services)
-    {
-        RequestHandlerRegistration
-         .WithRequest<GetAllInstructors>
-         .WithResponse<IEnumerable<InstructorViewModel>>
-         .For<GetAllInstructorsService>
-         .In(services)
-         .DecorateWithResilience()
-         .DecorateWithHttpExceptionCatcher()
-         .DecorateWithFailSnackbar();
-
-        RequestHandlerRegistration
-         .WithRequest<GetInstructorById>
-         .WithResponse<InstructorViewModel>
-         .For<GetInstructorByIdService>
-         .In(services)
-         .DecorateWithResilience()
-         .DecorateWithHttpExceptionCatcher()
-         .DecorateWithFailSnackbar();
-
-        services.AddOperationStateNotifier<InstructorRegistrationFormModel, CreateInstructorResult>();
-        RequestHandlerRegistration
-         .WithRequest<InstructorRegistrationFormModel>
-         .WithResponse<CreateInstructorResult>
-         .For<CreateInstructorService>
-         .In(services)
-         .DecorateWithResilience()
-         .DecorateWithHttpExceptionCatcher()
-         .DecorateWithFailSnackbar()
-         .DecorateWithNotifier();
-
-        return services;
-    }
-
-    public static IServiceCollection AddTrainingServices(this IServiceCollection services)
-    {
-        services.AddOperationStateNotifier<CreateTrainingFormModel, CreateTrainingResult>();
-        RequestHandlerRegistration
-            .WithRequest<CreateTrainingFormModel>
-            .WithResponse<CreateTrainingResult>
-            .For<CreateTrainingService>
-            .In(services)                
-            .DecorateWithResilience()
-            .DecorateWithHttpExceptionCatcher()
-            .DecorateWithFailSnackbar()
-            .DecorateWithNotifier();
-
-        RequestHandlerRegistration
-            .WithRequest<GetAllTrainings>
-            .WithResponse<IEnumerable<TrainingViewModel>>
-            .For<GetAllTrainingsService>
-            .In(services)
-            .DecorateWithResilience()
-            .DecorateWithHttpExceptionCatcher()
-            .DecorateWithFailSnackbar();
-
-        RequestHandlerRegistration
-            .WithRequest<GetTrainingById>
-            .WithResponse<TrainingViewModel>
-            .For<GetTrainingByIdService>
-            .In(services)
-            .DecorateWithResilience()
-            .DecorateWithHttpExceptionCatcher();
-
-        return services;
-    }
-
-    public static IServiceCollection AddClientServices(this IServiceCollection services)
-    {
-        RequestHandlerRegistration
-            .WithRequest<GetAllClientsForAdmin>
+            .WithRequest<ListClientsForAdmin>
             .WithResponse<IEnumerable<ClientViewModel>>
-            .For<GetAllClientsForAdminService>
+            .For<ListClientsForAdminService>
             .In(services)
             .DecorateWithResilience()
             .DecorateWithHttpExceptionCatcher()
             .DecorateWithFailSnackbar();
 
-        RequestHandlerRegistration
-            .WithRequest<GetAllClientsForInstructor>
-            .WithResponse<IEnumerable<ClientViewModel>>
-            .For<GetAllClientsForInstructorService>
-            .In(services)
-            .DecorateWithResilience()
-            .DecorateWithHttpExceptionCatcher()
-            .DecorateWithFailSnackbar();
-        
-
-
-        services.AddOperationStateNotifier<ChargeClientFormModel, ChargeClientResult>();
         RequestHandlerRegistration
             .WithRequest<ChargeClientFormModel>
             .WithResponse<ChargeClientResult>
@@ -352,6 +189,119 @@ public static class IServiceCollectionExtensions
             .DecorateWithHttpExceptionCatcher()
             .DecorateWithFailSnackbar()
             .DecorateWithNotifier();
+
+        RequestHandlerRegistration
+            .WithRequest<CreateCalendarEventFormModel>
+            .WithResponse<CreateCalendarEventResult>
+            .For<CreateCalendarEventService>
+            .In(services)
+            .DecorateWithResilience()
+            .DecorateWithHttpExceptionCatcher()
+            .DecorateWithFailSnackbar()
+            .DecorateWithNotifier();
+
+        RequestHandlerRegistration
+           .WithRequest<ListCalendarEventsForAdmin>
+           .WithResponse<IEnumerable<CalendarEventForAdminViewModel>>
+           .For<ListCalendarEventsForAdminService>
+           .In(services)
+           .DecorateWithResilience()
+           .DecorateWithHttpExceptionCatcher()
+           .DecorateWithFailSnackbar();
+
+        RequestHandlerRegistration
+            .WithRequest<CancelCalendarEvent>
+            .WithResponse<CancelCalendarEventResult>
+            .For<CancelCalendarEventService>
+            .In(services)
+            .DecorateWithResilience()
+            .DecorateWithHttpExceptionCatcher()
+            .DecorateWithFailSnackbar()
+            .DecorateWithNotifier();
+
+        RequestHandlerRegistration
+            .WithRequest<ListInstructors>
+            .WithResponse<IEnumerable<InstructorViewModel>>
+            .For<ListInstructorsService>
+            .In(services)
+            .DecorateWithResilience()
+            .DecorateWithHttpExceptionCatcher()
+            .DecorateWithFailSnackbar();
+
+        RequestHandlerRegistration
+            .WithRequest<ListTrainings>
+            .WithResponse<IEnumerable<TrainingViewModel>>
+            .For<ListTrainingsService>
+            .In(services)
+            .DecorateWithResilience()
+            .DecorateWithHttpExceptionCatcher()
+            .DecorateWithFailSnackbar();
+
+        RequestHandlerRegistration
+            .WithRequest<CreateTrainingFormModel>
+            .WithResponse<CreateTrainingResult>
+            .For<CreateTrainingService>
+            .In(services)
+            .DecorateWithResilience()
+            .DecorateWithHttpExceptionCatcher()
+            .DecorateWithFailSnackbar()
+            .DecorateWithNotifier();
+
+        RequestHandlerRegistration
+            .WithRequest<CreateInstructorFormModel>
+            .WithResponse<CreateInstructorResult>
+            .For<CreateInstructorService>
+            .In(services)
+            .DecorateWithResilience()
+            .DecorateWithHttpExceptionCatcher()
+            .DecorateWithFailSnackbar()
+            .DecorateWithNotifier();
+
+        RequestHandlerRegistration
+            .WithRequest<ListSessionClientCalendarEvents>
+            .WithResponse<IEnumerable<CalendarEventForClientViewModel>>
+            .For<ListSessionClientCalendarEventsService>
+            .In(services)
+            .DecorateWithResilience()
+            .DecorateWithHttpExceptionCatcher()
+            .DecorateWithFailSnackbar();
+
+        RequestHandlerRegistration
+           .WithRequest<ListSessionClientPersonalTrainings>
+           .WithResponse<IEnumerable<PersonalTrainingViewModel>>
+           .For<ListSessionClientPersonalTrainingsService>
+           .In(services)
+           .DecorateWithResilience()
+           .DecorateWithHttpExceptionCatcher()
+           .DecorateWithFailSnackbar();
+
+        return services;
+    }
+
+    public static IServiceCollection AddCalendarEventServices(this IServiceCollection services)
+    {
+        RequestHandlerRegistration
+           .WithRequest<GetInstructorCalendarEvents>
+           .WithResponse<IEnumerable<CalendarEventForAdminViewModel>>
+           .For<GetInstructorCalendarEventsService>
+           .In(services)
+           .DecorateWithResilience()
+           .DecorateWithHttpExceptionCatcher()
+           .DecorateWithFailSnackbar();
+
+        return services;
+    }
+
+    public static IServiceCollection AddClientServices(this IServiceCollection services)
+    {
+        RequestHandlerRegistration
+            .WithRequest<GetAllClientsForInstructor>
+            .WithResponse<IEnumerable<ClientViewModel>>
+            .For<GetAllClientsForInstructorService>
+            .In(services)
+            .DecorateWithResilience()
+            .DecorateWithHttpExceptionCatcher()
+            .DecorateWithFailSnackbar();   
 
         return services;
     }
@@ -376,14 +326,7 @@ public static class IServiceCollectionExtensions
             .DecorateWithHttpExceptionCatcher()
             .DecorateWithFailSnackbar();
 
-        RequestHandlerRegistration
-           .WithRequest<GetClientPersonalTrainings>
-           .WithResponse<IEnumerable<PersonalTrainingViewModel>>
-           .For<GetClientPersonalTrainingsService>
-           .In(services)
-           .DecorateWithResilience()
-           .DecorateWithHttpExceptionCatcher()
-           .DecorateWithFailSnackbar();
+        
 
         services.AddOperationStateNotifier<CancelPersonalTraining, CancelPersonalTrainingResult>();
         RequestHandlerRegistration
@@ -402,7 +345,6 @@ public static class IServiceCollectionExtensions
     public static IServiceCollection AddOperationStateNotifier<TRequest, TResponse>(this IServiceCollection services)
     {
         services.AddScoped<AsyncOperationStateNotifier<TRequest, TResponse>>();
-
         return services;
     }
 
