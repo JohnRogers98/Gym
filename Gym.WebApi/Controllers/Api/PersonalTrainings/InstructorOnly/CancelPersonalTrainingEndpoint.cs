@@ -16,7 +16,7 @@ namespace Gym.WebApi.Controllers.Api.PersonalTrainings.InstructorOnly
         .WithRequest<CancelPersonalTrainingRequest>
         .WithoutResult
     {
-        [HttpPost("api/personal-trainings/{id}/actions/cancel")]
+        [HttpPost("api/personal-trainings/{id}/cancel")]
         public override async Task<IActionResult> HandleAsync(CancelPersonalTrainingRequest request, CancellationToken cancellationToken = default)
         {
             CancelPersonalTrainingByInstructorCommand cancelPersonalTraining = new(

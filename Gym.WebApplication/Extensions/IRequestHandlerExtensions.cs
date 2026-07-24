@@ -22,6 +22,16 @@ public static class IRequestHandlerExtensions
             return request;
         }
 
+        public HttpRequestMessage CreateEmptyPostRequest(String url, Boolean setCookie = true)
+        {
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, url);
+
+            if (setCookie)
+                request.SetBrowserRequestCredentials(BrowserRequestCredentials.Include);
+
+            return request;
+        }
+
         public HttpRequestMessage CreateGetRequest(String url, Boolean setCookie = true)
         {
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, url);

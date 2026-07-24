@@ -44,6 +44,12 @@ namespace Gym.WebApplication.Options
         [Required] public String ListInstructorsEndpoint { get; set; } = default!;
         [Required] public String ListTrainingsEndpoint { get; set; } = default!;
         [Required] public String ListCalendarEventsForAdminEndpoint { get; set; } = default!;
+
+        [Required] public String ListClientsForInstructorEndpoint { get; set; } = default!;
+        [Required] public String CreatePersonalTrainingEndpoint { get; set; } = default!;
+        [Required] public String CancelPersonalTrainingEndpoint { get; set; } = default!;
+        [Required] public String ListSessionInstructorsCalendarEventsEndpoint { get; set; } = default!;
+        [Required] public String ListSessionInstructorPersonalTrainigsEndpoint { get; set; } = default!;
     }
 
     public static class UrlHelper

@@ -1,6 +1,4 @@
 ﻿using Gym.BFF.Options;
-using Gym.WebDto.Responses;
-using Gym.WebDto.Responses.Roles;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 
@@ -10,7 +8,7 @@ namespace Gym.BFF.Controllers.Api
     public class ListUserRolesEndpoint(IHttpClientFactory _httpClientFactory, IOptions<AuthorizationServerAdminApiOptions> _adminApiOptions) : ControllerBase
     {
         [HttpGet("api/user-roles")]
-        public async Task<ActionResult<ListResponse<UserRoleDto>>> HandleAsync(CancellationToken cancellationToken)
+        public async Task<IActionResult> HandleAsync(CancellationToken cancellationToken)
         {
             if (this.IsAccessTokenPresent() is false)
                 return Unauthorized();

@@ -1,13 +1,12 @@
 ﻿@page "/instructor-calendar"
-@using Gym.WebApplication.Features.Instructor.Calendar.Services
 @using Gym.WebApplication.Features._Common
 @using Gym.WebApplication.Features._Common.Components
 @using Gym.WebApplication.Features._Common.Services
 
 @attribute [Authorize(Roles = "Instructor")]
 
-@inject IRequestHandler<GetInstructorCalendarEvents, IEnumerable<CalendarEventForAdminViewModel>> GetCalendarEventsService
-@inject IRequestHandler<GetInstructorPersonalTrainings, IEnumerable<PersonalTrainingViewModel>> GetPersonalTrainingsService
+@inject IRequestHandler<ListSessionInstructorCalendarEvents, IEnumerable<CalendarEventForAdminViewModel>> GetCalendarEventsService
+@inject IRequestHandler<ListSessionInstructorPersonalTrainings, IEnumerable<PersonalTrainingViewModel>> GetPersonalTrainingsService
 
 <DatePicker OnDatePicked="@DatePicked"></DatePicker>
 
@@ -64,11 +63,11 @@
 
     private async Task LoadDataAsync()
     {
-        var getCalendarEventsResult = await GetCalendarEventsService.HandleAsync(new GetInstructorCalendarEvents());
+        var getCalendarEventsResult = await GetCalendarEventsService.HandleAsync(new ListSessionInstructorCalendarEvents());
         if (getCalendarEventsResult.Succeeded)
             _calendarEvents = [.. getCalendarEventsResult.Data!];
 
-        var getPersonalTrainingsResult = await GetPersonalTrainingsService.HandleAsync(new GetInstructorPersonalTrainings());
+        var getPersonalTrainingsResult = await GetPersonalTrainingsService.HandleAsync(new ListSessionInstructorPersonalTrainings());
         if (getPersonalTrainingsResult.Succeeded)
             _personalTrainings = [.. getPersonalTrainingsResult.Data!];
     }

@@ -1,5 +1,4 @@
 ﻿using Gym.BFF.Options;
-using Gym.WebDto.Responses;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 
@@ -9,7 +8,7 @@ namespace Gym.BFF.Controllers.Api
     public class ListSessionClientCalendarEventsEndpoint(IHttpClientFactory _httpClientFactory, IOptions<WebApiOptions> _webApiOptioons) : ControllerBase
     {
         [HttpGet("api/clients/me/client-calendar-events")]
-        public async Task<ActionResult<ListResponse<ListAvailableClientCalendarEventsEndpoint>>> HandleAsync(CancellationToken cancellationToken)
+        public async Task<IActionResult> HandleAsync(CancellationToken cancellationToken)
         {
             if (this.IsAccessTokenPresent() is false)
                 return Unauthorized();

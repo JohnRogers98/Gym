@@ -1,5 +1,4 @@
 ﻿using Gym.BFF.Options;
-using Gym.WebDto.Responses.Bookings;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 
@@ -9,7 +8,7 @@ namespace Gym.BFF.Controllers.Api
     public class BookCalendarEventEndpoint(IHttpClientFactory _httpClientFactory, IOptions<WebApiOptions> _webApiOptioons) : ControllerBase
     {      
         [HttpPost("api/client-calendar-events/book")]
-        public async Task<ActionResult<BookTrainingEventResponse>> HandleAsync(CancellationToken cancellationToken)
+        public async Task<IActionResult> HandleAsync(CancellationToken cancellationToken)
         {
             if (this.IsAccessTokenPresent() is false)
                 return Unauthorized();

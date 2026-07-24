@@ -85,17 +85,12 @@ namespace Gym.WebApplication.RequestHandlers
                 base.RuleFor(form => form.TrainingId)
                      .NotEmpty()
                      .WithMessage("TrainingId is required");
-
-                base.RuleFor(form => form.TrainingId)
-                     .NotEmpty()
-                     .WithMessage("TrainingId is required");
                 
                 base.When(form => form.PollFormModel is not null, () =>
                 {
                     base.RuleFor(form => form.PollFormModel)
                         .SetValidator(new CreatePollFormModel.Validator()!);
                 });
-               
             }
         }
     }

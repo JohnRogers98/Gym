@@ -5,16 +5,16 @@ using Microsoft.Extensions.Options;
 namespace Gym.BFF.Controllers.Api
 {
     [ApiController]
-    public class ListAvailableClientCalendarEventsEndpoint(IHttpClientFactory _httpClientFactory, IOptions<WebApiOptions> _webApiOptioons) : ControllerBase
+    public class CreatePersonalTrainingEndpoint(IHttpClientFactory _httpClientFactory, IOptions<WebApiOptions> _webApiOptioons) : ControllerBase
     {
-        [HttpGet("api/client-calendar-events")]
+        [HttpPost("api/personal-trainings")]
         public async Task<IActionResult> HandleAsync(CancellationToken cancellationToken)
         {
             if (this.IsAccessTokenPresent() is false)
                 return Unauthorized();
 
             using var webApiClient = _httpClientFactory.CreateClient(_webApiOptioons.Value.ClientName);
-            using var proxyRequestMessage = await this.CreateProxyRequestAsync("/api/client-calendar-events", cancellationToken: cancellationToken);
+            using var proxyRequestMessage = await this.CreateProxyRequestAsync("/api/personal-trainings", cancellationToken: cancellationToken);
             using var response = await webApiClient.SendAsync(proxyRequestMessage, cancellationToken);
 
             return await this.CreateProxyResponseAsync(response, cancellationToken);

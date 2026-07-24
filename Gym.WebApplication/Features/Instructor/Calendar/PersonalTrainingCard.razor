@@ -1,7 +1,4 @@
-﻿@using System.Globalization
-@using Gym.WebApplication.Features._Common.Components
-@using Gym.WebApplication.Features._Common.Components.CalendarItemCard
-@using Gym.WebDto.Responses.Instructor
+﻿@using Gym.WebApplication.Features._Common.Components.CalendarItemCard
 
 @inject IDialogService DialogService
 
@@ -53,7 +50,6 @@
 
     private async Task CancelTrainingAsync()
     {
-        Console.WriteLine(PersonalTraining.Status);
         var parameters = new DialogParameters<CancelPersonalTrainingDialog> { { x => x.PersonalTraining, PersonalTraining } };
 
         var dialog = await DialogService.ShowAsync<CancelPersonalTrainingDialog>("Cancelling training", parameters);

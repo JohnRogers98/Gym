@@ -15,7 +15,7 @@ namespace Gym.BFF.Controllers.Api
 
             var calendarEventId = base.RouteData.Values["calendarEventId"]?.ToString();
             if (String.IsNullOrEmpty(calendarEventId))
-                return BadRequest("clientId is required in path");
+                return BadRequest($"{nameof(calendarEventId)} is required in path");
 
             using var adminApiClient = _httpClientFactory.CreateClient(_webApiOptions.Value.ClientName);
             using var proxyRequestMessage = await this.CreateProxyRequestAsync($"/api/admin-calendar-events/{calendarEventId}/cancel", cancellationToken: cancellationToken);

@@ -65,10 +65,4 @@ builder.Services.AddBffServices();
 
 builder.Services.AddFormValidators();
 
-builder.Services.AddCalendarEventServices();
-
-builder.Services.AddClientServices();
-
-builder.Services.AddPersonalTrainingServices();
-
 await builder.Build().RunAsync();

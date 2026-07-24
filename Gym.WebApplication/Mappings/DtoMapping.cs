@@ -1,6 +1,4 @@
 ﻿using AutoMapper;
-using Gym.WebApplication.Features.Instructor.CreatePersonalTrainingPage.Models.Forms;
-using Gym.WebApplication.Features.Instructor.CreatePersonalTrainingPage.Models.Results;
 using Gym.WebApplication.RequestHandlers;
 using Gym.WebApplication.ViewModels;
 using Gym.WebDto.Requests.CalendarEvent;

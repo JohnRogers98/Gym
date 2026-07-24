@@ -14,17 +14,17 @@ namespace Gym.WebApplication.RequestHandlers
     public class CreateInstructorService(IHttpClientFactory _httpClientFactory, IOptions<BffOptions> _bffOptions) 
         : IRequestHandler<CreateInstructorFormModel, CreateInstructorResult>
     {
-        public async Task<AsyncOperation<CreateInstructorResult>> HandleAsync(CreateInstructorFormModel createInstructorFormModel, CancellationToken cancellationToken = default)
+        public async Task<AsyncOperation<CreateInstructorResult>> HandleAsync(CreateInstructorFormModel request, CancellationToken cancellationToken = default)
         {
             using var httpClient = _httpClientFactory.CreateClient(_bffOptions.Value.ClientName);
 
             CreateUserRequest createUser = new()
             {
-                Username = createInstructorFormModel.Username!,
-                Password = createInstructorFormModel.Password!,
-                FirstName = createInstructorFormModel.FirstName!,
-                LastName = createInstructorFormModel.LastName!,
-                RoleId = createInstructorFormModel.RoleId!
+                Username = request.Username!,
+                Password = request.Password!,
+                FirstName = request.FirstName!,
+                LastName = request.LastName!,
+                RoleId = request.RoleId!
             };
             using HttpRequestMessage createInstructorRequest = this.CreatePostRequestWithJson(_bffOptions.Value.CreateUserEndpoint, createUser);
 

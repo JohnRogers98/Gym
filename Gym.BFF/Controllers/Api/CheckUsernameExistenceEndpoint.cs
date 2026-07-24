@@ -1,5 +1,4 @@
 ﻿using Gym.BFF.Options;
-using Gym.WebDto.Responses.Users;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 
@@ -9,7 +8,7 @@ namespace Gym.BFF.Controllers.Api
     public class CheckUsernameExistenceEndpoint(IHttpClientFactory _httpClientFactory, IOptions<AuthorizationServerAdminApiOptions> _adminApiOptions) : ControllerBase
     {
         [HttpPost("api/users/check-username")]
-        public async Task<ActionResult<CreateUserResponse>> HandleAsync(CancellationToken cancellationToken)
+        public async Task<IActionResult> HandleAsync(CancellationToken cancellationToken)
         {
             if (this.IsAccessTokenPresent() is false)
                 return Unauthorized();
