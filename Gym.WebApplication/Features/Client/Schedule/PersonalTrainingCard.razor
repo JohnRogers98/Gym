@@ -1,0 +1,24 @@
+﻿@using Gym.WebApplication.Features._Common.Components.CalendarItemCard
+
+<MudCard Outlined="false" Elevation="3">
+
+    <CalendarItemCardHeader Title="@("Personal training")" Start="PersonalTraining.Start" End="@PersonalTraining.End" />
+
+    <MudDivider />
+
+    <MudCardContent>
+        <MudStack Spacing="3">
+            <MudText>Instructor: @PersonalTraining.Instructor.FullName</MudText>
+            @if (PersonalTraining.IsCancelled)
+            {
+                <MudChip T="String" Color="Color.Error">Cancelled</MudChip>
+            }
+        </MudStack>
+    </MudCardContent>
+
+</MudCard>    
+    
+
+@code {
+    [Parameter, EditorRequired] public PersonalTrainingViewModel PersonalTraining { get; set; } = default!;
+}

@@ -20,7 +20,8 @@ namespace Gym.Infrastructure.Entities.Extensions.Mappings
                 UserId.From(entity.Id.ToString()).Unwrap(),
                 userRole,
                 entity.FirstName is not null ? FirstName.From(entity.FirstName).Unwrap() : null, 
-                entity.LastName is not null ? LastName.From(entity.LastName).Unwrap() : null
+                entity.LastName is not null ? LastName.From(entity.LastName).Unwrap() : null,
+                entity.TelegramId.HasValue ? TelegramId.From(entity.TelegramId.Value).Unwrap() : null
             );
         }
 
@@ -32,6 +33,7 @@ namespace Gym.Infrastructure.Entities.Extensions.Mappings
                 Role = user.Role.ToString(),
                 FirstName = user.FirstName?.Value,
                 LastName = user.LastName?.Value,
+                TelegramId = user.TelegramId?.Value,
             };
         }
     }

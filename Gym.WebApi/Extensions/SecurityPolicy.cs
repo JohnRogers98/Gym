@@ -5,12 +5,15 @@ namespace Gym.WebApi.Extensions
     public enum SecurityPolicy
     {
         [Description("Requires authenticated user")]
-        AuthenticatedOnly,
+        Authenticated,
 
         [Description("Requires Admin role")]
-        AdminOnly,
+        Admin,
 
         [Description("Requires Client role")]
-        ClientOnly
+        Client,
+
+        [Description("Requires Instructor role")]
+        Instructor
     }
 }

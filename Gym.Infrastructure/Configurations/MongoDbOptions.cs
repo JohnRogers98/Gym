@@ -1,8 +1,16 @@
-﻿namespace Gym.Infrastructure.Configurations
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Gym.Infrastructure.Configurations
 {
-    public sealed record MongoDbOptions(String ConnectionString, String DatabaseName, CollectionOptions CollectionOptions)
+    public sealed class MongoDbOptions
     {
-        public static MongoDbOptions Default => new MongoDbOptions(String.Empty, "test", CollectionOptions.Default);
+        [Required]
+        public String ConnectionString { get; set; } = default!;
+
+        [Required]
+        public String DatabaseName { get; set; } = default!;
+
+        public CollectionOptions Collections { get; set; } = new();
 
         public override string ToString()
         {
@@ -10,42 +18,26 @@
         }
     }
 
-    public sealed record CollectionOptions(
-        String Instructors,
-        String InstructorProjections,
-        String Trainings,
-        String TrainingProjections,
-        String CalendarEvents,
-        String CalendarEventProjections,
-        String Users,
-        String TelegramAuths,
-        String FormAuths,
-        String Clients,
-        String ClientProjections,
-        String Events,
-        String EventProjections,
-        String Messages,
-        String OutboxChangeStreams,
-        String Polls,
-        String PollResponses)
+    public sealed class CollectionOptions
     {
-        public static CollectionOptions Default => new CollectionOptions(
-            "instructors",
-            "instructor-projections",
-            "trainings",
-            "training-projections",
-            "calendar-events",
-            "calendar-event-projections",
-            "users",              
-            "telegram-auths",
-            "form-auths",
-            "clients",
-            "client-projections",
-            "events",
-            "event-projections",
-            "messages",
-            "outbox-changes-streams",
-            "polls",
-            "poll-responses");
+        public String Instructors { get; set; } = "instructors";
+        public String InstructorProjections { get; set; } = "instructor-projections";
+        public String Trainings { get; set; } = "trainings";
+        public String TrainingProjections { get; set; } = "training-projections";
+        public String CalendarEvents { get; set; } = "calendar-events";
+        public String CalendarEventProjections { get; set; } = "calendar-event-projections";
+        public String Users { get; set; } = "users";
+        public String TelegramAuths { get; set; } = "telegram-auths";
+        public String FormAuths { get; set; } = "form-auths";
+        public String Clients { get; set; } = "clients";
+        public String ClientProjections { get; set; } = "client-projections";
+        public String Events { get; set; } = "events";
+        public String EventProjections { get; set; } = "event-projections";
+        public String Messages { get; set; } = "messages";
+        public String OutboxChangeStreams { get; set; } = "outbox-changes-streams";
+        public String Polls { get; set; } = "polls";
+        public String PollResponses { get; set; } = "poll-responses";
+        public String PersonalTrainings { get; set; } = "personal-trainings";
+        public String PersonalTrainingProjections { get; set; } = "personal-training-projections";
     }
 }

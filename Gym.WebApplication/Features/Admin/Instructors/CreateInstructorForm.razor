@@ -1,0 +1,134 @@
+﻿@using Gym.WebApplication.RequestHandlers
+
+@inject IRequestHandler<CreateInstructorFormModel, CreateInstructorResult> CreateInstructorService
+@inject IRequestHandler<ListUserRoles, ListUserRolesResult> ListUserRolesService
+
+@inject IAppSnackbarNotifier SnackbarNotifier
+@inject AsyncOperationStateNotifier<CreateInstructorFormModel, CreateInstructorResult> InstructorRegistrationState
+
+@inject IDialogService DialogService
+
+@implements IDisposable
+
+<EditForm Model="@_formModel" OnSubmit="@OnSubmit">
+
+    <FluentValidator AsyncMode="true" />
+
+    <div style="display:none; position:absolute; opacity:0; height:0; width:0; overflow:hidden;">
+        <input type="text" name="fakeusername" autocomplete="username" />
+        <input type="password" name="fakepassword" autocomplete="current-password" />
+    </div>
+
+    <MudGrid>
+        <MudItem xs="12" sm="12">
+            <MudCard Elevation="0">
+                <MudCardContent>
+                    <MudTextField Label="Instructor username"
+                                  Variant="Variant.Outlined"
+                                  @bind-Value="@_formModel.Username"
+                                  For="@(() => _formModel.Username)" />
+
+                    <MudPasswordField Label="Client password"
+                                      Variant="Variant.Outlined"
+                                      @bind-Value="@_formModel.Password"
+                                      PasswordMode="true"
+                                      DisablePaste="false"
+                                      For="@(() => _formModel.Password)" />
+
+                    <MudTextField Label="First name"
+                                  Variant="Variant.Outlined"
+                                  Class="mt-3"
+                                  @bind-Value="_formModel.FirstName"
+                                  For="@(() => _formModel.FirstName)" />
+
+                    <MudTextField Label="Last name"
+                                  Variant="Variant.Outlined"
+                                  Class="mt-3"
+                                  @bind-Value="_formModel.LastName"
+                                  For="@(() => _formModel.LastName)" />
+                </MudCardContent>
+                <MudCardActions>
+                    <MudButton ButtonType="ButtonType.Submit" Disabled="@_isSubmitting" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">
+                        @(_isSubmitting ? "Creating..." : "Create")
+                    </MudButton>
+                </MudCardActions>
+            </MudCard>
+        </MudItem>
+    </MudGrid>
+</EditForm>
+
+@code {
+    private CreateInstructorFormModel _formModel = new();
+
+    private const String InstructorRoleName = "Instructor";
+    private UserRole? _instructorRole;
+
+    private Boolean _isSubmitting;
+
+
+    protected async override Task OnInitializedAsync()
+    {
+        InstructorRegistrationState.Executed += ShowRegisteredInstructorInSnackbar;
+        await this.LoadInstructorRoleAsync();
+    }
+
+    private async Task LoadInstructorRoleAsync()
+    {
+        var listUserRolesResult = await ListUserRolesService.HandleAsync(new ListUserRoles());
+        if (listUserRolesResult.Succeeded)
+        {
+            _instructorRole = listUserRolesResult.Data.Roles.First(role => role.Name == InstructorRoleName);
+        }
+    }
+
+    private async Task OnSubmit(EditContext context)
+    {
+        if (_instructorRole == null)
+            await LoadInstructorRoleAsync();
+        _formModel.RoleId = _instructorRole?.Id;
+
+        var isValid = await context.ValidateAsync();
+        if (isValid)
+        {
+            await this.CreateInstructorAsync();
+        }
+    }
+    private async Task CreateInstructorAsync()
+    {
+        //guard
+        if (_isSubmitting) return;
+
+        _isSubmitting = true;
+        StateHasChanged();
+
+        try
+        {
+            var createInstructorResult = await CreateInstructorService.HandleAsync(_formModel);
+            if (createInstructorResult.Succeeded)
+            {
+                this.ClearForm();
+            }
+        }
+        finally
+        {
+            _isSubmitting = false;
+            StateHasChanged();
+        }
+    }
+    private void ClearForm()
+    {
+        _formModel = new();
+        base.StateHasChanged();
+    }
+
+    private void ShowRegisteredInstructorInSnackbar(AsyncOperation<CreateInstructorResult> instructorRegistrationResult)
+    {
+        if (instructorRegistrationResult.Succeeded)
+        {
+            SnackbarNotifier.ShowMessage($"Instructor - {instructorRegistrationResult.Data!.UserId} created", MessageSeverity.Success);
+        }
+    }
+
+    public void Dispose() => InstructorRegistrationState.Executed -= ShowRegisteredInstructorInSnackbar;
+
+}

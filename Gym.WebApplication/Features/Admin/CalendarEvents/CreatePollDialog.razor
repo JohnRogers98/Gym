@@ -1,0 +1,100 @@
+﻿
+<MudDialog>
+     
+    <DialogContent>
+        <EditForm @ref="_editForm" Model="@FormModel" OnSubmit="@ApproveAction">
+            <FluentValidator />
+
+            <MudTextField @bind-Value="@FormModel.Title" HelperText="Title" Variant="Variant.Outlined" For="@(() => @FormModel.Title)" />
+
+            <MudStack Row="true">
+                <MudCheckBox @bind-Value="FormModel.IsRequired" UncheckedColor="Color.Default" Color="Color.Primary" Label="Required"></MudCheckBox>
+                <MudCheckBox @bind-Value="FormModel.CanSelectMany" UncheckedColor="Color.Default" Color="Color.Primary" Label="Selectable"></MudCheckBox>
+            </MudStack>
+
+            <MudStack>
+                @if (FormModel.Choices.Any())
+                {
+                    @for (Int32 i = 0; i < FormModel.Choices.Count; i++)
+                    {
+                        var currentIndex = i;
+                        var currentChoice = FormModel.Choices[i];
+
+                        <MudStack Row="true">
+                            <MudTextField Value="@currentChoice" ReadOnly="true" Variant="Variant.Outlined"></MudTextField>
+                            <MudIconButton Icon="@Icons.Material.Filled.Delete" Variant="Variant.Text" Color="Color.Primary" OnClick="@(() => RemoveChoice(currentIndex))" />
+                        </MudStack>
+                    }
+                }
+               
+                <MudStack Row="true">
+                    <MudTextField Error="@_choiceError" ErrorText="At least one choice must be added" @bind-Value="@_currentChoiceText" Label="New choice" Variant="Variant.Outlined"></MudTextField>
+                    <MudIconButton Icon="@Icons.Material.Filled.Add" Variant="Variant.Text" Color="Color.Primary" OnClick="@AddChoice" />
+                </MudStack>
+            </MudStack>
+
+        </EditForm>
+      
+    </DialogContent>
+
+    <DialogActions>
+        <MudButton OnClick="@CancelAction">Cancel</MudButton>
+        <MudButton Color="Color.Primary" OnClick="@ApproveAction">Add</MudButton>
+    </DialogActions>
+
+</MudDialog>
+
+@code {
+    [Parameter] public CreatePollFormModel FormModel { get; set; } = new CreatePollFormModel();
+
+    private String _currentChoiceText = String.Empty;
+
+    private Boolean _choiceError = false;
+
+    private EditForm _editForm = default!;
+
+    [CascadingParameter] private IMudDialogInstance MudDialog { get; set; } = default!;
+
+    private void AddChoice()
+    {
+        if (String.IsNullOrWhiteSpace(_currentChoiceText))
+            return;
+
+        FormModel.Choices.Add(_currentChoiceText);
+        _currentChoiceText = String.Empty;
+        _choiceError = false;
+
+        base.StateHasChanged();
+    }
+
+    private void RemoveChoice(Int32 atIndex)
+    {
+        FormModel.Choices.RemoveAt(atIndex);
+        base.StateHasChanged();
+    }
+
+    private void CancelAction() => MudDialog.Cancel();
+
+    private void ApproveAction()
+    {
+        if (this.ValidateForm())
+        {
+            MudDialog.Close(DialogResult.Ok<CreatePollFormModel>(FormModel));
+        }
+    }
+
+    private Boolean ValidateForm() 
+    {
+        if (_editForm.EditContext!.Validate())
+            return true;
+
+        var fieldIdentifier = new FieldIdentifier(FormModel, nameof(CreatePollFormModel.Choices));
+        if (_editForm.EditContext.GetValidationMessages(fieldIdentifier).Any())
+            _choiceError = true;
+
+        base.StateHasChanged();
+        
+        return false;
+    }
+
+}

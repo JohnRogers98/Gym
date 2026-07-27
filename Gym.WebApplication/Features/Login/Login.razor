@@ -1,0 +1,15 @@
+﻿
+@inject NavigationManager NavManager
+@inject IOptions<BffOptions> BffOptions
+
+<AuthorizeView>
+
+    <NotAuthorized>
+        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Login" Color="Color.Primary" OnClick="Authenticate">Login</MudButton>
+    </NotAuthorized>
+
+</AuthorizeView>
+
+@code {
+    private void Authenticate() => NavManager.NavigateTo($"{BffOptions.Value.BaseUrl}{BffOptions.Value.LoginEndpoint}", forceLoad: true);
+}

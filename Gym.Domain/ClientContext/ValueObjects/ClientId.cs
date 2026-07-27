@@ -1,4 +1,5 @@
 ﻿using Gym.Domain._Common;
+using Gym.Domain._Shared;
 using Gym.Domain.ClientContext.Errors;
 
 namespace Gym.Domain.ClientContext.ValueObjects
@@ -17,6 +18,11 @@ namespace Gym.Domain.ClientContext.ValueObjects
             }  
 
             return Result<ClientId>.Ok(new(value));
+        }
+
+        public static ClientId From(UserId userId)
+        {
+            return new(userId.Value);
         }
 
         public override String ToString() => Value.ToString();

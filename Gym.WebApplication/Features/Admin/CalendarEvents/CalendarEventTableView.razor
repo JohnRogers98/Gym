@@ -1,0 +1,89 @@
+﻿@using Gym.WebApplication.Features._Common.Services
+
+@inject IRequestHandler<ListCalendarEventsForAdmin, IEnumerable<CalendarEventForAdminViewModel>> GetAllCalendarEventsService
+@inject IRequestHandler<CancelCalendarEvent, CancelCalendarEventResult> CancelCalendarEventService
+
+@inject IDialogService DialogService
+
+@inject IAppSnackbarNotifier SnackbarNotifier
+@inject AsyncOperationStateNotifier<CancelCalendarEvent, CancelCalendarEventResult> CancelCalendarEventState
+
+@implements IDisposable
+
+<MudDataGrid Items="@_calendarEvents" Striped="true" Elevation="0">
+
+    <ToolBarContent>
+        <MudSpacer />
+        <MudIconButton Icon="@Icons.Material.Filled.Refresh"
+                       OnClick="@RefreshDataAsync"
+                       Size="Size.Small" />
+    </ToolBarContent>
+
+    <Columns>
+        <PropertyColumn Property="x => x.Id" Title="Id" />
+        <PropertyColumn Property="x => x.Start" Title="Beginning" />
+        <PropertyColumn Property="x => x.Training.Name" Title="Name" />
+        <PropertyColumn Property="x =>x.InstructorNames" Title="Instructors" />
+
+        <TemplateColumn Title="Actions" CellClass="d-flex justify-between">
+            <CellTemplate>
+                <MudIconButton Disabled="@(!context.Item.IsUpcoming)"
+                               Size="@Size.Medium"
+                               Icon="@Icons.Material.Filled.Cancel"
+                               Color="Color.Error"
+                               OnClick="@(() => CancelCalendarEventAsync(context.Item))" />
+            </CellTemplate>
+        </TemplateColumn>
+    </Columns>
+</MudDataGrid>
+
+@code {
+    private List<CalendarEventForAdminViewModel> _calendarEvents = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        CancelCalendarEventState.Executed += ShowCancelledCalendarEventInSnackbar;
+        await this.LoadDataAsync();
+    }
+
+    private async Task CancelCalendarEventAsync(CalendarEventForAdminViewModel adminCalendarItemViewModel)
+    {
+        var parameters = new DialogParameters<CalendarEventCancelDialog> { { x => x.CalendarEventItem, adminCalendarItemViewModel } };
+
+        var dialog = await DialogService.ShowAsync<CalendarEventCancelDialog>("Cancelling event", parameters);
+        var result = await dialog.Result;
+
+        if ( result is not null && result.Canceled is false)
+        {
+            if (result.Data is String idValue)
+            {
+                var cancelCalendarEventResult = await CancelCalendarEventService.HandleAsync(new CancelCalendarEvent { CalendarEventId = idValue });
+                if (cancelCalendarEventResult.Succeeded)
+                    await this.RefreshDataAsync();
+            }
+
+        }
+    }
+
+    private async Task RefreshDataAsync() => await LoadDataAsync();
+
+    private async Task LoadDataAsync()
+    {
+        var getAllCalendarEventsResult = await GetAllCalendarEventsService.HandleAsync(new ListCalendarEventsForAdmin());
+        if (getAllCalendarEventsResult.Succeeded)
+        {
+            _calendarEvents = [.. getAllCalendarEventsResult.Data!];
+        }
+    }
+
+    private void ShowCancelledCalendarEventInSnackbar(AsyncOperation<CancelCalendarEventResult> cancelCalendarEventResult)
+    {
+        SnackbarNotifier.ShowMessage($"Calendar event was cancelled.", MessageSeverity.Success);
+    }
+
+    public void Dispose()
+    {
+        CancelCalendarEventState.Executed -= ShowCancelledCalendarEventInSnackbar;
+    }
+
+}

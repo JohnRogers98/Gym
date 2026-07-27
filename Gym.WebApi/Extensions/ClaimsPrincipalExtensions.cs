@@ -1,15 +1,17 @@
-﻿using System.Security.Claims;
+﻿using Microsoft.IdentityModel.JsonWebTokens;
 
-namespace Gym.WebApi.Extensions
+namespace System.Security.Claims;
+
+public static class ClaimsPrincipalExtensions
 {
-    public static class ClaimsPrincipalExtensions
+    extension(ClaimsPrincipal principal)
     {
-        public static String GetRequiredUserId(this ClaimsPrincipal principal)
+        public String GetRequiredUserId()
         {
-            var userId = principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var userId = principal.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
 
-            if (string.IsNullOrEmpty(userId))
-                throw new UnauthorizedAccessException("UserId not found in claims");
+            if (String.IsNullOrEmpty(userId))
+                throw new UnauthorizedAccessException("'Sub' not found in claims");
 
             return userId;
         }

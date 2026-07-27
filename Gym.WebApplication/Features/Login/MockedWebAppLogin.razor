@@ -1,14 +1,15 @@
-﻿@using Gym.WebApplication.Features.Login.Services
+﻿@using Gym.WebApplication.Authentication
 
-@inject IWebAppAuthService WebAppAuthService
+@inject ITelegramInitService TelegramInitService
+@inject AuthStateProvider AuthStateProvider
 
-<MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Login" Color="Color.Primary" OnClick="Authenticate">Login</MudButton>
+<MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Login" Color="Color.Primary" OnClick="AuthenticateAsync">Mocked tg login</MudButton>
+
 
 @code {
-
-    private async void Authenticate()
+    private async Task AuthenticateAsync()
     {
-        await WebAppAuthService.HandleAsync(MockedWebAppInitData.Value);
+        await TelegramInitService.HandleAsync(MockedWebAppInitData.Value);
+        await AuthStateProvider.ReloadAsync();
     }
-
 }

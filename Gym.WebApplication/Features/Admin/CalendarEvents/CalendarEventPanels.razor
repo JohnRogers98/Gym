@@ -1,13 +1,4 @@
-﻿@using Gym.WebApplication.Features.Admin.CalendarEvents.Creation
-@using Gym.WebApplication.Features.Admin.CalendarEvents.Creation.Models.Results
-@using Gym.WebApplication.Features.Admin.CalendarEvents.States
-@using Gym.WebApplication.Features.Admin.CalendarEvents.TableView
-
-@inject ISnackbar Snackbar
-@inject ICalendarEventCreationState CalendarEventCreationState
-
-@implements IDisposable
-
+﻿
 <MudExpansionPanel Text="Create calendar event form">
     <CreateCalendarEventForm></CreateCalendarEventForm>
 </MudExpansionPanel>
@@ -17,15 +8,5 @@
 </MudExpansionPanel>
 
 @code {
-    protected override async Task OnInitializedAsync()
-    {
-        CalendarEventCreationState.CalendarEventCreated += ShowCreatedCalendarEventInSnackbar;
-    }
 
-    private void ShowCreatedCalendarEventInSnackbar(CreateCalendarEventResult createCalendarEventResult)
-    {
-        Snackbar.Add($"Calendar event - {createCalendarEventResult.CalendarEventId} created", Severity.Success);
-    }
-
-    public void Dispose() => CalendarEventCreationState.CalendarEventCreated -= ShowCreatedCalendarEventInSnackbar;
 }

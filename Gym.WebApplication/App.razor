@@ -2,7 +2,9 @@
     <Found Context="routeData">
         <AuthorizeRouteView  RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
             <NotAuthorized>
-                <MudAlert Severity="Severity.Error">Not authorized</MudAlert>
+                @{
+                    NavigationManager.NavigateTo($"{BffOptions.Value.BaseUrl}{BffOptions.Value.LoginEndpoint}", true);
+                }
             </NotAuthorized>
 
             <Authorizing>
@@ -12,3 +14,8 @@
         <FocusOnNavigate RouteData="@routeData" Selector="h1" />
     </Found>
 </Router>
+
+@code {
+    [Inject] private NavigationManager NavigationManager { get; set; } = default!;
+    [Inject] private IOptions<BffOptions> BffOptions { get; set; } = default!;
+}

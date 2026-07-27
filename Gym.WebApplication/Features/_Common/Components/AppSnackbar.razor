@@ -1,0 +1,38 @@
+﻿@using Gym.WebApplication.Features._Common.States
+
+@implements IDisposable
+
+
+@code {
+
+    [Inject] private IAppSnackbarNotifier SnackbarNotifier { get; set; } = default!;
+
+    [Inject] private ISnackbar MudSnackbar { get; set; } = default!;
+
+    protected override void OnInitialized()
+    {
+        SnackbarNotifier.OnMessage += (message, severity) =>
+        {
+            switch (severity)
+            {
+                case MessageSeverity.Success:  
+                    MudSnackbar.Add(message, Severity.Success);
+                    break;
+
+                case MessageSeverity.Error:
+                    MudSnackbar.Add(message, Severity.Error);
+                    break;
+            }
+
+            base.StateHasChanged();
+        };
+    }
+    
+    public void Dispose()
+    {
+        if (SnackbarNotifier is IDisposable disposable)
+        {
+            disposable.Dispose();
+        }
+    }
+}

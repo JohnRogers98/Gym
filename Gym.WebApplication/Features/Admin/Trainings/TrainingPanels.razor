@@ -1,13 +1,4 @@
-﻿@using Gym.WebApplication.Features.Admin.Trainings.Creation
-@using Gym.WebApplication.Features.Admin.Trainings.Creation.Models.Results
-@using Gym.WebApplication.Features.Admin.Trainings.States
-@using Gym.WebApplication.Features.Admin.Trainings.TableView
-
-@inject ISnackbar Snackbar
-@inject ITrainingCreationSharedState TrainingCreationSharedState
-
-@implements IDisposable
-
+﻿
 <MudExpansionPanel Text="Create training form">
     <CreateTrainingForm></CreateTrainingForm>
 </MudExpansionPanel>
@@ -18,15 +9,4 @@
 
 @code {
 
-    protected override async Task OnInitializedAsync()
-    {
-        TrainingCreationSharedState.TrainingCreated += ShowRegisteredTrainingInSnackbar;
-    }
-
-    private void ShowRegisteredTrainingInSnackbar(CreateTrainingResult createTrainingResult)
-    {
-        Snackbar.Add($"Training - {createTrainingResult.TrainingId} created", Severity.Success);
-    }
-
-    public void Dispose() => TrainingCreationSharedState.TrainingCreated -= ShowRegisteredTrainingInSnackbar;
 }

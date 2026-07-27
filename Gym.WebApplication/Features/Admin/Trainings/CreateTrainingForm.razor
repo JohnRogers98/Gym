@@ -1,0 +1,97 @@
+﻿@using Gym.WebApplication.Features._Common.Services
+
+@inject IRequestHandler<CreateTrainingFormModel, CreateTrainingResult> CreateTrainingService
+
+@inject IAppSnackbarNotifier SnackbarNotifier
+@inject AsyncOperationStateNotifier<CreateTrainingFormModel ,CreateTrainingResult> CreateTrainingState
+
+@implements IDisposable
+
+<EditForm Model="@_formModel" OnSubmit="@OnSubmit">
+    
+    <FluentValidator />
+    
+    <MudGrid>
+        <MudItem xs="12" sm="12">
+            <MudCard Elevation="0">
+                <MudCardContent>
+                    <MudTextField Label="Enter training name"
+                                  Variant="Variant.Outlined"
+                                  @bind-Value="@_formModel.Name"
+                                  For="@(() => _formModel.Name)" />
+
+                    <MudTextField label="Enter description"
+                                  Variant="Variant.Outlined"
+                                  Class="mt-3"
+                                  @bind-Value="_formModel.Description"
+                                  For="@(() => _formModel.Description)" />
+                </MudCardContent>
+                <MudCardActions>
+                    <MudButton ButtonType="ButtonType.Submit" Disabled="@_isSubmitting" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">
+                        @(_isSubmitting ? "Creating..." : "Create")
+                    </MudButton>
+                </MudCardActions>
+            </MudCard>
+        </MudItem>
+    </MudGrid>
+</EditForm>
+
+
+@code {
+    private CreateTrainingFormModel _formModel = new CreateTrainingFormModel();
+
+    private Boolean _isSubmitting;
+
+    protected override async Task OnInitializedAsync()
+    {
+        CreateTrainingState.Executed += ShowRegisteredTrainingInSnackbar;
+    }
+
+    private async Task OnSubmit(EditContext context)
+    {
+        var isValid = await context.ValidateAsync();
+        if (isValid)
+        {
+            await this.CreateTrainingAsync();
+        }
+    }
+
+    private async Task CreateTrainingAsync()
+    {
+        //guard
+        if (_isSubmitting) return;
+
+        _isSubmitting = true;
+        StateHasChanged();
+
+        try
+        {
+            var createTrainingResult = await CreateTrainingService.HandleAsync(_formModel);
+            if (createTrainingResult.Succeeded)
+            {
+                this.ClearForm();
+            }
+        }
+        finally
+        {
+            _isSubmitting = false;
+            StateHasChanged();
+        }
+    }
+
+    private void ClearForm()
+    {
+        _formModel = new CreateTrainingFormModel();
+        base.StateHasChanged();
+    }
+
+    private void ShowRegisteredTrainingInSnackbar(AsyncOperation<CreateTrainingResult> createTrainingResult)
+    {
+        if (createTrainingResult.Succeeded)
+        {
+            SnackbarNotifier.ShowMessage($"Training - {createTrainingResult.Data!.TrainingId} created", MessageSeverity.Success);
+        }
+    }
+
+    public void Dispose() => CreateTrainingState.Executed -= ShowRegisteredTrainingInSnackbar;
+}

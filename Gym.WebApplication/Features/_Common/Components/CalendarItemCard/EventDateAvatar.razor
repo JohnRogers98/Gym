@@ -1,0 +1,18 @@
+@using System.Globalization
+@using Gym.WebApplication.Features._Common.Components
+@using Gym.WebDto.Responses.Instructor
+
+<div style="display: flex; flex-direction: column; align-items: center;">
+    <MudAvatar Size="Size.Large" Color="Color.Primary" Class="mb-1">
+        @EventTime.Day
+    </MudAvatar>
+    <MudText Color="Color.Primary" Typo="Typo.caption" Class="mt-1">
+        @this.GetMonthText()
+    </MudText>
+</div>
+
+@code{
+    [Parameter, EditorRequired] public DateTime EventTime { get; set; } = default!;
+
+    private String GetMonthText() => EventTime.ToString("MMM");
+}

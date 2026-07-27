@@ -2,6 +2,7 @@
 using AutoMapper;
 using Gym.Application.Services.CalendarEventApi.CreateCalendarEvent;
 using Gym.Domain._Common;
+using Gym.Domain._Shared.Errors;
 using Gym.Domain.CalendarEventContext.Errors;
 using Gym.Domain.TrainingContext.Errors;
 using Gym.WebApi.Extensions;
@@ -14,7 +15,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Gym.WebApi.Controllers.Api.CalendarEvents.AdminOnly
 {
     [ApiController]
-    [Authorize(Policy = nameof(SecurityPolicy.AdminOnly))]
+    [Authorize(Policy = nameof(SecurityPolicy.Admin))]
     public class CreateCalendarEventEndpoint(IMediator _mediator, IMapper _mapper) : EndpointBaseAsync
         .WithRequest<CreateCalendarEventRequest>
         .WithActionResult<CreateCalendarEventResponse>

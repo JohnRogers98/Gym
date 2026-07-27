@@ -1,15 +1,6 @@
-﻿@using Gym.WebApplication.Features.Admin.Instructors.Registration
-@using Gym.WebApplication.Features.Admin.Instructors.Registration.Models.Results
-@using Gym.WebApplication.Features.Admin.Instructors.States
-@using Gym.WebApplication.Features.Admin.Instructors.TableView
-
-@inject ISnackbar Snackbar
-@inject IInstructorRegisteredSharedState InstructorRegisteredSharedState
-
-@implements IDisposable
-
+﻿
 <MudExpansionPanel Text="Instructor registration form">
-    <InstructorRegistration></InstructorRegistration>
+    <CreateInstructorForm></CreateInstructorForm>
 </MudExpansionPanel>
 
 <MudExpansionPanel Text="Current instructors">
@@ -18,15 +9,4 @@
 
 @code {
 
-    protected override async Task OnInitializedAsync()
-    {
-        InstructorRegisteredSharedState.InstructorCreated += ShowRegisteredInstructorInSnackbar;
-    }
-
-    private void ShowRegisteredInstructorInSnackbar(CreateInstructorResult createdInstructorViewModel)
-    {
-        Snackbar.Add($"Instructor - {createdInstructorViewModel.InstructorId} created", Severity.Success);
-    }
-
-    public void Dispose() => InstructorRegisteredSharedState.InstructorCreated -= ShowRegisteredInstructorInSnackbar;
 }

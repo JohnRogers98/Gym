@@ -18,12 +18,12 @@ using static Gym.WebApi.Controllers.Api.Accounts.AdminOnly.ChargeAccountEndpoint
 namespace Gym.WebApi.Controllers.Api.Accounts.AdminOnly
 {
     [ApiController]
-    [Authorize(Policy = nameof(SecurityPolicy.AdminOnly))]
+    [Authorize(Policy = nameof(SecurityPolicy.Admin))]
     public class ChargeAccountEndpoint(IMediator _mediator, IMapper _mapper) : EndpointBaseAsync
         .WithRequest<ChargeAccountContainer>
         .WithActionResult<ChargeAccountResponse>
     {
-        [HttpPost("api/clients/{clientId}/account/actions/charge")]
+        [HttpPost("api/clients/{clientId}/account/charge")]
         public override async Task<ActionResult<ChargeAccountResponse>> HandleAsync(ChargeAccountContainer request, CancellationToken cancellationToken = default)
         {
             var chargeAccount = _mapper.Map<ChargeAccount>(request.Body, opts =>

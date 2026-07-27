@@ -8,28 +8,26 @@ namespace Gym.Domain.InstructorContext
     public class Instructor : AggregateRoot
     {
         public InstructorId Id { get; }
-        public FirstName FirstName { get; private set; }
-        public LastName? LastName { get; private set; }
+        public UserId UserId { get; }
 
-        private Instructor(InstructorId id, FirstName firstName, LastName? lastName)
+        private Instructor(InstructorId id, UserId userId)
         {
             Id = id;
-            FirstName = firstName;
-            LastName = lastName;
+            UserId = userId;
         }
 
-        public static Instructor Create(InstructorId id, FirstName firstName, LastName? lastName)
+        public static Instructor Create(InstructorId id, UserId userId)
         {
-            Instructor instructor = new(id, firstName, lastName);
+            Instructor instructor = new(id, userId);
             instructor.AddDomainEvent(InstructorCreatedDomainEvent.Create(instructor.Id));
             return instructor;
         } 
 
-        public static Instructor Restore(InstructorId id, FirstName firstName, LastName? lastName)
-            => new Instructor(id, firstName, lastName);
+        public static Instructor Restore(InstructorId id, UserId userId)
+            => new Instructor(id, userId);
 
         public override String ToString() 
-            => $"{nameof(Id)}: {Id} \t {nameof(FirstName)}: {FirstName} \t {nameof(LastName)}: {LastName?.Value ?? "_"}";
+            => $"{nameof(Id)}: {Id} \t {nameof(UserId)}: {UserId}";
 
         public override Boolean Equals(Object? obj)
         {

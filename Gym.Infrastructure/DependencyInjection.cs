@@ -2,16 +2,16 @@
 using Gym.Abstractions.Query.Clients;
 using Gym.Abstractions.Query.EventStore;
 using Gym.Abstractions.Query.Instructors;
+using Gym.Abstractions.Query.PersonalTrainings;
 using Gym.Abstractions.Query.Trainings;
 using Gym.Domain._Common;
 using Gym.Domain.AccountContext;
 using Gym.Domain.CalendarEventContext;
 using Gym.Domain.ClientContext;
-using Gym.Domain.FormAuthContext;
 using Gym.Domain.InstructorContext;
+using Gym.Domain.PersonalTrainingContext;
 using Gym.Domain.PollContext;
 using Gym.Domain.PollResponseContext;
-using Gym.Domain.TelegramAuthContext;
 using Gym.Domain.TrainingContext;
 using Gym.Domain.UserContext;
 using Gym.Infrastructure.Caching;
@@ -28,15 +28,15 @@ using Gym.Infrastructure.Entities.Projections.CalendarEvents;
 using Gym.Infrastructure.Entities.Projections.Clients;
 using Gym.Infrastructure.Entities.Projections.Events;
 using Gym.Infrastructure.Entities.Projections.Instructors;
+using Gym.Infrastructure.Entities.Projections.PersonalTrainings;
 using Gym.Infrastructure.Entities.Projections.Trainings;
 using Gym.Infrastructure.Entities.Repositories.Accounts;
 using Gym.Infrastructure.Entities.Repositories.CalendarEvents;
 using Gym.Infrastructure.Entities.Repositories.Clients;
-using Gym.Infrastructure.Entities.Repositories.FormAuths;
 using Gym.Infrastructure.Entities.Repositories.Instructors;
+using Gym.Infrastructure.Entities.Repositories.PersonalTrainings;
 using Gym.Infrastructure.Entities.Repositories.PollResponses;
 using Gym.Infrastructure.Entities.Repositories.Polls;
-using Gym.Infrastructure.Entities.Repositories.TelgramAuths;
 using Gym.Infrastructure.Entities.Repositories.Trainings;
 using Gym.Infrastructure.Entities.Repositories.Users;
 using Gym.Infrastructure.HostedServices;
@@ -45,6 +45,7 @@ using Gym.Infrastructure.Telegram;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Options;
 using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
 using System.Net;
@@ -53,86 +54,108 @@ using Telegram.Bot;
 
 [assembly: InternalsVisibleTo("Gym.Infrastructure.Tests")]
 
-namespace Gym.Infrastructure
+namespace Gym.Infrastructure;
+
+public static class DependencyInjection
 {
-    public static class DependencyInjection
+    static DependencyInjection()
     {
-        static DependencyInjection()
+        var camelCaseConvention = new ConventionPack { new CamelCaseElementNameConvention() };
+        ConventionRegistry.Register("CamelCase", camelCaseConvention, type => true);
+    }
+
+    extension(IServiceCollection services)
+    {
+        public IServiceCollection AddInfrastructure(IConfiguration configuration)
         {
-            var camelCaseConvention = new ConventionPack { new CamelCaseElementNameConvention() };
-            ConventionRegistry.Register("CamelCase", camelCaseConvention, type => true);
-        }
+            services.AddOptions<MongoDbOptions>()
+                .Bind(configuration.GetSection("MongodDb"))
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
 
-        public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
-        {
-            MongoDbOptions mongoDbOptions = configuration.GetSection("MongodDb").Get<MongoDbOptions>() ?? MongoDbOptions.Default;
-            services.TryAddSingleton<MongoDbOptions>(_ => mongoDbOptions);
+            services.AddOptions<ProxyOptions>()
+                .Bind(configuration.GetSection("Proxy"))
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
 
-            ProxyOptions proxyOptions = configuration.Get<ProxyOptions>()
-                ?? throw new ArgumentNullException("No configuration provided for proxy setup.");
-            services.TryAddSingleton<ProxyOptions>(_ => proxyOptions);
-
-            services.AddMongoInfrastructure(mongoDbOptions ?? MongoDbOptions.Default);
+            services.AddMongoInfrastructure();
             services.AddMessagePublisher();
             services.AddRepositories();
             services.AddProjections();
             services.AddFinderServices();
             services.AddEventStore();
             services.AddCaching();
-            services.AddPasswordServices();
 
-            services.AddBackgroundWorkers();
             services.AddHostedServices();
 
-            if (configuration["TG_BOT_TOKEN"] is not null)
+            services.AddMessageBusInfstrastructure(
+                configuration.GetRequiredConfiguration("RabbitMQ:Hostname"),
+                configuration.GetRequiredConfiguration("RabbitMQ:Username"),
+                configuration.GetRequiredConfiguration("RabbitMQ:Password"),
+                configuration.GetRequiredConfiguration("RabbitMQ:Vhost")
+            );
+
+            if (configuration["TelegramBot:Token"] is not null)
             {
-                services.AddTelegramInfrastructure(configuration["TG_BOT_TOKEN"]!);
+                services.AddTelegramInfrastructure(configuration.GetRequiredConfiguration("TelegramBot:Token"));
             }
-            
+
             return services;
         }
 
-        private static IServiceCollection AddMongoInfrastructure(this IServiceCollection services, MongoDbOptions mongoDbOptions)
+        private IServiceCollection AddMongoInfrastructure()
         {
-            services.TryAddSingleton<IMongoClient>(_ => new MongoClient(mongoDbOptions.ConnectionString));
-            services.TryAddSingleton<IMongoDatabase>(sp => sp.GetRequiredService<IMongoClient>().GetDatabase(mongoDbOptions.DatabaseName));
+            services.TryAddSingleton<IMongoClient>(sp => 
+            {
+                var options = sp.GetRequiredService<IOptions<MongoDbOptions>>().Value;
+                return new MongoClient(options.ConnectionString);
+            });
+
+            services.TryAddSingleton<IMongoDatabase>(sp =>
+            {
+                var options = sp.GetRequiredService<IOptions<MongoDbOptions>>().Value;
+                var mongocClient = sp.GetRequiredService<IMongoClient>();
+                return mongocClient.GetDatabase(options.DatabaseName);
+            });
 
             services.TryAddScoped<MongoUnitOfWork>();
             services.TryAddScoped<IUnitOfWork>(sp => sp.GetRequiredService<MongoUnitOfWork>());
 
-            services.AddMongoCollection<InstructorEntity>(mongoDbOptions.CollectionOptions.Instructors);
-            services.AddMongoCollection<InstructorProjection>(mongoDbOptions.CollectionOptions.InstructorProjections);
+            services.AddMongoCollection<InstructorEntity>(options => options.Collections.Instructors);
+            services.AddMongoCollection<InstructorProjection>(options => options.Collections.InstructorProjections);
 
-            services.AddMongoCollection<TrainingEntity>(mongoDbOptions.CollectionOptions.Trainings);
-            services.AddMongoCollection<TrainingProjection>(mongoDbOptions.CollectionOptions.TrainingProjections);
+            services.AddMongoCollection<TrainingEntity>(options => options.Collections.Trainings);
+            services.AddMongoCollection<TrainingProjection>(options => options.Collections.TrainingProjections);
 
-            services.AddMongoCollection<CalendarEventEntity>(mongoDbOptions.CollectionOptions.CalendarEvents);
-            services.AddMongoCollection<CalendarEventProjection>(mongoDbOptions.CollectionOptions.CalendarEventProjections);
+            services.AddMongoCollection<CalendarEventEntity>(options => options.Collections.CalendarEvents);
+            services.AddMongoCollection<CalendarEventProjection>(options => options.Collections.CalendarEventProjections);
 
-            services.AddMongoCollection<UserEntity>(mongoDbOptions.CollectionOptions.Users);
+            services.AddMongoCollection<UserEntity>(options => options.Collections.Users);
 
-            services.AddMongoCollection<TelegramAuthEntity>(mongoDbOptions.CollectionOptions.TelegramAuths);
-            services.AddMongoCollection<FormAuthEntity>(mongoDbOptions.CollectionOptions.FormAuths);
+            services.AddMongoCollection<ClientEntity>(options => options.Collections.Clients);
+            services.AddMongoCollection<ClientProjection>(options => options.Collections.ClientProjections);
 
-            services.AddMongoCollection<ClientEntity>(mongoDbOptions.CollectionOptions.Clients);
-            services.AddMongoCollection<ClientProjection>(mongoDbOptions.CollectionOptions.ClientProjections);
+            services.AddMongoCollection<EventEntity>(options => options.Collections.Events);
+            services.AddMongoCollection<EventProjection>(options => options.Collections.EventProjections);
+            services.AddMongoCollection<MessageEntity>(options => options.Collections.Messages);
 
-            services.AddMongoCollection<EventEntity>(mongoDbOptions.CollectionOptions.Events);
-            services.AddMongoCollection<EventProjection>(mongoDbOptions.CollectionOptions.EventProjections);
-            services.AddMongoCollection<MessageEntity>(mongoDbOptions.CollectionOptions.Messages);
+            services.AddMongoCollection<OutboxChangeStreamState>(options => options.Collections.OutboxChangeStreams);
 
-            services.AddMongoCollection<OutboxChangeStreamState>(mongoDbOptions.CollectionOptions.OutboxChangeStreams);
-            
-            services.AddMongoCollection<PollEntity>(mongoDbOptions.CollectionOptions.Polls);
-            services.AddMongoCollection<PollResponseEntity>(mongoDbOptions.CollectionOptions.PollResponses);
+            services.AddMongoCollection<PollEntity>(options => options.Collections.Polls);
+            services.AddMongoCollection<PollResponseEntity>(options => options.Collections.PollResponses);
+
+            services.AddMongoCollection<PersonalTrainingEntity>(options => options.Collections.PersonalTrainings);
+            services.AddMongoCollection<PersonalTrainingProjection>(options => options.Collections.PersonalTrainingProjections);
 
             return services;
         }
-
-        private static IServiceCollection AddMongoCollection<T>(this IServiceCollection services, String collectionName)
+        private IServiceCollection AddMongoCollection<T>(Func<MongoDbOptions, String> collectionNameFunc)
         {
             services.TryAddSingleton<IMongoCollection<T>>(sp =>
             {
+                var options = sp.GetRequiredService<IOptions<MongoDbOptions>>().Value;
+                var collectionName = collectionNameFunc(options);
+
                 var database = sp.GetRequiredService<IMongoDatabase>();
                 return database.GetCollection<T>(collectionName);
             });
@@ -140,17 +163,7 @@ namespace Gym.Infrastructure
             return services;
         }
 
-        private static IServiceCollection AddMessagePublisher(this IServiceCollection services)
-        {
-            services.TryAddScoped<IMessagePublisher, OutboxStore>();
-            services.TryAddSingleton<IOutboxResumeTokenStore, OutboxResumeTokenStore>();
-            services.TryAddSingleton<IOutboxReader, OutboxReader>();
-            services.TryAddScoped<IOutboxMessageStatusUpdater, OutboxMessageStatusUpdater>();
-            services.TryAddScoped<IEventStoreReader, EventStoreReader>();
-            return services;
-        }
-
-        private static IServiceCollection AddRepositories(this IServiceCollection services)
+        private IServiceCollection AddRepositories()
         {
             services.TryAddScoped<IInstructorRepository, InstructorRepository>();
             services.TryDecorate<IInstructorRepository, InstructorEventStoreAspect>();
@@ -163,12 +176,9 @@ namespace Gym.Infrastructure
 
             services.TryAddScoped<IUserRepository, UserRepository>();
 
-            services.TryAddScoped<ITelegramAuthRepository, TelegramAuthRepository>();
-            services.TryAddScoped<IFormAuthRepository, FormAuthRepository>();
-
             services.TryAddScoped<IClientRepository, ClientRepository>();
             services.TryDecorate<IClientRepository, ClientEventStoreAspect>();
-            
+
             services.TryAddScoped<IAccountRepository, AccountRepository>();
 
             services.TryAddScoped<IPollRepository, PollRepository>();
@@ -177,10 +187,23 @@ namespace Gym.Infrastructure
             services.TryAddScoped<IPollResponseRepository, PollResponseRepository>();
             services.TryDecorate<IPollResponseRepository, PollResponseEventStoreAspect>();
 
+            services.TryAddScoped<IPersonalTrainingRepository, PersonalTrainingRepository>();
+            services.TryDecorate<IPersonalTrainingRepository, PersonalTrainingEventStoreAspect>();
+
             return services;
         }
 
-        private static IServiceCollection AddProjections(this IServiceCollection services)
+        private IServiceCollection AddMessagePublisher()
+        {
+            services.TryAddScoped<IMessagePublisher, OutboxStore>();
+            services.TryAddSingleton<IOutboxResumeTokenStore, OutboxResumeTokenStore>();
+            services.TryAddSingleton<IOutboxReader, OutboxReader>();
+            services.TryAddScoped<IOutboxMessageStatusUpdater, OutboxMessageStatusUpdater>();
+            services.TryAddScoped<IEventStoreReader, EventStoreReader>();
+            return services;
+        }
+
+        private IServiceCollection AddProjections()
         {
             services.AddProjectionHanlders();
 
@@ -191,21 +214,19 @@ namespace Gym.Infrastructure
             services.TryAddScoped<IInstructorProjectionQueryService, InstructorProjectionQueryService>();
             services.TryAddScoped<ITrainingProjectionQueryService, TrainingProjectionQueryService>();
             services.TryAddScoped<IClientProjectionQueryService, ClientProjectionQueryService>();
+            services.TryAddScoped<IPersonalTrainingProjectionQueryService, PersonalTrainingProjectionQueryService>();
 
             return services;
         }
 
-        private static IServiceCollection AddFinderServices(this IServiceCollection services)
+        private IServiceCollection AddFinderServices()
         {
-            services.TryAddScoped<ITelegramAuthByUserIdFinder, TelegramAuthRepository>();
-            services.TryAddScoped<IFormAuthByUserIdFinder, FormAuthRepository>();
-            services.TryAddScoped<IClientByUserIdFinder, ClientRepository>();
             services.TryAddScoped<IClientByUserIdFinder, ClientRepository>();
             services.TryAddScoped<IPastCalendarEventsFinder, CalendarEventRepository>();
             return services;
         }
 
-        private static IServiceCollection AddEventStore(this IServiceCollection services)
+        private IServiceCollection AddEventStore()
         {
             services.TryAddScoped<IEventStore, EventStore>();
             services.TryDecorate<IEventStore, OutboxEventStoreAspect>();
@@ -224,15 +245,14 @@ namespace Gym.Infrastructure
             return services;
         }
 
-        private static IServiceCollection AddTelegramInfrastructure(this IServiceCollection services, String botToken)
+        private IServiceCollection AddTelegramInfrastructure(String botToken)
         {
             services.TryAddSingleton<TelegramBotToken>(_ => TelegramBotToken.From(botToken));
-            services.TryAddSingleton<ITelegramSignatureVerifier, TelegramSignatureVerifier>();
             services.TryAddScoped<INotificationService, TelegramBotNotificationService>();
 
-            services.TryAddSingleton<ITelegramBotClient>(sp => 
+            services.TryAddSingleton<ITelegramBotClient>(sp =>
             {
-                ProxyOptions proxyOptions = sp.GetRequiredService<ProxyOptions>();
+                ProxyOptions proxyOptions = sp.GetRequiredService<IOptions<ProxyOptions>>().Value;
 
                 WebProxy proxy = new WebProxy(proxyOptions.Host, Int32.Parse(proxyOptions.Port));
                 proxy.Credentials = new NetworkCredential(proxyOptions.Login, proxyOptions.Password);
@@ -251,22 +271,16 @@ namespace Gym.Infrastructure
             return services;
         }
 
-        private static IServiceCollection AddCaching(this IServiceCollection services)
+        private IServiceCollection AddCaching()
         {
             services.TryAddScoped<IExclusiveAccessCoordinator, MemoryCacheExclusiveAccess>();
             return services;
         }
 
-        private static IServiceCollection AddPasswordServices(this IServiceCollection services)
+        private IServiceCollection AddHostedServices()
         {
-            services.TryAddSingleton<IPasswordHasher, PasswordHasher>();
-            services.TryAddSingleton<IPasswordHashValidator, PasswordHashValidator>();
-            services.TryAddSingleton<IPasswordGenerator, PasswordGenerator>();
-            return services;
-        }
+            services.AddHostedService<ConfigurationLogger>();
 
-        private static IServiceCollection AddBackgroundWorkers(this IServiceCollection services)
-        {
             services.AddHostedService<OutboxEventReader>();
 
             services.TryAddKeyedSingleton<PeriodicTimer>(
@@ -284,10 +298,21 @@ namespace Gym.Infrastructure
             return services;
         }
 
-        private static IServiceCollection AddHostedServices(this IServiceCollection services)
+        private IServiceCollection AddMessageBusInfstrastructure(String hostname, String username, String password, String vhost)
         {
-            services.AddHostedService<ConfigurationLogger>();
+            services.AddRabbitMQConnection(options =>
+            {
+                options.Hostname = hostname;
+                options.Username = username;
+                options.Password = password;
+                options.Vhost = vhost;
+            });
+
+            services.AddHostedService<MessageBusInitializer>();
+            services.AddHostedService<UserCreatedMessagesConsumer>();
+
             return services;
         }
     }
+
 }

@@ -15,12 +15,12 @@ using static Gym.WebApi.Controllers.Api.CalendarEvents.AdminOnly.CancelCalendarE
 namespace Gym.WebApi.Controllers.Api.CalendarEvents.AdminOnly
 {
     [ApiController]
-    [Authorize(Policy = nameof(SecurityPolicy.AdminOnly))]
+    [Authorize(Policy = nameof(SecurityPolicy.Admin))]
     public class CancelCalendarEventEndpoint(IMediator _mediator, IMapper _mapper) : EndpointBaseAsync
         .WithRequest<CancelCalendarEventContainer>
         .WithActionResult<CancelCalendarEventResponse>
     {
-        [HttpPost("api/admin-calendar-events/{id}/actions/cancel")]
+        [HttpPost("api/admin-calendar-events/{id}/cancel")]
         public override async Task<ActionResult<CancelCalendarEventResponse>> HandleAsync(CancelCalendarEventContainer request, CancellationToken cancellationToken = default)
         {
             Result<CancelCalendarEventResult> cancelCalendarEventResult = await _mediator.Send(new CancelCalendarEvent(request.Id), cancellationToken);

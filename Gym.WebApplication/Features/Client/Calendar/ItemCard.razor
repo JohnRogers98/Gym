@@ -1,0 +1,79 @@
+﻿@using Gym.WebApplication.Features._Common.Components
+@using Gym.WebApplication.Features._Common.Components.CalendarItemCard
+
+<MudCard Outlined="false" Elevation="3">
+
+    <CalendarItemCardHeader Title="@CalendarItem.Training.Name" Start="@CalendarItem.Start" End="@CalendarItem.End" />
+
+    <MudDivider />
+
+    <MudCardContent>
+        <MudStack>
+            <MudText>@CalendarItem.Training.Description</MudText>
+
+            @if (CalendarItem.Instructors?.Any() == true)
+            {
+               <InstructorList Instructors="@CalendarItem.Instructors" />
+            }
+
+            @if (CalendarItem.MaxClientCount.HasValue)
+            {
+                <MudProgressLinear Color="Color.Tertiary" Size="Size.Medium" Min="0" Max="@CalendarItem.MaxClientCount.Value" Value="@CalendarItem.CurrentClientCount" />
+            }
+
+            @if (CalendarItem.Poll is not null)
+            {
+                <Expander ExpandTitle="Show Poll" CollapseTitle="Hide Poll">
+                    <PollInfo PollViewModel="@CalendarItem.Poll"></PollInfo>
+                </Expander>
+            }
+        </MudStack>
+    </MudCardContent>
+
+    <MudCardActions>
+        @if (CalendarItem.Status == "Cancelled")
+        {
+        <MudButton FullWidth="true"
+                   Variant="Variant.Filled"
+                   Color="Color.Error"
+                   Disabled="true">
+            Отменено
+        </MudButton>
+        }
+        else if(CalendarItem.IsAlreadyBooked)
+        {
+            <MudButton FullWidth="true"
+                       Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       Disabled="true">
+                Вы уже записаны
+            </MudButton>
+        }
+        else if (CalendarItem.IsFull())
+        {
+            <MudButton FullWidth="true"
+                       Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       Disabled="true">
+                Мест нет
+            </MudButton>
+        }
+        else
+        {
+            <MudButton FullWidth="true"
+                       Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       OnClick="@(async (_) => await OnSelected.InvokeAsync(CalendarItem))">
+                Записаться
+            </MudButton>
+        }
+    </MudCardActions>
+
+</MudCard>    
+    
+
+@code {
+    [Parameter, EditorRequired] public CalendarEventForClientViewModel CalendarItem { get; set; } = default!;
+    
+    [Parameter] public EventCallback<CalendarEventForClientViewModel> OnSelected { get; set; }
+}
