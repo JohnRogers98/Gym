@@ -74,7 +74,7 @@ public static class DependencyInjection
                 .ValidateOnStart();
 
             services.AddOptions<ProxyOptions>()
-                .Bind(configuration)
+                .Bind(configuration.GetSection("Proxy"))
                 .ValidateDataAnnotations()
                 .ValidateOnStart();
 
@@ -95,9 +95,9 @@ public static class DependencyInjection
                 configuration.GetRequiredConfiguration("RabbitMQ:Vhost")
             );
 
-            if (configuration["TG_BOT_TOKEN"] is not null)
+            if (configuration["TelegramBot:Token"] is not null)
             {
-                services.AddTelegramInfrastructure(configuration["TG_BOT_TOKEN"]!);
+                services.AddTelegramInfrastructure(configuration.GetRequiredConfiguration("TelegramBot:Token"));
             }
 
             return services;
