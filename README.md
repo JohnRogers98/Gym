@@ -89,7 +89,7 @@ BFF stands for reverse proxy surrogate whose main job is to be API gateway and m
 
 ---
 
-### Примечания
+### Annotations
 
 - `*` — RabbitMQ connection is shared across all application parts.
 
