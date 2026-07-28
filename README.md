@@ -11,7 +11,7 @@ Gym-Buddy has implemented OAuth 2.0 specification with OpenId Connect extension.
 
 In order to use telegram WebApp was implemented custom Assertion method which takes initData sent by telegram validates it and authenticate a user.
 
-To manage auth storage Gym.AuthorizationServer.Admin server is on duty. Currently, its main job is to create new users from. All events of user manipulation are sending to RabbitMQ message bus.
+To manage auth storage Gym.AuthorizationServer.Admin server is on duty. Currently, its main job is to create new users. All events of user manipulation are sending to RabbitMQ message bus.
 
 ## WebApi
 WebApi represents the core functionality of the application. It is divided into application, insfrastructure and domain projects. The Domain-Driven-Design pattern has been implemented.
