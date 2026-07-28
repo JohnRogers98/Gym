@@ -9,7 +9,7 @@ The project has three logical parts:
 ## OAuth 2.0
 Gym-Buddy has implemented OAuth 2.0 specification with OpenId Connect extension. Gym.AuthorizationServer is the core part of that implementation with authorization_code flow as the main authorization method.
 
-In order to use telegram WebApp was implemented custom Assertion method which takes initData sent by telegram validates it and authenticate a user.
+In order to use telegram WebApp custom Assertion method was implemented which takes initData sent by telegram, validates it and authenticate a user.
 
 To manage auth storage Gym.AuthorizationServer.Admin server is on duty. Currently, its main job is to create new users. All events of user manipulation are sending to RabbitMQ message bus.
 
