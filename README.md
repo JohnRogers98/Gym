@@ -1,5 +1,5 @@
 # Gym-buddy project
-The core concept of project is managing gym workouts. Admins can create calendar events, manage client`s accounts, register instructors. Instructors - create personal trainings, see their assigned events. Clients - see account history, book and look for available events.
+The core concept of this project is managing gym workouts. Admins can create calendar events, manage client`s accounts, register instructors. Instructors - create personal trainings, see their assigned events. Clients - see the account history, book and look for available events.
 
 The project has three logical parts:
 1. OAuth 2.0
@@ -79,7 +79,7 @@ BFF stands for reverse proxy surrogate whose main job is to be API gateway and m
 
 | Property | Description |
 |----------|----------|
-| `AccessTokenIssuer` | ase URL of Auth Server (see AuthorizationServer Jwt:Issuer) |
+| `AccessTokenIssuer` | Base URL of Auth Server (see AuthorizationServer Jwt:Issuer) |
 | `RabbitMQ` | RabbitMQ connection settings* |
 | `AuthorizationServer:BaseUrl` | Base URL of Auth Server |
 | `BffUrl` | URL of BFF server |
