@@ -5,7 +5,7 @@ namespace Gym.WebApplication.Features._Common.Services
 {
     public class FailSnackbarDecorator<TRequest, TResponse>(
         IRequestHandler<TRequest, TResponse> _decoratee,
-        IAppSnackbarNotifier _appSnackbarNotifier) : IRequestHandler<TRequest, TResponse>
+        IAppSnackbarNotifier _appSnackbarNotifier) : IRequestHandler<TRequest, TResponse>, IRequestHandlerDecoratorMarker
     {
         public async Task<AsyncOperation<TResponse>> HandleAsync(TRequest request, CancellationToken cancellationToken = default)
         {

@@ -4,7 +4,7 @@ using Polly.Fallback;
 
 namespace Gym.WebApplication.Features._Common.Services
 {
-    public class ResilienceDecorator<TRequest, TResponse> : IRequestHandler<TRequest, TResponse>
+    public class ResilienceDecorator<TRequest, TResponse> : IRequestHandler<TRequest, TResponse>, IRequestHandlerDecoratorMarker
     {
         private IRequestHandler<TRequest, TResponse> _decoratee;
         private ResiliencePipeline<AsyncOperation<TResponse>> _pipeline;

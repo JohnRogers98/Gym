@@ -55,8 +55,6 @@ builder.Services.AddAuthorizationCore(options =>
 });
 builder.Services.AddCascadingAuthenticationState();
 
-builder.Services.AddHttpClient(builder.Configuration);
-
 builder.Services.AddAuthenticationServices();
 
 builder.Services.AddLocalStorage();
