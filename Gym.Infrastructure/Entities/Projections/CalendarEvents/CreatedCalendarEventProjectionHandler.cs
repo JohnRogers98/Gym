@@ -1,4 +1,5 @@
-﻿using Gym.Abstractions.Query.CalendarEvents;
+﻿using Gym.Abstractions.Query._CommonInfos;
+using Gym.Abstractions.Query.CalendarEvents;
 using Gym.Domain.CalendarEventContext;
 using Gym.Domain.CalendarEventContext.Events;
 using Gym.Infrastructure.Entities.EventStores;
@@ -6,9 +7,9 @@ using Gym.Infrastructure.Entities.EventStores.DtoDeserializers;
 using Gym.Infrastructure.Entities.Extensions;
 using Gym.Infrastructure.Entities.Repositories.CalendarEvents;
 using Gym.Infrastructure.Entities.Repositories.CalendarEvents.EventsDto;
-using Gym.Infrastructure.Entities.Repositories.Instructors;
 using Gym.Infrastructure.Entities.Repositories.Polls;
 using Gym.Infrastructure.Entities.Repositories.Trainings;
+using Gym.Infrastructure.Entities.Repositories.Users;
 using MongoDB.Driver;
 
 namespace Gym.Infrastructure.Entities.Projections.CalendarEvents
@@ -16,7 +17,7 @@ namespace Gym.Infrastructure.Entities.Projections.CalendarEvents
     internal class CreatedCalendarEventProjectionHandler(
         IMongoCollection<CalendarEventEntity> _calendarEventCollection,
         IMongoCollection<TrainingEntity> _trainingColletion,
-        IMongoCollection<InstructorEntity> _instructorColletion,
+        IMongoCollection<UserEntity> _userColletion,
         IMongoCollection<PollEntity> _pollCollection,
         IMongoCollection<CalendarEventProjection> _projectionCollection,
         MongoUnitOfWork _mongoUnitOfWork,
@@ -47,11 +48,11 @@ namespace Gym.Infrastructure.Entities.Projections.CalendarEvents
             if (calendarEvent.Instructors?.Any() is true)
             {
                 var instructoresList = calendarEvent.Instructors.ToList();
-                instructors = await _instructorColletion
-                    .Find(instructor => instructoresList.Contains(instructor.Id))
-                    .Project(instructor => new InstructorInfo(
-                        instructor.Id.ToString(),
-                        String.Concat(instructor.FirstName, " ", instructor.LastName)))
+                instructors = await _userColletion
+                    .Find(user => instructoresList.Contains(user.Id))
+                    .Project(user => new InstructorInfo(
+                        user.Id.ToString(),
+                        String.Concat(user.FirstName, " ", user.LastName)))
                     .ToListAsync(cancellationToken);
             }
 

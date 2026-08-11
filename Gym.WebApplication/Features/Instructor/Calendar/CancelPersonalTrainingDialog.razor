@@ -1,0 +1,34 @@
+﻿@using Gym.WebApplication.Features._Common.Services
+
+@inject IRequestHandler<CancelPersonalTraining, CancelPersonalTrainingResult> CancelPersonalTrainingService
+
+<MudDialog>
+    <DialogContent>
+        Are you sure you want cancel training - @PersonalTraining.Id
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="CancelAction">No</MudButton>
+        <MudButton Color="Color.Error" OnClick="@ApproveActionAsync">Yes</MudButton>
+    </DialogActions>
+</MudDialog>
+
+<style>
+    .my-custom-class {
+        backdrop-filter: blur(10px);
+    }
+</style>
+
+@code {
+    [CascadingParameter]
+    private IMudDialogInstance MudDialog { get; set; } = default!;
+
+    [Parameter, EditorRequired] public PersonalTrainingViewModel PersonalTraining { get; set; } = default!;
+
+    private void CancelAction() => MudDialog.Cancel();
+
+    private async Task ApproveActionAsync()
+    {
+        var cancelResult = await CancelPersonalTrainingService.HandleAsync(new CancelPersonalTraining() { PersonalTrainingId = PersonalTraining.Id });
+        MudDialog.Close();
+    }
+}

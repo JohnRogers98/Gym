@@ -1,0 +1,25 @@
+﻿@using Gym.WebApplication.Features._Common.Components.CalendarItemCard
+
+<MudCard Outlined="false" Elevation="3">
+
+    <CalendarItemCardHeader Title="@CalendarEvent.Training.Name" Start="@CalendarEvent.Start" End="@CalendarEvent.End" />
+
+    <MudDivider />
+
+    <MudCardContent>
+        <MudStack>
+            <MudText>@CalendarEvent.Training.Description</MudText>
+
+            @if (CalendarEvent.Instructors?.Any() == true)
+            {
+                <InstructorList Instructors="@CalendarEvent.Instructors" />
+            }
+        </MudStack>
+    </MudCardContent>
+
+</MudCard>    
+    
+
+@code {
+    [Parameter, EditorRequired] public CalendarEventForAdminViewModel CalendarEvent { get; set; } = default!;
+}

@@ -1,7 +1,7 @@
 ﻿using Gym.CompositionRoot.Extensions;
-using Gym.WebApi.Controllers.Api.Users.Jwt;
 using Gym.WebApi.Converters;
 using Gym.WebApi.Extensions;
+using Gym.Abstractions.MessageBus;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,19 +16,28 @@ builder.Services.AddOpenApi(options =>
     options.OpenApiVersion = Microsoft.OpenApi.OpenApiSpecVersion.OpenApi3_0;
 });
 
+builder.Services.AddCorsPolicies(builder.Configuration.GetRequiredConfiguration("BffUrl"));
+
+builder.Services.AddMemoryCache();
+
+builder.Services.AddAuthenticationSchemes(
+    builder.Configuration.GetRequiredConfiguration("AccessTokenIssuer"),
+    builder.Configuration.GetRequiredConfiguration("AudienceUri")
+);
+
+builder.Services.AddAuthorizationPolicies();
+
+builder.Services.AddAuthorizationServerClient(builder.Configuration);
+
+builder.Services.AddMessageBus(builder.Configuration);
+
+builder.Services.AddProviders();
+
 builder.Services.AddProblemDetails();
 
 builder.Services.AddAutoMapper(cfg => { }, typeof(Program).Assembly);
 
 builder.Services.AddCompositionRoot(builder.Configuration);
-
-builder.Services.AddSingleton<IAccessTokenGenerator, AccessTokenGenerator>();
-builder.Services.AddSingleton<IAccessCookieAppender, AccessCookieAppender>();
-
-builder.Services.AddCorsPolicies(builder.Configuration);
-
-builder.Services.AddJwtAuthentication(builder.Configuration);
-builder.Services.AddAuthorizationPolicies();
 
 var app = builder.Build();
 
@@ -38,7 +47,7 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
-app.UseCors(nameof(CorsPolicy.AllowWebApplication));
+app.UseCors(nameof(CorsPolicy.AllowBff));
 
 app.UseHttpsRedirection();
 

@@ -1,0 +1,242 @@
+﻿using Gym.AuthorizationServer.Infrastructure.Entities.Scopes;
+using Gym.AuthorizationServer.Services.Tokens;
+using Gym.OAuth.Extensions;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.JsonWebTokens;
+using Microsoft.IdentityModel.Tokens;
+using MongoDB.Bson;
+using System.Net.Http.Json;
+using System.Security.Cryptography;
+
+namespace Gym.AuthorizationServer.Integration.Tests.Flows
+{
+    [Collection<TestServerCollection>]
+    public class AuthorizationCodeFlowTests(TestServerFixture _fixture, ITestOutputHelper _outputHelper) : IntegrationTest(_fixture, _outputHelper)
+    {
+        [Fact]
+        public async Task Pass_Through_Authorization_Code_Flow()
+        {
+            #region Given
+            DatabaseShaper databaseShaper = new DatabaseShaper(Fixture);
+            await databaseShaper.WithDefaultClientAsync();
+            await databaseShaper.WithDefaultUserAsync();
+            await databaseShaper.WithDefaultUserRoleAsync();
+            await databaseShaper.WithDefaultProtectedResourceAsync();
+            var scope_1 = await databaseShaper.WithScopeAsync(
+                new()
+                {
+                    Id = ObjectId.GenerateNewId().ToString(),
+                    RoleId = DatabaseShaper.DefaultRoleId,
+                    ProtectedResourceId = DatabaseShaper.DefaultProtectedResourceId,
+                    Name = "scope_1"
+                });
+            var scope_2 = await databaseShaper.WithScopeAsync(
+                new()
+                {
+                    Id = ObjectId.GenerateNewId().ToString(),
+                    RoleId = DatabaseShaper.DefaultRoleId,
+                    ProtectedResourceId = DatabaseShaper.DefaultProtectedResourceId,
+                    Name = "scope_2"
+                });
+            await databaseShaper.WithDefaultUserFormCredentialsAsync();
+
+            var httpClient = Fixture.CreateClient();
+            #endregion
+
+            var authorizeQuery = new AuthorizeQuery
+            {
+                ClientId = DatabaseShaper.DefaultClientId,
+                ResponseType = "code",
+                RedirectUri = DatabaseShaper.DefaultClientRedirectUri,
+                Scope = "scope_2",
+                State = DatabaseShaper.DefaultState,
+                Resource = DatabaseShaper.DefaultProtectedResourceAudienceUri,
+                CodeChallenge = DatabaseShaper.DefaultCodeChallange,
+                CodeChallengeMethod = DatabaseShaper.DefaultCodeChallangeMethod
+            };
+
+            await RunAuthorizationCodeFlow(authorizeQuery, scope_2, expectIdToken: false);
+        }
+
+        [Fact]
+        public async Task Pass_Through_Authorization_Code_Flow_Using_Open_Id_Connect()
+        {
+            #region Given
+            DatabaseShaper databaseShaper = new DatabaseShaper(Fixture);
+            await databaseShaper.WithDefaultClientAsync();
+            await databaseShaper.WithDefaultUserAsync();
+            await databaseShaper.WithDefaultUserRoleAsync();
+            await databaseShaper.WithDefaultProtectedResourceAsync();
+            var openidScope = await databaseShaper.WithScopeAsync(
+                new()
+                {
+                    Id = ObjectId.GenerateNewId().ToString(),
+                    RoleId = DatabaseShaper.DefaultRoleId,
+                    ProtectedResourceId = DatabaseShaper.DefaultProtectedResourceId,
+                    Name = "openid"
+                });
+         
+            await databaseShaper.WithDefaultUserFormCredentialsAsync();
+
+            var httpClient = Fixture.CreateClient();
+            #endregion
+
+            var authorizeQuery = new AuthorizeQuery
+            {
+                ClientId = DatabaseShaper.DefaultClientId,
+                ResponseType = "code",
+                RedirectUri = DatabaseShaper.DefaultClientRedirectUri,
+                Scope = "openid",
+                State = DatabaseShaper.DefaultState,
+                Resource = DatabaseShaper.DefaultProtectedResourceAudienceUri,
+                CodeChallenge = DatabaseShaper.DefaultCodeChallange,
+                CodeChallengeMethod = DatabaseShaper.DefaultCodeChallangeMethod,
+                Nonce = DatabaseShaper.DefaultNonce
+            };
+
+            await RunAuthorizationCodeFlow(authorizeQuery, openidScope, expectIdToken: true);
+        }
+
+        private async Task RunAuthorizationCodeFlow(AuthorizeQuery authorizeQuery, ScopeEntity scope, Boolean expectIdToken)
+        {
+            var httpClient = Fixture.CreateClient();
+
+            #region Authorize
+            var authorizeResponse = await httpClient.GetAsync($"/authorize{authorizeQuery.ToQueryString()}", TestContext.Current.CancellationToken);
+            authorizeResponse.EnsureRedirectStatusCode();
+            #endregion
+
+            #region Login
+            var redirectLoginResponse = await httpClient.GetAsync(authorizeResponse.Headers.Location, TestContext.Current.CancellationToken);
+            redirectLoginResponse.EnsureSuccessStatusCode();
+
+            var tokens = await Fixture.GetAntiforgeryTokensAsync(httpClient, TestContext.Current.CancellationToken);
+
+            var loginFormData = new Dictionary<String, String>
+            {
+                [tokens.FormFieldName] = tokens.RequestToken,
+                ["Username"] = DatabaseShaper.DefaultUserUsername,
+                ["Password"] = DatabaseShaper.DefaultUserPassword
+            };
+            var loginFormContent = new FormUrlEncodedContent(loginFormData);
+
+            var loginPostResponse = await httpClient.PostAsync("/login", loginFormContent, TestContext.Current.CancellationToken);
+            loginPostResponse.EnsureRedirectStatusCode();
+            #endregion
+
+            #region Approve
+            var redirectApproveResponse = await httpClient.GetAsync(loginPostResponse.Headers.Location,TestContext.Current.CancellationToken);
+            redirectApproveResponse.EnsureSuccessStatusCode();
+
+            tokens = await Fixture.GetAntiforgeryTokensAsync(httpClient, TestContext.Current.CancellationToken);
+
+            var approveFormData = new Dictionary<String, String>
+            {
+                [tokens.FormFieldName] = tokens.RequestToken,
+                ["Scopes[0].IsSelected"] = "true",
+                ["Scopes[0].Id"] = scope.Id,
+                ["Scopes[0].Name"] = scope.Name,
+            };
+            var approveFormContent = new FormUrlEncodedContent(approveFormData);
+
+            var approvePostResponse = await httpClient.PostAsync("/approve", approveFormContent, TestContext.Current.CancellationToken);
+            approvePostResponse.EnsureRedirectStatusCode();
+
+            var queryString = approvePostResponse.Headers.Location!.ToString()
+                .Substring(approvePostResponse.Headers.Location!.ToString().IndexOf('?'));
+
+            var queryParams = System.Web.HttpUtility.ParseQueryString(queryString);
+
+            var code = queryParams["code"];
+            Assert.NotNull(code);
+            Assert.Equal(DatabaseShaper.DefaultState, queryParams["state"]);
+            #endregion
+
+            #region Token
+            var tokenRequest = new TokenRequest
+            {
+                ClientId = DatabaseShaper.DefaultClientId,
+                ClientSecret = DatabaseShaper.DefaultClientSecret,
+                RedirectUri = DatabaseShaper.DefaultClientRedirectUri,
+                GrantType = "authorization_code",
+                Resource = DatabaseShaper.DefaultProtectedResourceAudienceUri,
+                Code = code,
+                CodeVerifier = DatabaseShaper.DefaultCodeVerifier
+            };
+
+            var tokenPostResponse = await httpClient.PostAsync("/token", tokenRequest.ToFormContent(), TestContext.Current.CancellationToken);
+            tokenPostResponse.EnsureSuccessStatusCode();
+            Assert.True(tokenPostResponse.Headers.CacheControl?.NoStore);
+
+            var tokenResponse = await tokenPostResponse.Content.ReadFromJsonAsync<TokenResponse>(TestContext.Current.CancellationToken);
+            Assert.NotNull(tokenResponse);
+            Assert.NotNull(tokenResponse.AccessToken);
+            Assert.NotNull(tokenResponse.RefreshToken);
+            #endregion
+
+            if (expectIdToken)
+            {
+                Assert.NotNull(tokenResponse.IdToken);
+                await ValidateIdToken(httpClient, tokenResponse.IdToken);
+                await ValidateAtHash(tokenResponse.AccessToken, tokenResponse.IdToken);
+            }
+            else
+            {
+                Assert.Null(tokenResponse.IdToken);
+            }
+        }
+
+        private async Task ValidateIdToken(HttpClient httpClient, String idToken)
+        {
+            var jwksResponse = await httpClient.GetAsync("/.well-known/jwks.json", TestContext.Current.CancellationToken);
+            jwksResponse.EnsureSuccessStatusCode();
+
+            var jwks = await jwksResponse.Content.ReadFromJsonAsync<JwkSet>(TestContext.Current.CancellationToken);
+            Assert.NotNull(jwks);
+
+            var jwk = jwks.Jwks.First();
+            byte[] n = jwk.Modulus.Base64UrlDecode();
+            byte[] e = jwk.Exponent.Base64UrlDecode();
+
+            using RSA rsaPublic = RSA.Create();
+            rsaPublic.ImportParameters(new RSAParameters { Modulus = n, Exponent = e });
+
+            var validationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidIssuer = TestServerFixture.DefaultTokenIssuer,
+                ValidateAudience = true,
+                ValidAudience = DatabaseShaper.DefaultClientId,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new RsaSecurityKey(rsaPublic)
+                {
+                    CryptoProviderFactory = new CryptoProviderFactory
+                    {
+                        CacheSignatureProviders = false
+                    }
+                },
+                ClockSkew = TimeSpan.FromMinutes(5)
+            };
+
+            var tokenHandler = new JsonWebTokenHandler();
+            var result = await tokenHandler.ValidateTokenAsync(idToken, validationParameters);
+            Assert.True(result.IsValid);
+            Assert.Equal(DatabaseShaper.DefaultNonce, result.Claims[JwtRegisteredClaimNames.Nonce]);
+        }
+
+        private async Task ValidateAtHash(String accessToken, String idToken)
+        {
+            using var scope = Fixture.Services.CreateScope();
+            var atHash = scope.ServiceProvider.GetRequiredService<IComputeOpenIdAtHashService>()
+                .Compute(accessToken);
+
+            var tokenHandler = new JsonWebTokenHandler();
+            var jsonToken = tokenHandler.ReadJsonWebToken(idToken);
+
+            Assert.Equal(atHash, jsonToken.GetClaim(JwtRegisteredClaimNames.AtHash).Value);
+        }
+
+    }
+}

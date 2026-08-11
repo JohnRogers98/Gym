@@ -12,8 +12,7 @@ namespace Gym.Infrastructure.Entities.Extensions.Mappings
         {
             return Instructor.Restore(
                 InstructorId.From(entity.Id.ToString()).Unwrap(),
-                FirstName.From(entity.FirstName).Unwrap(),
-                entity.LastName is not null ? LastName.From(entity.LastName).Unwrap() : null 
+                UserId.From(entity.UserId.ToString()).Unwrap()
             );
         }
 
@@ -22,8 +21,7 @@ namespace Gym.Infrastructure.Entities.Extensions.Mappings
             return new() 
             { 
                 Id = instructor.Id.Value.ToObjectId(),
-                FirstName = instructor.FirstName.Value,
-                LastName = instructor.LastName?.Value 
+                UserId = instructor.UserId.Value.ToObjectId()
             };
         }
     }

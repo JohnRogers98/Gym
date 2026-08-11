@@ -1,4 +1,6 @@
-﻿namespace Gym.Abstractions.Query.CalendarEvents
+﻿using Gym.Abstractions.Query._CommonInfos;
+
+namespace Gym.Abstractions.Query.CalendarEvents
 {
     public record CalendarEventProjection(
         String Id,
@@ -13,8 +15,6 @@
         );
 
     public record TrainingInfo(String Id, String Name, String? Description);
-    
-    public record InstructorInfo(String Id, String FullName);
 
     public record PollInfo(String Id, String Title, Boolean IsResponseRequired, Boolean CanAcceptMany, List<ChoiceInfo> Choices);
 

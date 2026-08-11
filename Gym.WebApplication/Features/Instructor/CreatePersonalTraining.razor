@@ -1,0 +1,156 @@
+﻿@page "/create-personal-training"
+@using Gym.WebApplication.Features._Common.Services
+@using Gym.WebApplication.Features._Common.States
+
+@inject IRequestHandler<ListClientsForInstructor, IEnumerable<ClientViewModel>> ListClientsService
+@inject IRequestHandler<CreatePersonalTrainingFormModel, CreatePersonalTrainingResult> CreatePersonalTrainingService
+
+@inject IAppSnackbarNotifier SnackbarNotifier
+@inject AsyncOperationStateNotifier<CreatePersonalTrainingFormModel, CreatePersonalTrainingResult> CreatePersonalTrainingState
+
+@inject IDialogService DialogService
+
+@implements IDisposable
+
+<MudContainer>
+
+    <EditForm Model="@_formModel" OnSubmit="@OnSubmit">
+        <FluentValidator />
+
+        <MudCard Elevation="3">
+
+            <MudCardHeader Class="d-flex justify-center align-center">
+                <MudText Typo="Typo.h5">Create personal training</MudText>
+            </MudCardHeader>
+
+            <MudCardContent>
+                <MudStack Spacing="3">
+
+                    <MudSelect T="String" @bind-Value="@_formModel.ClientId"
+                               Variant="Variant.Outlined"
+                               Clearable="true"
+                               Label="Choose client"
+                               For="@(() => _formModel.ClientId)">
+                        @foreach (var client in _clients)
+                        {
+                            <MudSelectItem T="String" Value="@client.Id">
+                                @client.FullName
+                            </MudSelectItem>
+                        }
+                    </MudSelect>
+
+                    <MudDatePicker PickerVariant="PickerVariant.Dialog"
+                                   Variant="Variant.Outlined"
+                                   Label="Choose day"
+                                   AutoClose="true"
+                                   MinDate="@DateTime.Today"
+                                   @bind-Date="@_formModel.LocalStartDateTime"
+                                   For="@(() => _formModel.LocalStartDateTime)" />
+
+                    <MudTimePicker PickerVariant="PickerVariant.Dialog"
+                                   Variant="Variant.Outlined"
+                                   Label="Choose time"
+                                   AutoClose="true"
+                                   @bind-Time="@_formModel.StartTimeSpan"
+                                   For="@(() => _formModel.StartTimeSpan)" />
+                    
+                    <MudNumericField @bind-Value="@_formModel.DurationInMinutes"
+                                     Label="Choose duration in minutes"
+                                     Variant="Variant.Outlined"
+                                     Step="15"
+                                     For="@(() => _formModel.DurationInMinutes)" />
+
+                    <MudTextField @bind-Value="@_formModel.InstructorComment"
+                                  Label="Your comment"
+                                  Variant="Variant.Outlined"
+                                  For="@(() => _formModel.InstructorComment)" />
+
+                    <MudCheckBox @bind-Value="@_formModel.IsPaid"
+                                 Label="Is payed?"
+                                 Color="Color.Primary"/>
+
+                </MudStack>
+            </MudCardContent>
+
+            <MudCardActions>
+                <MudStack Row="true" Class="ml-auto">
+                    <MudButton ButtonType="ButtonType.Submit"
+                               Disabled="@_isSubmitting"
+                               Variant="Variant.Filled"
+                               Color="Color.Primary">
+                        @(_isSubmitting ? "Creating..." : "Create")
+                    </MudButton>
+                </MudStack>
+            </MudCardActions>
+        </MudCard>
+
+    </EditForm>
+
+</MudContainer>
+
+@code {
+    private CreatePersonalTrainingFormModel _formModel = new();
+
+    private IList<ClientViewModel> _clients = [];
+
+    private Boolean _isSubmitting;
+
+    protected override async Task OnInitializedAsync()
+    {
+        CreatePersonalTrainingState.Executed += this.ShowInSnackbar;
+        await this.LoadDataAsyn();
+    }
+
+    private async Task LoadDataAsyn()
+    {
+        var getAllClientsResult = await ListClientsService.HandleAsync(new ListClientsForInstructor());
+        if (getAllClientsResult.Succeeded)
+            _clients = [.. getAllClientsResult.Data!];
+    }
+
+    private async Task OnSubmit(EditContext context)
+    {
+        var isValid = await context.ValidateAsync();
+        if (isValid)
+        {
+            await this.CreatePersonalTrainingAsync();
+        }
+    }
+    private async Task CreatePersonalTrainingAsync()
+    {
+        //guard
+        if (_isSubmitting) return;
+
+        _isSubmitting = true;
+        StateHasChanged();
+
+        try
+        {
+            var createPersonalTrainingResult = await CreatePersonalTrainingService.HandleAsync(_formModel);
+            if (createPersonalTrainingResult.Succeeded)
+            {
+                this.ClearForm();
+            }
+        }
+        finally
+        {
+            _isSubmitting = false;
+            StateHasChanged();
+        }
+    }
+    private void ClearForm()
+    {
+        _formModel = new();
+        base.StateHasChanged();
+    }
+
+    private void ShowInSnackbar(AsyncOperation<CreatePersonalTrainingResult> accountChargingResult)
+    {
+        if (accountChargingResult.Succeeded)
+        {
+            SnackbarNotifier.ShowMessage($"Training created.", MessageSeverity.Success);
+        }
+    }
+
+    public void Dispose() => CreatePersonalTrainingState.Executed -= this.ShowInSnackbar;
+}

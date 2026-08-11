@@ -1,0 +1,36 @@
+﻿@page
+@model Gym.AuthorizationServer.Pages.ApproveModel
+@{
+    Layout = "_Layout";
+}
+
+<div style="width: 100%; max-width: 400px; padding: 20px;">
+    <div class="card">
+        <div class="card-content">
+            <span class="card-title center-align">Approve scopes</span>
+
+            <form method="post">
+                @for (Int32 i = 0; i < Model.Scopes.Count; i++)
+                {
+                    <div class="row">
+                        <div class="col s12">
+                            <label>
+                                <input asp-for="@Model.Scopes[i].IsSelected" type="checkbox"/>
+                                <span>@Model.Scopes[i].Name</span>
+                            </label>
+                            <input type="hidden" asp-for="@Model.Scopes[i].Id" />
+                            <input type="hidden" asp-for="@Model.Scopes[i].Name" />
+                        </div>
+                    </div>
+                }
+
+                <div class="row">
+                    <div class="col s12">
+                        <button class="btn waves-effect waves-light full-width" type="submit" style="width: 100%;">Submit</button>
+                    </div>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>

@@ -1,0 +1,53 @@
+﻿using Ardalis.ApiEndpoints;
+using Gym.AuthorizationServer.Extensions;
+using Gym.AuthorizationServer.Infrastructure.Entities.Roles;
+using Gym.AuthorizationServer.Infrastructure.Entities.Users;
+using Gym.OAuth.Extensions;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+
+namespace Gym.AuthorizationServer.Controllers.Api
+{
+    [Route("userinfo")]
+    [ApiController]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    public class UserInfoEndpoint(IUserRepository _userRepository, IRoleRepository _roleRepository) : EndpointBaseAsync.WithoutRequest.WithActionResult<UserInfo>
+    {
+        [HttpGet, HttpPost]
+        public override async Task<ActionResult<UserInfo>> HandleAsync(CancellationToken cancellationToken = default)
+        {
+            if (String.IsNullOrEmpty(User.GetSub()))
+                return base.Unauthorized(new { error = "invalid_token", error_description = "Missing 'sub' claim" });
+
+            var scopes = User.GetScope()?.Split(' ') ?? Array.Empty<String>();
+
+            
+            if (!scopes.Contains("openid"))
+                return base.Forbid();
+
+            var user = await _userRepository.GetByIdAsync(User.GetSub()!, cancellationToken);
+            if (user is null)
+                return base.Unauthorized(new { error = "invalid_token", error_description = "User not found" });
+
+            var role = await _roleRepository.GetByIdAsync(user.RoleId, cancellationToken);
+
+            UserInfo userInfo = new()
+            {
+                Subject = user.Id,
+                Role = role!.Name
+            };
+
+            if (scopes.Contains("profile"))
+            {
+                userInfo.Name = $"{user.FirstName} {user.LastName}";
+                userInfo.GivenName = user.FirstName;
+                userInfo.FamilyName = user.LastName;
+            }
+            if (scopes.Contains("email")) { }
+            if (scopes.Contains("phone")) { }
+
+            return base.Ok(userInfo);
+        }
+    }
+}

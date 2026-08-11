@@ -6,6 +6,10 @@
 
         Task<IEnumerable<CalendarEventProjection>> GetAllAsync(CancellationToken cancellationToken);
 
+        Task<IEnumerable<CalendarEventProjection>> GetAllByInstructorIdAsync(String instructorId, CancellationToken cancellationToken);
+
+        Task<IEnumerable<CalendarEventProjection>> GetAllByClientIdAsync(String clientId, CancellationToken cancellationToken);
+
         Task<IEnumerable<CalendarEventProjection>> GetStartingFromAsync(DateTime dateTime, CancellationToken cancellationToken);
     }
 }

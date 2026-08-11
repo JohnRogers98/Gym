@@ -11,24 +11,26 @@ namespace Gym.Domain.UserContext
         public UserRole Role { get; }
         public FirstName? FirstName { get; }
         public LastName? LastName { get; }
+        public TelegramId? TelegramId { get; }
 
-        private User(UserId id, UserRole role, FirstName? firstName, LastName? lastName)
+        private User(UserId id, UserRole role, FirstName? firstName, LastName? lastName, TelegramId? telegramId)
         {
             Id = id;
             Role = role;
             FirstName = firstName;
             LastName = lastName;
+            TelegramId = telegramId;
         }
 
-        public static User Create(UserId id, UserRole role, FirstName? firstName, LastName? lastName)
+        public static User Create(UserId id, UserRole role, FirstName? firstName, LastName? lastName, TelegramId? telegramId)
         {
-            User user = new(id, role, firstName, lastName);
+            User user = new(id, role, firstName, lastName, telegramId);
             user.AddDomainEvent(UserCreatedDomainEvent.Create(id));
             return user;
         }
 
-        public static User Restore(UserId id, UserRole role, FirstName? firstName, LastName? lastName)
-            => new(id, role, firstName, lastName);
+        public static User Restore(UserId id, UserRole role, FirstName? firstName, LastName? lastName, TelegramId? telegramId)
+            => new(id, role, firstName, lastName, telegramId);
 
         public override String ToString()
             => $"{nameof(Id)}: {Id} \t {nameof(Role)}: {Role}";

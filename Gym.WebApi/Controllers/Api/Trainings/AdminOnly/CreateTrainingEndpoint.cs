@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Gym.WebApi.Controllers.Api.Trainings.AdminOnly
 {
     [ApiController]
-    [Authorize(Policy = nameof(SecurityPolicy.AdminOnly))]
+    [Authorize(Policy = nameof(SecurityPolicy.Admin))]
     public class CreateTrainingEndpoint(IMediator _mediator, IMapper _mapper) : EndpointBaseAsync
         .WithRequest<CreateTrainingRequest>
         .WithActionResult<CreateTrainingResponse>

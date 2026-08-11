@@ -11,11 +11,13 @@
     <PackageReference Include="AutoMapper" Version="16.1.1" />
     <PackageReference Include="MediatR" Version="14.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.1" />
-    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.1" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.9" />
+    <PackageReference Include="Microsoft.OpenApi" Version="2.9.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Gym.Application\Gym.Application.csproj" />
+    <ProjectReference Include="..\Gym.AuthorizationServer.Client\Gym.AuthorizationServer.Client.csproj" />
     <ProjectReference Include="..\Gym.CompositionRoot\Gym.CompositionRoot.csproj" />
     <ProjectReference Include="..\Gym.WebDto\Gym.WebDto.csproj" />
   </ItemGroup>

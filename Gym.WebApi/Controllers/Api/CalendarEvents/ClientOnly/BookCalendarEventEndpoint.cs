@@ -11,16 +11,17 @@ using Gym.WebDto.Responses.Bookings;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace Gym.WebApi.Controllers.Api.CalendarEvents.ClientOnly
 {
     [ApiController]
-    [Authorize(Policy = nameof(SecurityPolicy.ClientOnly))]
+    [Authorize(Policy = nameof(SecurityPolicy.Client))]
     public class BookCalendarEventEndpoint(IMediator _mediator, IMapper _mapper) : EndpointBaseAsync
         .WithRequest<BookTrainingEventRequest>
         .WithActionResult<BookTrainingEventResponse>
     {
-        [HttpPost("api/client-calendar-events/actions/book")]
+        [HttpPost("api/client-calendar-events/book")]
         public override async Task<ActionResult<BookTrainingEventResponse>> HandleAsync(BookTrainingEventRequest request, CancellationToken cancellationToken = default)
         {
             var bookTrainingEvent = new BookTrainingEvent(

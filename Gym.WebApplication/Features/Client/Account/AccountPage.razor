@@ -1,0 +1,53 @@
+﻿@page "/account"
+
+@attribute [Authorize(Roles = "Client")]
+
+<MudContainer>
+    <MudHidden Breakpoint="Breakpoint.MdAndUp" Invert="false">
+        <div class="d-flex flex-column align-center gap-3">
+            <MudTabs Class="mx-4" Rounded="true" ActiveTabClass="border-solid border-2 mud-border-primary" TabPanelsClass="pt-10 px-4">
+
+                <MudTabPanel Text="Details">
+                    <AccountDetails></AccountDetails>
+                </MudTabPanel>
+
+                <MudTabPanel Text="History">
+                    <AccountHistory></AccountHistory>
+                </MudTabPanel>
+
+                <AuthorizeView Policy="HasBasicAuth">
+                    <MudTabPanel Text="Password">
+                        <ChangePassword></ChangePassword>
+                    </MudTabPanel>
+                </AuthorizeView>
+
+            </MudTabs>
+        </div>
+    </MudHidden>
+
+    <MudHidden Breakpoint="Breakpoint.MdAndUp" Invert="true">
+        <MudTabs Class="mx-4" Rounded="true" ActiveTabClass="border-solid border-2 mud-border-primary" TabPanelsClass="pt-10">
+
+            <MudTabPanel Text="Details">
+                <AccountDetails></AccountDetails>
+            </MudTabPanel>
+
+            <MudTabPanel Text="History">
+                <AccountHistory></AccountHistory>
+            </MudTabPanel>
+
+            <AuthorizeView Policy="HasBasicAuth">
+                <MudTabPanel Text="Password">
+                    <ChangePassword></ChangePassword>
+                </MudTabPanel>
+            </AuthorizeView>
+
+        </MudTabs>
+    </MudHidden>
+</MudContainer>
+
+
+
+@code {
+
+}

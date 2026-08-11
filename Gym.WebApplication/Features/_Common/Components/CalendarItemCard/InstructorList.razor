@@ -1,0 +1,14 @@
+﻿
+<MudList T="InstructorViewModel" Dense="true" Gutters="false">
+    @foreach (var instructor in Instructors)
+    {
+        <MudListItem>
+            <MudIcon Icon="@Icons.Material.Filled.Person" Size="Size.Small" />
+            @instructor.FullName
+        </MudListItem>
+    }
+</MudList>
+
+@code {
+    [Parameter, EditorRequired] public IEnumerable<InstructorViewModel> Instructors { get; set; } = default!;
+}

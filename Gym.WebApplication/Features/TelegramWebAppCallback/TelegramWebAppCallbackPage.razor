@@ -1,0 +1,22 @@
+﻿@page "/telegram-web-app-callback"
+
+@using Gym.WebApplication.Authentication
+
+@inject NavigationManager NavigationManager
+@inject ITelegramInitService TelegramInitService
+@inject AuthStateProvider AuthStateProvider
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        Uri? uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
+        String telegramData = uri.Fragment.TrimStart('#');
+
+        if (String.IsNullOrEmpty(telegramData) is false)
+        {
+            await TelegramInitService.HandleAsync(telegramData);
+        }
+        await AuthStateProvider.ReloadAsync();
+        NavigationManager.NavigateTo("/", forceLoad: false);
+    }
+}

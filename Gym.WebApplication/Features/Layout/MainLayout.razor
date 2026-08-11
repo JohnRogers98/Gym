@@ -1,10 +1,12 @@
-﻿@inherits LayoutComponentBase
+﻿@using Gym.WebApplication.Features._Common.Components
+@inherits LayoutComponentBase
 <div class="page">
 
     <MudThemeProvider />
     <MudPopoverProvider />
     <MudDialogProvider />
     <MudSnackbarProvider />
+    <AppSnackbar />
 
     <MudLayout>
         <Menu />

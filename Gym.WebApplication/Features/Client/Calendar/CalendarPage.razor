@@ -1,0 +1,87 @@
+﻿@page "/client-calendar"
+@using Gym.WebApplication.Features._Common.Components
+@using Gym.WebApplication.Features._Common.Services
+
+@attribute [Authorize(Roles = "Client")]
+
+@inject IRequestHandler<ListAvailableClientCalendarItems, IEnumerable<CalendarEventForClientViewModel>> ListAvailableCalendarItemsService
+@inject IRequestHandler<BookCalendarItem, BookCalendarItemResult> BookCalendarItemService
+
+@inject IDialogService DialogService
+
+@if (_calendarItems is null)
+{
+    <MudSkeleton />
+}
+else
+{
+    <DatePicker OnDatePicked="@this.DatePicked"></DatePicker>
+    
+    <ItemsContainer CalendarItems="@_selectedItems" OnSelectedCalendarItem="@this.BookEventAsync"></ItemsContainer>
+}
+
+
+@code {
+    private List<CalendarEventForClientViewModel> _calendarItems = default!;
+
+    private List<CalendarEventForClientViewModel> _selectedItems = default!;
+
+    private DateOnly _pickedDate = default; 
+
+    protected override async Task OnInitializedAsync()
+    {
+        var loadedCalendarEvents = await ListAvailableCalendarItemsService.HandleAsync(new ListAvailableClientCalendarItems());
+        if (loadedCalendarEvents.Succeeded)
+            _calendarItems = new List<CalendarEventForClientViewModel>(loadedCalendarEvents.Data!);
+
+        _pickedDate = DateTime.Now.ToDateOnly();
+        this.RefreshSelectedItems();
+    }
+
+    private void DatePicked(DateOnly pickedDate)
+    {
+        _pickedDate = pickedDate;
+        this.RefreshSelectedItems();
+    }
+
+    private async Task BookEventAsync(CalendarEventForClientViewModel selectdCalendarEvent)
+    {
+        PollResponse? pollResponse = null;
+        if (selectdCalendarEvent.Poll is not null)
+        {
+            var parameters = new DialogParameters<SubmitPollDialog> { { x => x.PollViewModel, selectdCalendarEvent.Poll } };
+
+            var dialog = await DialogService.ShowAsync<SubmitPollDialog>("Response poll", parameters);
+            var result = await dialog.Result;
+
+            if (result!.Canceled)
+            {
+                return;
+            }
+
+            if (result?.Data is PollResponse shapedResponse)
+                pollResponse = shapedResponse;
+        }
+
+        var bookingResult = await BookCalendarItemService.HandleAsync(new BookCalendarItem { CalendarItem = selectdCalendarEvent, PollResponse = pollResponse });
+        if (bookingResult.Succeeded)
+        {
+            var indexOfEvent = _calendarItems.IndexOf(selectdCalendarEvent);
+            if (indexOfEvent >= 0)
+            {
+                var eventWithUpdatedBookingStatus = selectdCalendarEvent with
+                {
+                    IsAlreadyBooked = true,
+                    CurrentClientCount = selectdCalendarEvent.CurrentClientCount + 1
+                };
+
+                _calendarItems[indexOfEvent] = eventWithUpdatedBookingStatus;
+                this.RefreshSelectedItems();
+            }
+
+            base.StateHasChanged();
+        }
+    }
+
+    private void RefreshSelectedItems() => _selectedItems = new(_calendarItems.Where(aCalendarEvent => aCalendarEvent.UtcStart.ToDateOnly() == _pickedDate));
+}

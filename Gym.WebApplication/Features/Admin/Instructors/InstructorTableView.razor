@@ -1,0 +1,40 @@
+﻿@using Gym.WebApplication.Features._Common.Services
+
+@inject IRequestHandler<ListInstructors, IEnumerable<InstructorViewModel>> GetAllInstructorsService
+
+
+<MudDataGrid Items="@_instructors" Striped="true" Elevation="0">
+    
+    <ToolBarContent>
+        <MudSpacer />
+        <MudIconButton Icon="@Icons.Material.Filled.Refresh"
+                       OnClick="@RefreshDataAsync"
+                       Size="Size.Small" />
+    </ToolBarContent>
+
+    <Columns>
+        <PropertyColumn Property="x => x.Id" Title="Id" />
+        <PropertyColumn Property="x => x.FullName" Title="FullName" />
+    </Columns>
+</MudDataGrid>
+
+@code {
+    private IList<InstructorViewModel> _instructors = new List<InstructorViewModel>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await this.LoadDataAsync();
+    }
+
+   
+    private async Task RefreshDataAsync() => await LoadDataAsync();
+
+    private async Task LoadDataAsync()
+    {
+        var getAllInstructorsResult = await GetAllInstructorsService.HandleAsync(new ListInstructors());
+        if (getAllInstructorsResult.Succeeded)
+        {
+            _instructors = getAllInstructorsResult.Data!.ToList();
+        }
+    }
+}

@@ -1,0 +1,43 @@
+﻿@using Gym.WebApplication.Features._Common.Services
+
+@inject IRequestHandler<GetAccountHistoryItems, IEnumerable<AccountHistoryItemViewModel>> GetAccountHistoryItemsService
+
+@if (_historyItems is null)
+{
+    <MudSkeleton />
+}
+else
+{
+    <MudGrid Spacing="3">
+        <MudTimeline TimelinePosition="TimelinePosition.Start">
+
+            @foreach (var aHistoryItem in _historyItems)
+            {
+                <MudTimelineItem Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small">
+                    <ItemContent>
+                        <MudCard Outlined="true" Elevation="25">
+                            <MudCardContent>
+                                <MudText Typo="Typo.body2">@aHistoryItem.GetMessage()</MudText>
+                                <MudText Typo="Typo.body2">@aHistoryItem.LocalOccurredAt.ToDateOnly()</MudText>
+                            </MudCardContent>
+                        </MudCard>
+                    </ItemContent>
+
+                </MudTimelineItem>
+            }
+        </MudTimeline>
+
+    </MudGrid>
+}
+
+@code {
+
+    public List<AccountHistoryItemViewModel> _historyItems = default!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var getAllAccountHistoryItemsResult = await GetAccountHistoryItemsService.HandleAsync(new GetAccountHistoryItems());
+        if (getAllAccountHistoryItemsResult.Succeeded)
+            _historyItems = [.. getAllAccountHistoryItemsResult.Data!];
+    }
+}

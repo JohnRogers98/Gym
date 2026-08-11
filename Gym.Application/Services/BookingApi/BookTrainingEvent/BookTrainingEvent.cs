@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Gym.Application.Services.BookingApi.BookTrainingEvent
 {
-    public record BookTrainingEvent(String UserId, String CalendarEventId, CalendarEventPollResponse? PollResponse = null) : IRequest<Result<BookTrainingEventResult>>, ILockedRequest, ITransactionalRequest
+    public record BookTrainingEvent(String ClientId, String CalendarEventId, CalendarEventPollResponse? PollResponse = null) : IRequest<Result<BookTrainingEventResult>>, ILockedRequest, ITransactionalRequest
     {
         public String GetLockId() => CalendarEventId;
 

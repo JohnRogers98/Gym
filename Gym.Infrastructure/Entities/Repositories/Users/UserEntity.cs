@@ -10,5 +10,6 @@ namespace Gym.Infrastructure.Entities.Repositories.Users
         public String? LastName {  get; set; }
 
         public required String Role { get; set; }
+        public Int64? TelegramId { get; set; }
     }
 }

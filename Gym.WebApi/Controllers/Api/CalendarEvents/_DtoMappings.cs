@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Gym.Abstractions.Query._CommonInfos;
 using Gym.Abstractions.Query.CalendarEvents;
 using Gym.Application.Services.BookingApi.BookTrainingEvent;
 using Gym.Application.Services.CalendarEventApi.CancelCalendarEvent;
@@ -40,7 +41,7 @@ namespace Gym.WebApi.Controllers.Api.CalendarEvents
             CreateMap<BookTrainingEventResult, BookTrainingEventResponse>();
 
             CreateMap<Abstractions.Query.CalendarEvents.TrainingInfo, WebDto.Responses.Training.TrainingInfo>();
-            CreateMap<Abstractions.Query.CalendarEvents.InstructorInfo, WebDto.Responses.Instructor.InstructorInfo>();
+            CreateMap<InstructorInfo, WebDto.Responses.Instructor.InstructorInfo>();
             CreateMap<Abstractions.Query.CalendarEvents.BookingUserInfo, WebDto.Responses.Bookings.BookingUserInfo>();
 
             CreateMap<CancelCalendarEventResult, CancelCalendarEventResponse>();

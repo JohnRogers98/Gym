@@ -1,0 +1,30 @@
+﻿
+<MudDialog>
+    <DialogContent>
+        Are you sure you want cancel event - @CalendarEventItem?.Training.Name? 
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="CancelAction">Cancel</MudButton>
+        <MudButton Color="Color.Error" OnClick="@ApproveAction">Cancel</MudButton>
+    </DialogActions>
+</MudDialog>
+
+<style>
+    .my-custom-class {
+        backdrop-filter: blur(10px);
+    }
+</style>
+
+@code {
+    [CascadingParameter]
+    private IMudDialogInstance MudDialog { get; set; } = default!;
+
+    [Parameter] public CalendarEventForAdminViewModel? CalendarEventItem { get; set; }
+
+    private void CancelAction() => MudDialog.Cancel();
+
+    private void ApproveAction()
+    {
+        MudDialog.Close(DialogResult.Ok(CalendarEventItem?.Id));
+    }
+}

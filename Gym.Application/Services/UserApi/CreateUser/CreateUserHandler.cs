@@ -4,92 +4,115 @@ using Gym.Domain.AccountContext;
 using Gym.Domain.AccountContext.ValueObjects;
 using Gym.Domain.ClientContext;
 using Gym.Domain.ClientContext.ValueObjects;
-using Gym.Domain.FormAuthContext;
-using Gym.Domain.FormAuthContext.Errors;
-using Gym.Domain.FormAuthContext.ValueObjects;
+using Gym.Domain.InstructorContext;
+using Gym.Domain.InstructorContext.ValueObjects;
 using Gym.Domain.UserContext;
 using Gym.Domain.UserContext.Errors;
 using Gym.Domain.UserContext.ValueObjects;
 using MediatR;
 
-namespace Gym.Application.Services.UserApi.CreateUser
+namespace Gym.Application.Services.UserApi.CreateClient
 {
     internal class CreateUserHandler(
-        IPasswordHasher _passwordHasher,
-        IPasswordGenerator _passwordGenerator,
-        IFormAuthRepository _formAuthRepository,
         IUserRepository _userRepository,
         IClientRepository _clientRepository,
-        IAccountRepository _accountRepository) : IRequestHandler<CreateUser, Result<CreateUserResult>>
+        IAccountRepository _accountRepository,
+        IInstructorRepository _instructorRepository) : IRequestHandler<CreateUser, Result>
     {
-        public async Task<Result<CreateUserResult>> Handle(CreateUser request, CancellationToken cancellationToken)
+        public async Task<Result> Handle(CreateUser request, CancellationToken cancellationToken)
         {
-            var loginResult = Login.From(request.Login);
-            if (loginResult.Success is false)
-                return Result<CreateUserResult>.Fail(loginResult.Error!);
+            var createdUserResult = await this.CreateUserAsync(request, cancellationToken);
+            if (createdUserResult.Success is false)
+                return Result.Fail(createdUserResult.Error!);
 
-            var loginExists = await _formAuthRepository.ExistsAsync(loginResult.Data!, cancellationToken);
-            if (loginExists)
-                return Result<CreateUserResult>.Fail(LoginAlreadyExistsError.Create());
-
-            var password = _passwordGenerator.Generate();
-            var hashedPassword = _passwordHasher.HashPassword(password);
-
-            var userResult = await this.CreateUserAsync(request, cancellationToken);
-            if(userResult.Success is false)
-                return Result<CreateUserResult>.Fail(userResult.Error!);
-
-            if(userResult.Data!.Role == UserRole.Client)
+            switch (createdUserResult.Data!.Role)
             {
-                await CreateClientAsync(userResult.Data!.Id, cancellationToken);
-                await CreateAccountAsync(userResult.Data!.Id, cancellationToken);
+                case UserRole.Client:
+                    {
+                        var createClientResult = await this.CreateClientAsync(createdUserResult.Data!.Id, cancellationToken);
+                        if (createClientResult.Success is false)
+                            return Result.Fail(createClientResult.Error!);
+
+                        var createAccountResult = await this.CreateAccountAsync(createdUserResult.Data!.Id, cancellationToken);
+                        if (createAccountResult.Success is false)
+                            return Result.Fail(createAccountResult.Error!);
+
+                        break;
+                    }
+                case UserRole.Instructor:
+                    {
+                        var createInstructorResult = await this.CreateInstructorAsync(createdUserResult.Data!.Id, cancellationToken);
+                        if (createInstructorResult.Success is false)
+                            return Result.Fail(createInstructorResult.Error!);
+
+                        break;
+                    }
+                default:
+                    {
+                        break;
+                    }
             }
 
-            var formAuth = FormAuth.Create(loginResult.Data!, hashedPassword, userResult.Data!.Id);
-            await _formAuthRepository.SaveAsync(formAuth, cancellationToken);
+            return Result.Ok();
+        }   
 
-            return Result<CreateUserResult>.Ok(new CreateUserResult(userResult.Data!.Id.Value, loginResult.Data!.Value, password.Value));
-        }
-
-        private async Task<Result<User>> CreateUserAsync(CreateUser request, CancellationToken cancellationToken)
+        private async Task<Result<User>> CreateUserAsync(CreateUser createUser, CancellationToken cancellationToken)
         {
-            var userId = _userRepository.NextIdentity();
-           
-            if (!Enum.TryParse<UserRole>(request.Role, true, out UserRole userRole) || !Enum.IsDefined(typeof(UserRole), userRole))
+            var userIdResult = UserId.From(createUser.UserId);
+            if (userIdResult.Success is false)
+                return Result<User>.Fail(userIdResult.Error!);
+
+            var isUserRoleParsed = Enum.TryParse<UserRole>(createUser.Role, true, out var userRole);
+            if (isUserRoleParsed is false)
                 return Result<User>.Fail(UserRoleParseError.Create());
 
-            var firstNameResult = FirstName.From(request.FirstName);
+            var firstNameResult = FirstName.From(createUser.FirstName!);
             if (firstNameResult.Success is false)
                 return Result<User>.Fail(firstNameResult.Error!);
 
             LastName? lastName = null;
-            if (request.LastName is not null)
+            if (createUser.LastName is not null)
             {
-                var lastNameResult = LastName.From(request.LastName);
+                var lastNameResult = LastName.From(createUser.LastName);
                 if (lastNameResult.Success is false)
                     return Result<User>.Fail(lastNameResult.Error!);
                 lastName = lastNameResult.Data!;
             }
 
-            User user = User.Create(userId, userRole, firstNameResult.Data!, lastName);
-            await _userRepository.SaveAsync(user, cancellationToken);
+            TelegramId? telegramId = null;
+            if (createUser.TelegramId is not null)
+            {
+                var telegramIdResult = TelegramId.From(createUser.TelegramId.Value);
+                if (telegramIdResult.Success is false)
+                    return Result<User>.Fail(telegramIdResult.Error!);
+                telegramId = telegramIdResult.Data!;
+            }
 
-            return Result<User>.Ok(user);
+            User newUser = User.Create(userIdResult.Data!, userRole, firstNameResult.Data!, lastName, telegramId);
+            await _userRepository.SaveAsync(newUser, cancellationToken);
+
+            return Result<User>.Ok(newUser);
         }
 
-        private async Task<Client> CreateClientAsync(UserId userId, CancellationToken cancellationToken)
+        private async Task<Result<Client>> CreateClientAsync(UserId userId, CancellationToken cancellationToken)
         {
-            ClientId clientId = _clientRepository.NextIdentity();
-            Client client = Client.Create(clientId, userId);
+            Client client = Client.Create(ClientId.From(userId), userId);
             await _clientRepository.SaveAsync(client, cancellationToken);
-            return client;
+            return Result<Client>.Ok(client);
         }
 
-        private async Task<Account> CreateAccountAsync(UserId userId, CancellationToken cancellationToken)
+        private async Task<Result<Account>> CreateAccountAsync(UserId userId, CancellationToken cancellationToken)
         {
             Account account = Account.Create(AccountId.From(userId), userId);
             await _accountRepository.SaveAsync(account, cancellationToken);
-            return account;
+            return Result<Account>.Ok(account);
+        }
+
+        private async Task<Result<Instructor>> CreateInstructorAsync(UserId userId, CancellationToken cancellationToken)
+        {
+            Instructor instructor = Instructor.Create(InstructorId.From(userId), userId);
+            await _instructorRepository.SaveAsync(instructor, cancellationToken);
+            return Result<Instructor>.Ok(instructor);
         }
     }
 }

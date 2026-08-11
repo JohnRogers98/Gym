@@ -13,7 +13,7 @@ using static Gym.WebApi.Controllers.Api.Trainings.AuthenticatedOnly.GetTrainingE
 namespace Gym.WebApi.Controllers.Api.Trainings.AuthenticatedOnly
 {
     [ApiController]
-    [Authorize(Policy = nameof(SecurityPolicy.AuthenticatedOnly))]
+    [Authorize(Policy = nameof(SecurityPolicy.Authenticated))]
     public class GetTrainingEndpoint(IMediator _mediator, IMapper _mapper) : EndpointBaseAsync
         .WithRequest<GetTrainingByIdContainer>
         .WithActionResult<Response<TrainingDto>>

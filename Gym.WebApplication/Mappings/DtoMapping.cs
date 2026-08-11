@@ -1,20 +1,14 @@
 ﻿using AutoMapper;
-using Gym.WebApplication.Features.Admin.CalendarEvents.Creation.Models.Forms;
-using Gym.WebApplication.Features.Admin.CalendarEvents.Creation.Models.Results;
-using Gym.WebApplication.Features.Admin.Clients.TableView.Models.Results;
-using Gym.WebApplication.Features.Admin.Instructors.Registration.Models.Forms;
-using Gym.WebApplication.Features.Admin.Instructors.Registration.Models.Results;
-using Gym.WebApplication.Features.Admin.Trainings.Creation.Models.Forms;
-using Gym.WebApplication.Features.Admin.Trainings.Creation.Models.Results;
-using Gym.WebApplication.Features.Calendar.Models;
+using Gym.WebApplication.RequestHandlers;
 using Gym.WebApplication.ViewModels;
 using Gym.WebDto.Requests.CalendarEvent;
-using Gym.WebDto.Requests.Instructor;
-using Gym.WebDto.Requests.Training;
+using Gym.WebDto.Requests.PersonalTraining;
 using Gym.WebDto.Responses.Account;
+using Gym.WebDto.Responses.Bookings;
 using Gym.WebDto.Responses.CalendarEvent;
 using Gym.WebDto.Responses.Clients;
 using Gym.WebDto.Responses.Instructor;
+using Gym.WebDto.Responses.PersonalTraining;
 using Gym.WebDto.Responses.Training;
 
 namespace Gym.WebApplication.Mappings
@@ -26,21 +20,15 @@ namespace Gym.WebApplication.Mappings
             #region Training
             base.CreateMap<TrainingDto, TrainingViewModel>();
             base.CreateMap<TrainingInfo, TrainingViewModel>();
-
-            base.CreateMap<CreateTrainingFormModel, CreateTrainingRequest>();
-            base.CreateMap<CreateTrainingResponse, CreateTrainingResult>();
             #endregion
 
             #region Instructor
             base.CreateMap<InstructorDto, InstructorViewModel>();
-            base.CreateMap<InstructorInfo, InstructorViewModel>();
-
-            base.CreateMap<InstructorRegistrationFormModel, CreateInstructorRequest>();
-            base.CreateMap<CreateInstructorResponse, CreateInstructorResult>();
+            base.CreateMap<WebDto.Responses.Instructor.InstructorInfo, InstructorViewModel>();
             #endregion
 
             #region CalendarEvent
-            base.CreateMap<ClientCalendarEventDto, ClientCalendarItemViewModel>()
+            base.CreateMap<ClientCalendarEventDto, CalendarEventForClientViewModel>()
                 .ForMember(dest => dest.UtcStart,
                 opt => opt.MapFrom((src, dest, _, context) =>
                 {
@@ -57,7 +45,7 @@ namespace Gym.WebApplication.Mappings
                     return src.PollInfo;
                 }));
 
-            base.CreateMap<AdminCalendarEventDto, AdminCalendarItemViewModel>()
+            base.CreateMap<AdminCalendarEventDto, CalendarEventForAdminViewModel>()
                 .ForMember(dest => dest.UtcStart,
                 opt => opt.MapFrom((src, dest, _, context) =>
                 {
@@ -87,11 +75,14 @@ namespace Gym.WebApplication.Mappings
                 }));
 
             base.CreateMap<CreateCalendarEventResponse, CreateCalendarEventResult>();
+
+            base.CreateMap<BookingUserInfo, BookingUserViewModel>();
             #endregion
 
             #region Client
             base.CreateMap<ClientDto, ClientViewModel>();
             base.CreateMap<ChargeAccountResponse, ChargeClientResult>();
+            base.CreateMap<ClientInfo, ClientViewModel>();
             #endregion
 
             #region Poll
@@ -128,6 +119,34 @@ namespace Gym.WebApplication.Mappings
                 }));
 
             base.CreateMap<PollResponse, CalendarEventPollResponseDto>();
+            #endregion
+
+            #region PersonalTraining
+            base.CreateMap<CreatePersonalTrainingFormModel, CreatePersonalTrainingRequest>()
+                .ForMember(dest => dest.Start,
+                opt => opt.MapFrom((src, dest, _, context) =>
+                {
+                    return src.UtcStart;
+                }))
+                .ForMember(dest => dest.End,
+                opt => opt.MapFrom((src, dest, _, context) =>
+                {
+                    return src.UtcEnd;
+                }));
+
+            base.CreateMap<CreatePersonalTrainingResponse, CreatePersonalTrainingResult>();
+
+            base.CreateMap<PersonalTrainingDto, PersonalTrainingViewModel>() 
+                .ForMember(dest => dest.UtcStart,
+                opt => opt.MapFrom((src, dest, _, context) =>
+                {
+                    return src.Start;
+                }))
+                .ForMember(dest => dest.UtcEnd,
+                opt => opt.MapFrom((src, dest, _, context) =>
+                {
+                    return src.End;
+                }));
             #endregion
         }
     }

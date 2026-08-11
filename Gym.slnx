@@ -1,14 +1,29 @@
 <Solution>
-  <Project Path="Gym.Abstractions.MessageBus/Gym.MessageBus.csproj" Id="040515b2-97d5-4bfd-934c-92c79dd95d23" />
-  <Project Path="Gym.Abstractions.Query/Gym.Abstractions.Query.csproj" Id="01abf42f-6734-4194-9470-67b750072937" />
-  <Project Path="Gym.Application.Tests/Gym.Application.Tests.csproj" Id="482f5b75-34f5-4092-addd-4cfddd19232e" />
-  <Project Path="Gym.Application/Gym.Application.csproj" Id="b31db3c8-506f-4d4f-bf8a-26717d3ff42c" />
-  <Project Path="Gym.CompositionRoot/Gym.CompositionRoot.csproj" Id="9a8155cd-ffda-46cb-afee-7fb77b821cff" />
-  <Project Path="Gym.Domain.Tests/Gym.Domain.Tests.csproj" Id="c02783b4-20b6-468b-82be-b755ec096208" />
-  <Project Path="Gym.Domain/Gym.Domain.csproj" Id="769121ba-d3d4-48b8-b38a-46247e31d969" />
-  <Project Path="Gym.Infrastructure.Tests/Gym.Infrastructure.Tests.csproj" Id="87bbe6e7-8100-4cfa-a63a-97cfbd6ecbfe" />
-  <Project Path="Gym.Infrastructure/Gym.Infrastructure.csproj" />
-  <Project Path="Gym.WebApi/Gym.WebApi.csproj" Id="de7882f4-a18d-43f0-aab2-e6b777371fe8" />
+  <Folder Name="/OAuth/">
+    <Project Path="Gym.AuthorizationServer.Admin.Application/Gym.AuthorizationServer.Admin.Application.csproj" Id="5dc45b73-8448-4d06-a05f-ecdc7dda0ba8" />
+    <Project Path="Gym.AuthorizationServer.Admin/Gym.AuthorizationServer.Admin.csproj" Id="3abc1b7b-6bf9-4a63-8391-393c34499318" />
+    <Project Path="Gym.AuthorizationServer.Client/Gym.AuthorizationServer.Client.csproj" Id="a2d11c65-4644-4423-b434-d7952657361a" />
+    <Project Path="Gym.AuthorizationServer.Infrastructure/Gym.AuthorizationServer.Infrastructure.csproj" Id="b58a41a8-2506-4a35-a4f7-65eb0fa3d042" />
+    <Project Path="Gym.AuthorizationServer.Integration.Tests/Gym.AuthorizationServer.Integration.Tests.csproj" Id="7791cd4b-e8cd-494e-9e5c-c904d2620b99" />
+    <Project Path="Gym.AuthorizationServer.Tests/Gym.AuthorizationServer.Tests.csproj" Id="10963a41-ef15-4075-b455-c386865b5676" />
+    <Project Path="Gym.AuthorizationServer/Gym.AuthorizationServer.csproj" Id="6900d9af-622c-4bdc-b313-ac2aac2ecf7f" />
+    <Project Path="Gym.OAuth.Extensions/Gym.OAuth.Extensions.csproj" Id="a3819741-56a9-4f67-9dc2-39d5c4f85989" />
+  </Folder>
+  <Folder Name="/WebApi/">
+    <Project Path="Gym.Abstractions.MessageBus/Gym.MessageBus.csproj" Id="040515b2-97d5-4bfd-934c-92c79dd95d23" />
+    <Project Path="Gym.Abstractions.Query/Gym.Abstractions.Query.csproj" Id="01abf42f-6734-4194-9470-67b750072937" />
+    <Project Path="Gym.Application.Tests/Gym.Application.Tests.csproj" Id="482f5b75-34f5-4092-addd-4cfddd19232e" />
+    <Project Path="Gym.Application/Gym.Application.csproj" Id="b31db3c8-506f-4d4f-bf8a-26717d3ff42c" />
+    <Project Path="Gym.CompositionRoot/Gym.CompositionRoot.csproj" Id="9a8155cd-ffda-46cb-afee-7fb77b821cff" />
+    <Project Path="Gym.Domain.Tests/Gym.Domain.Tests.csproj" Id="c02783b4-20b6-468b-82be-b755ec096208" />
+    <Project Path="Gym.Domain/Gym.Domain.csproj" Id="769121ba-d3d4-48b8-b38a-46247e31d969" />
+    <Project Path="Gym.Infrastructure.Tests/Gym.Infrastructure.Tests.csproj" Id="87bbe6e7-8100-4cfa-a63a-97cfbd6ecbfe" />
+    <Project Path="Gym.Infrastructure/Gym.Infrastructure.csproj" />
+    <Project Path="Gym.WebApi/Gym.WebApi.csproj" Id="de7882f4-a18d-43f0-aab2-e6b777371fe8" />
+  </Folder>
+  <Project Path="Gym.BFF.Integration.Tests/Gym.BFF.Integration.Tests.csproj" Id="4560fcb8-d71a-45cd-8b54-0bd73b799803" />
+  <Project Path="Gym.BFF/Gym.BFF.csproj" Id="be3ffeed-ab4d-4c52-beb8-19ac91e4d601" />
+  <Project Path="Gym.RabbitMQ.Topology/Gym.RabbitMQ.Topology.csproj" Id="17742eec-e1a5-456a-ac60-f0df06308af7" />
   <Project Path="Gym.WebApplication/Gym.WebApplication.csproj" Id="6196cc29-cb9a-468d-bfda-dbcd84bef184" />
   <Project Path="Gym.WebDto/Gym.WebDto.csproj" Id="19f12ed8-27b8-49a8-8d3c-4cf93619a012" />
 </Solution>
