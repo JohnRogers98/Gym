@@ -25,9 +25,9 @@ services:
       - RabbitMQ__Password=guest
       - AudienceUri=urn:gym:api
       - AccessTokenIssuer=http://gym-authserver:8080
-      - BffUrl=https://gym-buddy.ru/bff
-      - AuthorizationServer__BaseUrl=https://gym-buddy.ru/auth
-      - AccessTokenIssuer=http://gym-buddy.ru/auth
+      #- BffUrl=https://gym-buddy.ru/bff
+      #- AuthorizationServer__BaseUrl=https://gym-buddy.ru/auth
+      #- AccessTokenIssuer=http://gym-buddy.ru/auth
       - ASPNETCORE_FORWARDEDHEADERS_ENABLED=true
       - Proxy__Host=127.0.0.1
       - Proxy__Port=8080
@@ -45,8 +45,10 @@ services:
       context: .
       dockerfile: Gym.WebApplication/Dockerfile
     container_name: gym-ui
-    # expose:
-    #   - "3000"
+    environment:
+      - Bff__BaseUrl=http://gym-buddy.ru/bff
+    expose:
+      - "80"
     networks:
       - gym-net
     restart: always
@@ -107,7 +109,7 @@ services:
       - TelegramBot__Token=${TG_BOT_TOKEN}
       # Разрешаем CORS для UI и BFF внутри сети
       - CorsOrigins__0=http://gym-buddy.ru
-      - CorsOrigins__1=http://gym-ui 
+      #- CorsOrigins__1=http://gym-ui:80 
     depends_on:
       - mongodb
       - rabbitmq
@@ -168,7 +170,7 @@ services:
     image: rabbitmq:3-management-alpine
     container_name: gym-rabbitmq
     ports:
-      - "5673:5673"   # Порт для подключения приложений
+      - "5672:5672"   # Порт для подключения приложений
       - "15672:15672" # Порт для веб-интерфейса управления
     environment:
       - RABBITMQ_DEFAULT_USER=guest
