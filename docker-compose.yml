@@ -9,6 +9,7 @@ services:
       context: .
       dockerfile: Gym.WebApi/Dockerfile
     container_name: gym-backend
+    #Не забыть проверить переменные окружения на предмет наличия HTTPS при работе на выденном сервере!!!!!!!!!!1
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - JWT_SECRET=${JWT_SECRET}
@@ -26,7 +27,7 @@ services:
       - AccessTokenIssuer=http://gym-authserver:8080
       - BffUrl=https://gym-buddy.ru/bff
       - AuthorizationServer__BaseUrl=https://gym-buddy.ru/auth
-      - AccessTokenIssuer=https://gym-buddy.ru/auth
+      - AccessTokenIssuer=http://gym-buddy.ru/auth
       - ASPNETCORE_FORWARDEDHEADERS_ENABLED=true
       - Proxy__Host=127.0.0.1
       - Proxy__Port=8080
@@ -75,8 +76,8 @@ services:
       - RabbitMQ__Password=guest
       - AudienceUri=urn:gym:api
       - AccessTokenIssuer=http://gym-authserver:8080
-      - AuthorizationServer__BaseUrl=https://gym-buddy.ru/auth
-      - AccessTokenIssuer=https://gym-buddy.ru/auth
+      - AuthorizationServer__BaseUrl=http://gym-buddy.ru/auth
+      - AccessTokenIssuer=http://gym-buddy.ru/auth
       - ASPNETCORE_FORWARDEDHEADERS_ENABLED=true
     depends_on:
       - mongodb
@@ -105,7 +106,7 @@ services:
       - RabbitMQ__Password=guest
       - TelegramBot__Token=${TG_BOT_TOKEN}
       # Разрешаем CORS для UI и BFF внутри сети
-      - CorsOrigins__0=https://gym-buddy.ru
+      - CorsOrigins__0=http://gym-buddy.ru
       - CorsOrigins__1=http://gym-ui 
     depends_on:
       - mongodb
@@ -127,9 +128,9 @@ services:
       
       # 1. КЛИЕНТСКИЕ URL (Для редиректов браузера через Nginx)
       # Браузер будет стучаться на публичный домен, Nginx отрежет /bff/ и передаст запрос в контейнер на /callback
-      - ClientCredentials__RedirectUri=https://gym-buddy.ru/bff/callback
+      - ClientCredentials__RedirectUri=http://gym-buddy.ru/bff/callback
       # Публичный URL вашего Blazor WebAssembly приложения (висит на корне домена)
-      - Urls__Spa__BaseUrl=https://gym-buddy.ru
+      - Urls__Spa__BaseUrl=http://gym-buddy.ru
       
       # 2. СЕРВЕРНЫЕ URL (BFF ходит в другие контейнеры напрямую внутри Docker-сети)
       # BFF -> AuthServer (для обмена кода на токен, получения userinfo)
@@ -175,21 +176,30 @@ services:
     networks:
       - gym-net
     restart: always
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
 
   nginx:
     image: nginx:alpine
     container_name: gym-nginx
     ports:
       - "80:80" # ЕДИНСТВЕННЫЙ порт, открытый наружу
-      - "443:443" # Если позже добавите SSL
+      #- "443:443" # Если позже добавите SSL
     volumes:
       # Монтируем ваш конфиг из корня проекта
       - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
-      - ./gym-buddy.ru_cert.pem:/etc/nginx/certs/gym-buddy.ru_cert.pem:ro
-      - ./gym-buddy.ru_private_key.pem:/etc/nginx/certs/gym-buddy.ru_private_key.pem:ro
+      #- ./gym-buddy.ru_cert.pem:/etc/nginx/certs/gym-buddy.ru_cert.pem:ro
+      #- ./gym-buddy.ru_private_key.pem:/etc/nginx/certs/gym-buddy.ru_private_key.pem:ro
     depends_on:
       - ui
       - backend
+      - gym.bff
+      - gym.authserver
+      - gym.authadmin
     networks:
       - gym-net
     restart: unless-stopped
