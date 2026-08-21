@@ -69,7 +69,7 @@ public static class DependencyInjection
         public IServiceCollection AddInfrastructure(IConfiguration configuration)
         {
             services.AddOptions<MongoDbOptions>()
-                .Bind(configuration.GetSection("MongodDb"))
+                .Bind(configuration.GetSection("MongoDb"))
                 .ValidateDataAnnotations()
                 .ValidateOnStart();
 

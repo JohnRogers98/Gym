@@ -1,38 +1,28 @@
-# docker-compose.yml
 version: '3.8'
 
 services:
-  
-  #Образы которые собираются из проекта
+  # ------------------- Собственные образы -------------------
   backend:
     build:
       context: .
       dockerfile: Gym.WebApi/Dockerfile
     container_name: gym-backend
-    #Не забыть проверить переменные окружения на предмет наличия HTTPS при работе на выденном сервере!!!!!!!!!!1
     environment:
-      - ASPNETCORE_ENVIRONMENT=Production
       - JWT_SECRET=${JWT_SECRET}
       - TG_BOT_TOKEN=${TG_BOT_TOKEN}
+      - ASPNETCORE_ENVIRONMENT=Production
       - ASPNETCORE_URLS=http://+:8080
-      - MongodDb__ConnectionString=mongodb://gym-mongodb:27017/?replicaSet=rs0
-      - BffUrl=http://gym-bff:8080
-      - AuthorizationServer__ClientName=auth-server
-      - AuthorizationServer__BaseUrl=http://gym-authserver:8080
-      - AuthorizationServer__Kid=gym_auth_key
+      - ASPNETCORE_FORWARDEDHEADERS_ENABLED=true
+      - MongoDb__ConnectionString=mongodb://gym-mongodb:27017/?replicaSet=rs0
       - RabbitMQ__Hostname=gym-rabbitmq
       - RabbitMQ__Username=guest
       - RabbitMQ__Password=guest
-      - AudienceUri=urn:gym:api
-      - AccessTokenIssuer=http://gym-authserver:8080
       - BffUrl=https://gym-buddy.ru/bff
       - AuthorizationServer__BaseUrl=https://gym-buddy.ru/auth
-      - AccessTokenIssuer=http://gym-buddy.ru/auth
-      - ASPNETCORE_FORWARDEDHEADERS_ENABLED=true
-      - Proxy__Host=127.0.0.1
-      - Proxy__Port=8080
-      - Proxy__Login=dummy
-      - Proxy__Password=dummy
+      - AccessTokenIssuer=https://gym-buddy.ru/auth
+      - AudienceUri=urn:gym:api
+      - AuthorizationServer__ClientName=auth-server
+      - AuthorizationServer__Kid=gym_auth_key
     depends_on:
       - mongodb
       - rabbitmq
@@ -45,16 +35,11 @@ services:
       context: .
       dockerfile: Gym.WebApplication/Dockerfile
     container_name: gym-ui
-    # expose:
-    #   - "3000"
     networks:
       - gym-net
     restart: always
-    ulimits:
-      nofile:
-        soft: 65536
-        hard: 65536
-  gym.authadmin:
+
+  authadmin:
     build:
       context: .
       dockerfile: Gym.AuthorizationServer.Admin/Dockerfile
@@ -62,32 +47,30 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - ASPNETCORE_URLS=http://+:8080
+      - ASPNETCORE_FORWARDEDHEADERS_ENABLED=true
       - MongoDb__ConnectionString=mongodb://gym-mongodb:27017/?replicaSet=rs0
       - MongoDb__DatabaseName=auth-server
-      - AuthorizationServer__ClientName=auth-server
+      - RabbitMQ__Hostname=gym-rabbitmq
+      - RabbitMQ__Username=guest
+      - RabbitMQ__Password=guest
+      - AudienceUri=urn:gym:api
       - AuthorizationServer__BaseUrl=http://gym-authserver:8080
+      - AuthorizationServer__ClientName=auth-server
       - AuthorizationServer__AuthorizeEndpoint=/authorize
       - AuthorizationServer__TokenEndpoint=/token
       - AuthorizationServer__UserInfoEndpoint=/userinfo
       - AuthorizationServer__JwksEndpoint=/.well-known/jwks.json
       - AuthorizationServer__Kid=gym_auth_key
-      - RabbitMQ__Hostname=gym-rabbitmq
-      - RabbitMQ__Username=guest
-      - RabbitMQ__Password=guest
-      - AudienceUri=urn:gym:api
-      - AccessTokenIssuer=http://gym-authserver:8080
-      - AuthorizationServer__BaseUrl=http://gym-buddy.ru/auth
-      - AccessTokenIssuer=http://gym-buddy.ru/auth
-      - ASPNETCORE_FORWARDEDHEADERS_ENABLED=true
+      - AccessTokenIssuer=https://gym-buddy.ru/auth
     depends_on:
       - mongodb
       - rabbitmq
-      - gym.authserver
+      - authserver
     networks:
       - gym-net
     restart: always
-  
-  gym.authserver:
+
+  authserver:
     build:
       context: .
       dockerfile: Gym.AuthorizationServer/Dockerfile
@@ -99,15 +82,18 @@ services:
       - Jwt__Issuer=https://gym-buddy.ru/auth
       - Jwt__Audience=urn:gym:api
       - Jwt__RsaKeyId=gym_auth_key
+      - Jwt__RsaKeyPath=/app/keys/gym_auth_key.pem
       - MongoDb__ConnectionString=mongodb://gym-mongodb:27017/?replicaSet=rs0
       - MongoDb__DatabaseName=auth-server
       - RabbitMQ__Hostname=gym-rabbitmq
       - RabbitMQ__Username=guest
       - RabbitMQ__Password=guest
       - TelegramBot__Token=${TG_BOT_TOKEN}
-      # Разрешаем CORS для UI и BFF внутри сети
-      - CorsOrigins__0=http://gym-buddy.ru
-      - CorsOrigins__1=http://gym-ui 
+      - CorsOrigins__0=https://gym-buddy.ru
+      - CorsOrigins__1=http://gym-ui
+      - CorsOrigins__2=http://gym-bff
+    volumes:
+      - ./keys:/app/keys:ro   
     depends_on:
       - mongodb
       - rabbitmq
@@ -115,7 +101,7 @@ services:
       - gym-net
     restart: always
 
-  gym.bff:
+  bff:
     build:
       context: .
       dockerfile: Gym.BFF/Dockerfile
@@ -123,31 +109,21 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - ASPNETCORE_URLS=http://+:8080
-      # КРИТИЧНО: Включаем обработку заголовков X-Forwarded-* от Nginx
       - ASPNETCORE_FORWARDEDHEADERS_ENABLED=true
-      
-      # 1. КЛИЕНТСКИЕ URL (Для редиректов браузера через Nginx)
-      # Браузер будет стучаться на публичный домен, Nginx отрежет /bff/ и передаст запрос в контейнер на /callback
-      - ClientCredentials__RedirectUri=http://gym-buddy.ru/bff/callback
-      # Публичный URL вашего Blazor WebAssembly приложения (висит на корне домена)
-      - Urls__Spa__BaseUrl=http://gym-buddy.ru
-      
-      # 2. СЕРВЕРНЫЕ URL (BFF ходит в другие контейнеры напрямую внутри Docker-сети)
-      # BFF -> AuthServer (для обмена кода на токен, получения userinfo)
+      - ClientCredentials__RedirectUri=https://gym-buddy.ru/bff/callback
+      - Urls__Spa__BaseUrl=https://gym-buddy.ru
       - Urls__AuthorizationServer__BaseUrl=http://gym-authserver:8080
-      # BFF -> AuthAdmin API (для управления пользователями/ролями)
       - Urls__AuthorizationServerAdminApi__BaseUrl=http://gym-authadmin:8080
-      # BFF -> WebApi (для проксирования бизнес-запросов)
       - Urls__WebApi__BaseUrl=http://gym-backend:8080
     depends_on:
       - backend
-      - gym.authserver
-      - gym.authadmin
+      - authserver
+      - authadmin
     networks:
       - gym-net
     restart: always
 
-#Образы которые берутся из облака
+  # ------------------- Сторонние образы -------------------
   mongodb:
     image: mongo:7-jammy
     container_name: gym-mongodb
@@ -163,13 +139,12 @@ services:
       - gym-net
     restart: always
 
-
   rabbitmq:
     image: rabbitmq:3-management-alpine
     container_name: gym-rabbitmq
     ports:
-      - "5673:5673"   # Порт для подключения приложений
-      - "15672:15672" # Порт для веб-интерфейса управления
+      - "5673:5673"
+      - "15672:15672"
     environment:
       - RABBITMQ_DEFAULT_USER=guest
       - RABBITMQ_DEFAULT_PASS=guest
@@ -187,25 +162,24 @@ services:
     image: nginx:alpine
     container_name: gym-nginx
     ports:
-      - "80:80" # ЕДИНСТВЕННЫЙ порт, открытый наружу
-      #- "443:443" # Если позже добавите SSL
+      - "80:80"
+      - "443:443"
     volumes:
-      # Монтируем ваш конфиг из корня проекта
       - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
-      #- ./gym-buddy.ru_cert.pem:/etc/nginx/certs/gym-buddy.ru_cert.pem:ro
-      #- ./gym-buddy.ru_private_key.pem:/etc/nginx/certs/gym-buddy.ru_private_key.pem:ro
+      - ./certs/gym-buddy.ru.crt:/etc/nginx/certs/gym-buddy.ru.crt:ro
+      - ./certs/gym-buddy.ru.key:/etc/nginx/certs/gym-buddy.ru.key:ro
     depends_on:
       - ui
       - backend
-      - gym.bff
-      - gym.authserver
-      - gym.authadmin
+      - bff          
+      - authserver
+      - authadmin
     networks:
       - gym-net
     restart: unless-stopped
 
 volumes:
-  mongodb_data:
+  mongodb_data:      
 
 networks:
   gym-net:
