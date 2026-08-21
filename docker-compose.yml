@@ -82,7 +82,7 @@ services:
       - Jwt__Issuer=https://gym-buddy.ru/auth
       - Jwt__Audience=urn:gym:api
       - Jwt__RsaKeyId=gym_auth_key
-      - Jwt__RsaKeyPath=/app/keys/gym_auth_key.pem
+      - Jwt__RsaKeyPath=/root/gym/keys/gym_private_key.pem
       - MongoDb__ConnectionString=mongodb://gym-mongodb:27017/?replicaSet=rs0
       - MongoDb__DatabaseName=auth-server
       - RabbitMQ__Hostname=gym-rabbitmq
