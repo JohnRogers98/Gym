@@ -18,7 +18,7 @@ namespace Gym.BFF.Controllers.Api
                 return BadRequest($"{nameof(calendarEventId)} is required in path");
 
             using var adminApiClient = _httpClientFactory.CreateClient(_webApiOptions.Value.ClientName);
-            using var proxyRequestMessage = await this.CreateProxyRequestAsync($"/api/admin-calendar-events/{calendarEventId}/cancel", cancellationToken: cancellationToken);
+            using var proxyRequestMessage = await this.CreateProxyRequestAsync($"api/admin-calendar-events/{calendarEventId}/cancel", cancellationToken: cancellationToken);
             using var response = await adminApiClient.SendAsync(proxyRequestMessage, cancellationToken);
 
             return await this.CreateProxyResponseAsync(response, cancellationToken);

@@ -18,7 +18,7 @@ namespace Gym.BFF.Controllers.Api
                 return BadRequest("clientId is required in path");
 
             using var adminApiClient = _httpClientFactory.CreateClient(_webApiOptions.Value.ClientName);
-            using var proxyRequestMessage = await this.CreateProxyRequestAsync($"/api/clients/{clientId}/account/charge", cancellationToken: cancellationToken);
+            using var proxyRequestMessage = await this.CreateProxyRequestAsync($"api/clients/{clientId}/account/charge", cancellationToken: cancellationToken);
             using var response = await adminApiClient.SendAsync(proxyRequestMessage, cancellationToken);
 
             return await this.CreateProxyResponseAsync(response, cancellationToken);

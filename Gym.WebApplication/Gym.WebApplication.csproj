@@ -7,9 +7,9 @@
     <OverrideHtmlAssetPlaceholders>true</OverrideHtmlAssetPlaceholders>
   </PropertyGroup>
 
-<PropertyGroup>
+  <PropertyGroup>
 	<BlazorWebAssemblyJiterpreter>false</BlazorWebAssemblyJiterpreter>
-</PropertyGroup>
+  </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="16.1.1" />

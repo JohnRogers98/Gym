@@ -17,7 +17,7 @@ builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddServerSideSession();
 
-builder.Services.AddCorsPolicy("BffCorsPolicy", builder.Configuration.GetRequiredConfiguration("Urls:Spa:BaseUrl"));
+builder.Services.AddCorsPolicy("BffCorsPolicy", builder.Configuration);
 
 builder.Services.AddOptionsFromConfiguration(builder.Configuration);
 

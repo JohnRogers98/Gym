@@ -12,6 +12,5 @@ namespace Gym.BFF.Options
 
         [Required]
         public String CallbackEndpoint { get; set; } = default!;
-        public String FullCallbackPath => $"{BaseUrl}{CallbackEndpoint}";
     }
 }

@@ -41,7 +41,7 @@ namespace Gym.BFF.Controllers
                 Resource = _resourceUrisOptions.Value.Api
             };
 
-            return base.Redirect($"{_authorizationServerOptions.Value.FullAuthorizeUrl}{authorizeQuery.ToQueryString()}");
+            return base.Redirect($"{_authorizationServerOptions.Value.BaseUrl}/{_authorizationServerOptions.Value.AuthorizeEndpoint}{authorizeQuery.ToQueryString()}");
         }
     }
 

@@ -45,13 +45,17 @@ public static class IServiceCollectionExtensions
             return services;
         }
 
-        public IServiceCollection AddCorsPolicy(String policyName, String spaUrl)
+        public IServiceCollection AddCorsPolicy(String policyName, IConfiguration configuration)
         {
+            var spaCorsOrigins = configuration.GetRequiredSection("CorsOrigins").Get<String[]>();
+            if (spaCorsOrigins is null)
+                throw new InvalidOperationException("No CorsOrigins presented in configurations.");
+
             services.AddCors(options =>
             {
                 options.AddPolicy(policyName, policy =>
                 {
-                    policy.WithOrigins(spaUrl)
+                    policy.WithOrigins(spaCorsOrigins)
                           .AllowAnyHeader()
                           .AllowAnyMethod()
                           .AllowCredentials();
@@ -138,6 +142,10 @@ public static class IServiceCollectionExtensions
                 {
                     authServerOptions.ClientName = configuration.GetRequiredConfiguration("Urls:AuthorizationServer:ClientName");
                     authServerOptions.BaseUrl = configuration.GetRequiredConfiguration("Urls:AuthorizationServer:BaseUrl");
+                    authServerOptions.AuthorizeEndpoint = configuration.GetRequiredConfiguration("Urls:AuthorizationServer:AuthorizeEndpoint");
+                    authServerOptions.TokenEndpoint = configuration.GetRequiredConfiguration("Urls:AuthorizationServer:TokenEndpoint");
+                    authServerOptions.UserInfoEndpoint = configuration.GetRequiredConfiguration("Urls:AuthorizationServer:UserInfoEndpoint");
+                    authServerOptions.JwksEndpoint = configuration.GetRequiredConfiguration("Urls:AuthorizationServer:JwksEndpoint");
                     authServerOptions.Kid = configuration.GetRequiredConfiguration("Urls:AuthorizationServer:Kid");
                 }
             );
