@@ -11,7 +11,7 @@
         public HashSet<PathString> GetExcludedPathStrings()
         {
             return ExcludedPaths
-                .Select(s => new PathString(s))
+                .Select(s => new PathString("/" + s))
                 .ToHashSet();
         }
     }

@@ -1,4 +1,5 @@
 ﻿using Gym.AuthorizationServer.Client.Services;
+using Gym.BFF.Helpers;
 using Gym.BFF.Options;
 using Gym.BFF.Services;
 using Gym.BFF.Services.Session;
@@ -56,7 +57,7 @@ namespace Gym.BFF.Controllers
             await _setTokensToClientSideSessionService
                 .HandleAsync(tokenResponseResult.Value.AccessToken, tokenResponseResult.Value.RefreshToken, tokenResponseResult.Value.IdToken);
 
-            return base.Redirect(_spaOptions.Value.FullCallbackPath);
+            return base.Redirect(UrlHelper.Combine(_spaOptions.Value.BaseUrl, _spaOptions.Value.CallbackEndpoint));
         }
     }
 }
