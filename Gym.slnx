@@ -1,7 +1,4 @@
 <Solution>
-  <Folder Name="/deploy/">
-    <File Path="../../../Downloads/nginx-1.31.4/conf/nginx.conf" />
-  </Folder>
   <Folder Name="/OAuth/">
     <Project Path="Gym.AuthorizationServer.Admin.Application/Gym.AuthorizationServer.Admin.Application.csproj" Id="5dc45b73-8448-4d06-a05f-ecdc7dda0ba8" />
     <Project Path="Gym.AuthorizationServer.Admin/Gym.AuthorizationServer.Admin.csproj" Id="3abc1b7b-6bf9-4a63-8391-393c34499318" />
