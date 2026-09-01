@@ -17,9 +17,9 @@ services:
       - RabbitMQ__Hostname=gym-rabbitmq
       - RabbitMQ__Username=guest
       - RabbitMQ__Password=guest
-      - BffUrl=https://gym-buddy.ru/bff
-      - AuthorizationServer__BaseUrl=https://gym-buddy.ru/auth
-      - AccessTokenIssuer=https://gym-buddy.ru/auth
+      - BffUrl=https://gym-buddy.ru/bff/
+      - AuthorizationServer__BaseUrl=https://gym-buddy.ru/auth-server/
+      - AccessTokenIssuer=https://gym-buddy.ru/auth-server/
       - AudienceUri=urn:gym:api
       - AuthorizationServer__ClientName=auth-server
       - AuthorizationServer__Kid=gym_auth_key
@@ -54,14 +54,14 @@ services:
       - RabbitMQ__Username=guest
       - RabbitMQ__Password=guest
       - AudienceUri=urn:gym:api
-      - AuthorizationServer__BaseUrl=http://gym-authserver:8080
+      - AuthorizationServer__BaseUrl=https://gym-buddy.ru/auth-server/
       - AuthorizationServer__ClientName=auth-server
       - AuthorizationServer__AuthorizeEndpoint=/authorize
       - AuthorizationServer__TokenEndpoint=/token
       - AuthorizationServer__UserInfoEndpoint=/userinfo
       - AuthorizationServer__JwksEndpoint=/.well-known/jwks.json
       - AuthorizationServer__Kid=gym_auth_key
-      - AccessTokenIssuer=https://gym-buddy.ru/auth
+      - AccessTokenIssuer=https://gym-buddy.ru/auth-server/
     depends_on:
       - mongodb
       - rabbitmq
@@ -79,7 +79,7 @@ services:
       - ASPNETCORE_ENVIRONMENT=Production
       - ASPNETCORE_URLS=http://+:8080
       - ASPNETCORE_FORWARDEDHEADERS_ENABLED=true
-      - Jwt__Issuer=https://gym-buddy.ru/auth
+      - Jwt__Issuer=https://gym-buddy.ru/auth-server/
       - Jwt__Audience=urn:gym:api
       - Jwt__RsaKeyId=gym_auth_key
       - Jwt__RsaKeyPath=/root/gym/keys/gym_private_key.pem
@@ -90,8 +90,6 @@ services:
       - RabbitMQ__Password=guest
       - TelegramBot__Token=${TG_BOT_TOKEN}
       - CorsOrigins__0=https://gym-buddy.ru
-      - CorsOrigins__1=http://gym-ui
-      - CorsOrigins__2=http://gym-bff
     volumes:
       - ./keys:/app/keys:ro   
     depends_on:
@@ -111,10 +109,10 @@ services:
       - ASPNETCORE_URLS=http://+:8080
       - ASPNETCORE_FORWARDEDHEADERS_ENABLED=true
       - ClientCredentials__RedirectUri=https://gym-buddy.ru/bff/callback
-      - Urls__Spa__BaseUrl=https://gym-buddy.ru
-      - Urls__AuthorizationServer__BaseUrl=http://gym-authserver:8080
-      - Urls__AuthorizationServerAdminApi__BaseUrl=http://gym-authadmin:8080
-      - Urls__WebApi__BaseUrl=http://gym-backend:8080
+      - Urls__Spa__BaseUrl=https://gym-buddy.ru/
+      - Urls__AuthorizationServer__BaseUrl=https://gym-buddy.ru/auth-server/
+      - Urls__AuthorizationServerAdminApi__BaseUrl=https://gym-buddy.ru/auth-server-admin/
+      - Urls__WebApi__BaseUrl=https://gym-buddy.ru/services/
     depends_on:
       - backend
       - authserver
