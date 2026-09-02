@@ -11,6 +11,11 @@
 	<BlazorWebAssemblyJiterpreter>false</BlazorWebAssemblyJiterpreter>
   </PropertyGroup>
 
+	<!-- Environment name setting -->
+	<PropertyGroup>
+		<WasmApplicationEnvironmentName>Staging</WasmApplicationEnvironmentName>
+	</PropertyGroup>
+	
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="16.1.1" />
     <PackageReference Include="Blazilla" Version="2.4.0" />

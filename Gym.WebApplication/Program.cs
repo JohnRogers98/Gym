@@ -12,8 +12,6 @@ var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
-builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: false);
-
 builder.Logging.AddDebug();
 builder.Logging.AddConfiguration(builder.Configuration.GetSection("Logging"));
 builder.Logging.SetMinimumLevel(LogLevel.Trace);
