@@ -32,6 +32,7 @@ builder.Services.AddDelegatingHandlers();
 
 builder.Services
     .AddAuthorizationServerClient(builder.Configuration)
+    .AddRedisClient(builder.Configuration)
     .AddAuthorizationServerAdminApiNamedClient(builder.Configuration)
     .AddWebApiNamedClient(builder.Configuration);
 

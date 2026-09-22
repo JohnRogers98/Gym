@@ -5,6 +5,7 @@ using Gym.BFF.Services.Session;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Session;
 using Gym.AuthorizationServer.Client;
+using Gym.Redis.Client.Services.Ports;
 
 namespace Gym.BFF.Extensions;
 
@@ -68,7 +69,7 @@ public static class IServiceCollectionExtensions
         public IServiceCollection AddDelegatingHandlers()
         {
             services.AddTransient<AddForwardHeadersHandler>();
-            services.AddTransient<RefreshTokenHandler>();
+            services.AddTransient<AccessTokenHandler>();
             return services;
         }
 
@@ -99,6 +100,11 @@ public static class IServiceCollectionExtensions
                 .ValidateDataAnnotations()
                 .ValidateOnStart();
 
+            services.AddOptions<Options.CookieOptions>()
+                .Bind(configuration.GetRequiredSection(Options.CookieOptions.SectionName))
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
+
             return services;
         }
 
@@ -111,7 +117,9 @@ public static class IServiceCollectionExtensions
             services.AddSingleton<IComputeOpenIdAtHashService, ComputeOpenIdAtHashService>();
             services.AddSingleton<IRsaSecurityKeyProvider, RsaSecurityKeyProvider>();
             services.AddSingleton<IOAuthIdTokenValidator, OAuthIdTokenValidator>();
-            services.AddSingleton<ISetTokensToClientSideSessionService, SetTokensToClientSideSessionService>();
+
+            services.AddSingleton<ISessionKeyGenerator, SessionKeyGenerator>();
+            services.AddSingleton<ISetSessionKeyToClientSession, SetSessionKeyToClientSession>();
 
             return services;
         }
@@ -153,6 +161,26 @@ public static class IServiceCollectionExtensions
             return services;
         }
 
+        public IServiceCollection AddRedisClient(IConfiguration configuration)
+        {
+            services.AddRedis(
+                clientOptions =>
+                {
+                    clientOptions.ConnectionString = configuration.GetRequiredConfiguration("Redis:ConnectionString");
+
+                    var sessionKeyTtlString = configuration.GetRequiredConfiguration("Redis:SessionKeyTtl");
+                    if(!String.IsNullOrWhiteSpace(sessionKeyTtlString))
+                    {
+                        clientOptions.SessionKeyTtl = TimeSpan.Parse(sessionKeyTtlString);
+                    }
+                }
+            );
+
+            services.AddSingleton<IExchangeRefreshTokenService, ExchangeRefreshTokenService>();
+
+            return services;
+        }
+
         public IServiceCollection AddAuthorizationServerAdminApiNamedClient(IConfiguration configuration)
         {
             var key = configuration.GetRequiredConfiguration("Urls:AuthorizationServerAdminApi:ClientName");
@@ -167,7 +195,7 @@ public static class IServiceCollectionExtensions
                 UseDefaultCredentials = false
             })
             .AddHttpMessageHandler<AddForwardHeadersHandler>()
-            .AddHttpMessageHandler<RefreshTokenHandler>();
+            .AddHttpMessageHandler<AccessTokenHandler>();
 
             return services;
         }
@@ -186,7 +214,7 @@ public static class IServiceCollectionExtensions
                 UseDefaultCredentials = false
             })
             .AddHttpMessageHandler<AddForwardHeadersHandler>()
-            .AddHttpMessageHandler<RefreshTokenHandler>();
+            .AddHttpMessageHandler<AccessTokenHandler>();
 
             return services;
         }

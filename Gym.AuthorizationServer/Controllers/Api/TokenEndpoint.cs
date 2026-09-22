@@ -81,7 +81,8 @@ namespace Gym.AuthorizationServer.Controllers.Api
                             TokenType = authorizationCodeFlowResult.Value.TokenType,
                             ExpiresIn = authorizationCodeFlowResult.Value.ExpiresIn,
                             Scope = authorizationCodeFlowResult.Value.Scope,
-                            IdToken = authorizationCodeFlowResult.Value.IdToken
+                            IdToken = authorizationCodeFlowResult.Value.IdToken,
+                            RefreshTokenExpiresIn = authorizationCodeFlowResult.Value.RefreshTokenExpiresIn
                         };
 
                         return base.Ok(tokenResponse);
@@ -104,7 +105,8 @@ namespace Gym.AuthorizationServer.Controllers.Api
                             TokenType = refreshTokenFlowResult.Value.TokenType,
                             ExpiresIn = refreshTokenFlowResult.Value.ExpiresIn,
                             Scope = refreshTokenFlowResult.Value.Scope,
-                            IdToken = refreshTokenFlowResult.Value.IdToken
+                            IdToken = refreshTokenFlowResult.Value.IdToken,
+                            RefreshTokenExpiresIn = refreshTokenFlowResult.Value.RefreshTokenExpiresIn
                         };
 
                         return base.Ok(tokenResponse);
@@ -140,7 +142,8 @@ namespace Gym.AuthorizationServer.Controllers.Api
                             TokenType = telegramAssertionFlowResult.Value.TokenType,
                             ExpiresIn = telegramAssertionFlowResult.Value.ExpiresIn,
                             Scope = telegramAssertionFlowResult.Value.Scope,
-                            IdToken = telegramAssertionFlowResult.Value.IdToken
+                            IdToken = telegramAssertionFlowResult.Value.IdToken,
+                            RefreshTokenExpiresIn = telegramAssertionFlowResult.Value.RefreshTokenExpiresIn
                         };
 
                         return base.Ok(tokenResponse);

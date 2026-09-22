@@ -1,0 +1,31 @@
+[
+  {
+    "Name": "Fullstack Nginx",
+    "Projects": [
+      {
+        "Path": "Gym.WebApplication\\Gym.WebApplication.csproj",
+        "Action": "StartWithoutDebugging"
+      },
+      {
+        "Path": "Gym.BFF\\Gym.BFF.csproj",
+        "Action": "Start",
+        "DebugTarget": "Staging"
+      },
+      {
+        "Path": "Gym.AuthorizationServer\\Gym.AuthorizationServer.csproj",
+        "Action": "Start",
+        "DebugTarget": "Staging"
+      },
+      {
+        "Path": "Gym.AuthorizationServer.Admin\\Gym.AuthorizationServer.Admin.csproj",
+        "Action": "Start",
+        "DebugTarget": "Staging"
+      },
+      {
+        "Path": "Gym.WebApi\\Gym.WebApi.csproj",
+        "Action": "Start",
+        "DebugTarget": "Staging"
+      }
+    ]
+  }
+]
