@@ -164,7 +164,7 @@ services:
       - "443:443"
     volumes:
       - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
-      - ./certs/gym-buddy.ru.crt:/etc/nginx/certs/gym-buddy.ru.crt:ro
+      - ./certs/gym-buddy.ru.cert:/etc/nginx/certs/gym-buddy.ru.cert:ro
       - ./certs/gym-buddy.ru.key:/etc/nginx/certs/gym-buddy.ru.key:ro
     depends_on:
       - ui

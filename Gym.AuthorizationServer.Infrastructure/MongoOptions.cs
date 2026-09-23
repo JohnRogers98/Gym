@@ -2,7 +2,7 @@
 {
     public class MongoOptions
     {
-        public String ConnectionString { get; set; } = "mongodb://localhost:27017/?replicaSet=rs0";
+        public String ConnectionString { get; set; } = "mongodb://gym-mongodb:27017/?replicaSet=rs0";
         public String DatabaseName { get; set; } = "auth-server";
         public CollectionNames Collections { get; set; } = new();
     }
