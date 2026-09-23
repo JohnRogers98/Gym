@@ -4,6 +4,8 @@ using Gym.BFF.Options;
 using Gym.BFF.Services;
 using Gym.BFF.Services.Session;
 using Gym.OAuth.Extensions;
+using Gym.Redis.Client;
+using Gym.Redis.Client.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using System.Security.Claims;
@@ -16,7 +18,9 @@ namespace Gym.BFF.Controllers
         IOptions<SpaOptions> _spaOptions,
         IExchangeCodeForTokenService _exchangeCodeForTokenService,
         IOAuthIdTokenValidator _idTokenValidator,
-        ISetTokensToClientSideSessionService _setTokensToClientSideSessionService) : ControllerBase
+        ISessionKeyGenerator _sessionKeyGenerator,
+        ISaveSessionTokensService _saveSessionTokens,
+        ISetSessionKeyToClientSession _setSessionKeyToClientSession) : ControllerBase
     {
         //TODO: redirect to SPA endpoint to properly handle errors.
         [HttpGet("callback")]
@@ -48,14 +52,26 @@ namespace Gym.BFF.Controllers
 
             if (tokenResponseResult.Value.IdToken is not null)
             {
-                Result<ClaimsPrincipal> result = await _idTokenValidator
-                    .ValidateAsync(tokenResponseResult.Value.IdToken, tokenResponseResult.Value.AccessToken, sessionNonce, cancellationToken);
+                Result<ClaimsPrincipal> result = await _idTokenValidator.ValidateAsync(
+                    tokenResponseResult.Value.IdToken,
+                    tokenResponseResult.Value.AccessToken,
+                    sessionNonce, cancellationToken
+                );
                 if(result.IsFailed)
                     return BadRequest(new OAuthError { Error = result.ErrorCode, ErrorDescription = result.ErrorDescription });
             }
 
-            await _setTokensToClientSideSessionService
-                .HandleAsync(tokenResponseResult.Value.AccessToken, tokenResponseResult.Value.RefreshToken, tokenResponseResult.Value.IdToken);
+            var clientSessionKey = _sessionKeyGenerator.Generate();
+            await _saveSessionTokens.HandleAsync(
+                clientSessionKey,
+                new SessionTokens
+                {
+                    AccessToken = tokenResponseResult.Value.AccessToken,
+                    RefreshToken = tokenResponseResult.Value.RefreshToken,
+                    IdToken = tokenResponseResult.Value.IdToken
+                }
+            );
+            await _setSessionKeyToClientSession.HandleAsync(clientSessionKey);
 
             return base.Redirect(UrlHelper.Combine(_spaOptions.Value.BaseUrl, _spaOptions.Value.CallbackEndpoint));
         }

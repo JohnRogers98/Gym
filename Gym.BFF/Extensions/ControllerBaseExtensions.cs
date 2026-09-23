@@ -56,11 +56,11 @@ public static class ControllerBaseExtensions
             return new EmptyResult();
         }
 
-        public Boolean IsAccessTokenPresent()
+        public Boolean IsSessionKeyPresent()
         {
-            var accessToken = controllerBase.User.FindFirst(ExtendedClaimTypes.AccessToken)?.Value;
+            var clientSessionKey = controllerBase.User.FindFirst(ExtendedClaimTypes.ClientSessionKey)?.Value;
 
-            if (String.IsNullOrEmpty(accessToken))
+            if (String.IsNullOrEmpty(clientSessionKey))
                 return false;
             return true;
         }

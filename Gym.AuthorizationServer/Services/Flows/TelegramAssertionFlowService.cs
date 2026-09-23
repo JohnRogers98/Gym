@@ -8,9 +8,11 @@ using Gym.AuthorizationServer.Infrastructure.Entities.Roles;
 using Gym.AuthorizationServer.Infrastructure.Entities.UserConsents;
 using Gym.AuthorizationServer.Infrastructure.Entities.Users;
 using Gym.AuthorizationServer.Infrastructure.Entities.Users.TelegramCredentials;
+using Gym.AuthorizationServer.Options;
 using Gym.AuthorizationServer.Services.Tokens;
 using Gym.RabbitMQ.Topology.Messages;
 using Gym.RabbitMQ.Topology.Services;
+using Microsoft.Extensions.Options;
 
 namespace Gym.AuthorizationServer.Services.Flows
 {
@@ -34,7 +36,8 @@ namespace Gym.AuthorizationServer.Services.Flows
         IRefreshTokenRepository _refreshTokenRepository,
         IIdTokenGeneratorHelper _idTokenGeneratorHelper,
         IUserRoleByUserIdFinder _userRoleByUserIdFinder,
-        IUserCreatedEventService _userCreatedEventService) : ITelegramAssertionFlowService
+        IUserCreatedEventService _userCreatedEventService,
+        IOptions<TtlsOptions> _ttlsOptions) : ITelegramAssertionFlowService
     {
         public async Task<Result<TelegramAssertionResponse>> HandleAsync(TelegramAssertionRequest request, CancellationToken cancellationToken)
         {
@@ -105,7 +108,7 @@ namespace Gym.AuthorizationServer.Services.Flows
                 ClientId = userConsent.ClientId,
                 UserId = userConsent.UserId,
                 ProtectedResourceId = targetProtectedResource.Id,
-                ExpiresAt = DateTime.UtcNow.AddHours(1)
+                ExpiresAt = DateTime.UtcNow + _ttlsOptions.Value.AccessToken
             };
             await _accessTokenRepository.AddAsync(accessTokenEntity, cancellationToken);
 
@@ -114,7 +117,7 @@ namespace Gym.AuthorizationServer.Services.Flows
             {
                 Token = refreshToken,
                 AccessTokenId = accessTokenEntity.Id,
-                ExpiresAt = DateTime.UtcNow.AddDays(1),
+                ExpiresAt = DateTime.UtcNow + _ttlsOptions.Value.RefreshToken,
                 Acr = "2fa",
                 Amr = ["tel"]
             };
@@ -133,7 +136,8 @@ namespace Gym.AuthorizationServer.Services.Flows
                 TokenType = "Bearer",
                 ExpiresIn = accessTokenEntity.ExpiresAt.GetSecondsFromUtcNow(),
                 Scope = String.Join(' ', userConsent.GrantedScopes.Select(aScope => aScope.Name)),
-                IdToken = idToken
+                IdToken = idToken,
+                RefreshTokenExpiresIn = refreshTokenEntity.ExpiresAt.GetSecondsFromUtcNow()
             });
         }
     }
@@ -154,5 +158,6 @@ namespace Gym.AuthorizationServer.Services.Flows
         public Int32? ExpiresIn { get; init; }
         public String? Scope { get; init; }
         public String? IdToken { get; init; }
+        public Int32? RefreshTokenExpiresIn { get; init; }
     }
 }

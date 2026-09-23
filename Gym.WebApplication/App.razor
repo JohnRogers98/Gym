@@ -3,7 +3,7 @@
         <AuthorizeRouteView  RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
             <NotAuthorized>
                 @{
-                    NavigationManager.NavigateTo($"{BffOptions.Value.BaseUrl}{BffOptions.Value.LoginEndpoint}", true);
+                    NavigationManager.NavigateTo(UrlHelper.Combine(BffOptions.Value.BaseUrl, BffOptions.Value.LoginEndpoint), true);
                 }
             </NotAuthorized>
 

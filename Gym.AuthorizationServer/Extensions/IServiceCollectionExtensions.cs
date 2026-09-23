@@ -23,6 +23,11 @@ public static class IServiceCollectionExtensions
               .ValidateDataAnnotations()
               .ValidateOnStart();
 
+            services.AddOptions<TtlsOptions>()
+              .Bind(configuration.GetRequiredSection(TtlsOptions.SectionName))
+              .ValidateDataAnnotations()
+              .ValidateOnStart();
+
             return services;
         }
 

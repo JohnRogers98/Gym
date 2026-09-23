@@ -21,4 +21,9 @@ public class TokenResponse
 
     [JsonPropertyName("id_token")]
     public String? IdToken { get; set; }
+
+    #region Extensions
+    [JsonPropertyName("refresh_token_expires_in")]
+    public Int32? RefreshTokenExpiresIn { get; set; }
+    #endregion
 }
