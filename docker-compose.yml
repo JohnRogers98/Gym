@@ -9,7 +9,7 @@ services:
     container_name: gym-backend
     environment:
       - JWT_SECRET=${JWT_SECRET}
-      - TG_BOT_TOKEN=${TG_BOT_TOKEN}
+      - TelegramBot__Token=${TelegramBot__Token}
       - ASPNETCORE_ENVIRONMENT=Production
       - ASPNETCORE_URLS=http://+:8080
       - ASPNETCORE_FORWARDEDHEADERS_ENABLED=true
@@ -88,7 +88,7 @@ services:
       - RabbitMQ__Hostname=gym-rabbitmq
       - RabbitMQ__Username=guest
       - RabbitMQ__Password=guest
-      - TelegramBot__Token=${TG_BOT_TOKEN}
+      - TelegramBot__Token=${TelegramBot__Token}
       - CorsOrigins__0=https://gym-buddy.ru
     volumes:
       - ./keys:/app/keys:ro   

@@ -8,6 +8,7 @@
 @code {
     protected override async Task OnInitializedAsync()
     {
+        Console.WriteLine("We are in the login callback page.");
         NavigationManager.NavigateTo("/", forceLoad: false);
     }
 }

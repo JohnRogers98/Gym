@@ -20,6 +20,7 @@ namespace Gym.AuthorizationServer.Admin.Controllers.Api.Roles
             var userRoles = await _mediator.Send(new GetAllUserRoles(), cancellationToken);
 
             var response = new ListResponse<UserRoleDto>(userRoles.Select(userRoles => userRoles.ToResponseDto()));
+            Console.WriteLine("Roles count = " + response.Data!.Count());
             return base.Ok(response);
         }
     }

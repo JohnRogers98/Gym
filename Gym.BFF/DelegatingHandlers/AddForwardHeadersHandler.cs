@@ -48,8 +48,6 @@
                 if (!String.IsNullOrEmpty(existingContextFor))
                     request.Headers.TryAddWithoutValidation(XForwardedFor, $"{existingContextFor}, {clientIp}");
                 
-                else
-                    request.Headers.TryAddWithoutValidation(XForwardedFor, "sdfsdff");
             }
         }
     }
