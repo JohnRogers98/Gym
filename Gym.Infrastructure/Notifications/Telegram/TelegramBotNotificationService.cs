@@ -2,9 +2,9 @@
 using Gym.Domain.UserContext;
 using Telegram.Bot;
 
-namespace Gym.Infrastructure.Telegram
+namespace Gym.Infrastructure.Notifications.Telegram
 {
-    internal class TelegramBotNotificationService(ITelegramBotClient _botClient, IUserRepository _userRepository) : INotificationService
+    internal class TelegramBotNotificationService(ITelegramBotClient _botClient, IUserRepository _userRepository) : INotificationChannel
     {
         /// <summary>
         /// Send message to bot. In telegram private chat ChatId is the same as TelegramId

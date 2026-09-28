@@ -1,4 +1,4 @@
-﻿namespace Gym.Infrastructure.Telegram
+﻿namespace Gym.Infrastructure.Notifications.Telegram
 {
     internal record TelegramBotToken
     {

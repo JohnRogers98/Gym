@@ -6,4 +6,9 @@ namespace Gym.Domain.UserContext
     {
         Task SendMessageAsync(UserId userId, String message, CancellationToken cancellationToken);
     }
+
+    public interface INotificationChannel
+    {
+        Task SendMessageAsync(UserId userId, String message, CancellationToken cancellationToken);
+    }
 }

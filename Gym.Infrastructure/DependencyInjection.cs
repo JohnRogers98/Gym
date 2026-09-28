@@ -40,8 +40,9 @@ using Gym.Infrastructure.Entities.Repositories.Polls;
 using Gym.Infrastructure.Entities.Repositories.Trainings;
 using Gym.Infrastructure.Entities.Repositories.Users;
 using Gym.Infrastructure.HostedServices;
+using Gym.Infrastructure.Notifications;
+using Gym.Infrastructure.Notifications.Telegram;
 using Gym.Infrastructure.Scanners;
-using Gym.Infrastructure.Telegram;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -95,10 +96,7 @@ public static class DependencyInjection
                 configuration.GetRequiredConfiguration("RabbitMQ:Vhost")
             );
 
-            if (configuration["TelegramBot:Token"] is not null)
-            {
-                services.AddTelegramInfrastructure(configuration.GetRequiredConfiguration("TelegramBot:Token"));
-            }
+            services.AddNotificationServices(configuration);
 
             return services;
         }
@@ -245,10 +243,20 @@ public static class DependencyInjection
             return services;
         }
 
+        private IServiceCollection AddNotificationServices(IConfiguration configuration)
+        {
+            if (!String.IsNullOrWhiteSpace(configuration["TelegramBot:Token"]))
+            {
+                services.AddTelegramInfrastructure(configuration.GetRequiredConfiguration("TelegramBot:Token"));
+            }
+
+            services.TryAddScoped<INotificationService, NotificationService>();
+
+            return services;
+        }
         private IServiceCollection AddTelegramInfrastructure(String botToken)
         {
             services.TryAddSingleton<TelegramBotToken>(_ => TelegramBotToken.From(botToken));
-            services.TryAddScoped<INotificationService, TelegramBotNotificationService>();
 
             services.TryAddSingleton<ITelegramBotClient>(sp =>
             {
@@ -267,6 +275,8 @@ public static class DependencyInjection
 
                 return new TelegramBotClient(botToken, httpClient: httpProxyClient, cancellationToken: CancellationToken.None);
             });
+
+            services.TryAddEnumerable(ServiceDescriptor.Scoped<INotificationChannel, TelegramBotNotificationService>());
 
             return services;
         }
