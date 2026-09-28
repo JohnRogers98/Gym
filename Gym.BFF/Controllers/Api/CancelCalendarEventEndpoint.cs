@@ -10,7 +10,7 @@ namespace Gym.BFF.Controllers.Api
         [HttpPost("api/admin-calendar-events/{calendarEventId}/cancel")]
         public async Task<IActionResult> HandleAsync(CancellationToken cancellationToken)
         {
-            if (this.IsAccessTokenPresent() is false)
+            if (this.IsSessionKeyPresent() is false)
                 return Unauthorized();
 
             var calendarEventId = base.RouteData.Values["calendarEventId"]?.ToString();

@@ -24,6 +24,11 @@ public static class DependencyInjection
     {
         public IServiceCollection AddMongoInfrastructure(Action<MongoOptions> configureOptions)
         {
+            services.AddOptions<MongoOptions>()
+                .Configure(configureOptions)
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
+
             services.TryAddSingleton<IMongoClient>(sp => 
             {
                 var options = sp.GetRequiredService<IOptions<MongoOptions>>().Value;

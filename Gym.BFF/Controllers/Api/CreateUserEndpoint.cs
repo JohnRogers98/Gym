@@ -10,7 +10,7 @@ namespace Gym.BFF.Controllers.Api
         [HttpPost("api/users")]
         public async Task<IActionResult> HandleAsync(CancellationToken cancellationToken)
         {
-            if (this.IsAccessTokenPresent() is false)
+            if (this.IsSessionKeyPresent() is false)
                 return Unauthorized();
 
             using var adminApiClient = _httpClientFactory.CreateClient(_adminApiOptions.Value.ClientName);

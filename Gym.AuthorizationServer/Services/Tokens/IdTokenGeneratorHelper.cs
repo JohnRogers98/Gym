@@ -18,7 +18,8 @@ namespace Gym.AuthorizationServer.Services.Tokens
     public class IdTokenGeneratorHelper(
         IIdTokenGenerator _idTokenGenerator,
         IComputeOpenIdAtHashService _computeOpenIdAtHashService,
-        IOptions<JwtOptions> _jwtOptions) : IIdTokenGeneratorHelper
+        IOptions<JwtOptions> _jwtOptions,
+        IOptions<TtlsOptions> _ttlsOptions) : IIdTokenGeneratorHelper
     {
         public String GenerateToken(
             String accessToken,
@@ -33,7 +34,7 @@ namespace Gym.AuthorizationServer.Services.Tokens
                 Issuer = _jwtOptions.Value.Issuer,
                 Subject = userId,
                 Audience = clientId,
-                Expiration = DateTimeOffset.UtcNow.AddMinutes(2).ToUnixTimeSeconds(),
+                Expiration = (DateTimeOffset.UtcNow + _ttlsOptions.Value.IdToken).ToUnixTimeSeconds(),
                 IssuedAt = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
                 Nonce = nonce,
                 AuthenticationContextClassReference = acr,

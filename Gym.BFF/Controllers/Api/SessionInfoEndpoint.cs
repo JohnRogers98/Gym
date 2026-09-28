@@ -1,5 +1,6 @@
 ﻿using Gym.AuthorizationServer.Client.Services;
 using Gym.BFF.Options;
+using Gym.Redis.Client.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text.Json.Serialization;
@@ -7,16 +8,20 @@ using System.Text.Json.Serialization;
 namespace Gym.BFF.Controllers.Api
 {
     [ApiController]
-    public class SessionInfoEndpoint(IGetUserInfoService _getUserInfoService) : ControllerBase
+    public class SessionInfoEndpoint(IGetUserInfoService _getUserInfoService, IGetSessionTokensService _getSessionTokensService) : ControllerBase
     {
         [HttpGet("api/session-info")]
         public async Task<ActionResult<SessionInfo>> HandleAsync(CancellationToken cancellationToken)
         {
-            var accessToken = User.FindFirst(ExtendedClaimTypes.AccessToken)?.Value;
-            if (String.IsNullOrEmpty(accessToken))
+            var clientSessionKey = User.FindFirst(ExtendedClaimTypes.ClientSessionKey)?.Value;
+            if (String.IsNullOrEmpty(clientSessionKey))
                 return Unauthorized();
 
-            var userInfoResult = await _getUserInfoService.HandleAsync(accessToken, cancellationToken);
+            var sessionTokens =  await _getSessionTokensService.HandleAsync(clientSessionKey);
+            if(sessionTokens is null)
+                return Unauthorized();
+
+            var userInfoResult = await _getUserInfoService.HandleAsync(sessionTokens.AccessToken, cancellationToken);
             if(userInfoResult.IsFailure)
                 return BadRequest(userInfoResult.Error);
 

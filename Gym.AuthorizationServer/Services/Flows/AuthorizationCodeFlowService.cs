@@ -5,7 +5,9 @@ using Gym.AuthorizationServer.Infrastructure.Entities.GrantCodes;
 using Gym.AuthorizationServer.Infrastructure.Entities.ProtectedResources;
 using Gym.AuthorizationServer.Infrastructure.Entities.RefreshTokens;
 using Gym.AuthorizationServer.Infrastructure.Entities.UserConsents;
+using Gym.AuthorizationServer.Options;
 using Gym.AuthorizationServer.Services.Tokens;
+using Microsoft.Extensions.Options;
 
 namespace Gym.AuthorizationServer.Services.Flows
 {
@@ -24,7 +26,8 @@ namespace Gym.AuthorizationServer.Services.Flows
         IRefreshTokenGenerator _refreshTokenGenerator,
         IRefreshTokenRepository _refreshTokenRepository,
         IIdTokenGeneratorHelper _idTokenGeneratorHelper,
-        IUserRoleByUserIdFinder _userRoleByUserIdFinder) : IAuthorizationCodeFlowService
+        IUserRoleByUserIdFinder _userRoleByUserIdFinder,
+        IOptions<TtlsOptions> _ttlsOptions) : IAuthorizationCodeFlowService
     {
         public async Task<Result<AuthorizationCodeResponse>> HandleAsync(AuthorizationCodeRequest request, CancellationToken cancellationToken)
         {
@@ -70,7 +73,7 @@ namespace Gym.AuthorizationServer.Services.Flows
                 ClientId = grantCode.ClientId,
                 UserId = grantCode.UserId,
                 ProtectedResourceId = grantCode.ProtectedResourceId,
-                ExpiresAt = DateTime.UtcNow.AddHours(1)
+                ExpiresAt = DateTime.UtcNow + _ttlsOptions.Value.AccessToken
             };
             await _accessTokenRepository.AddAsync(accessTokenEntity, cancellationToken);
 
@@ -79,7 +82,7 @@ namespace Gym.AuthorizationServer.Services.Flows
             {
                 Token = refreshToken,
                 AccessTokenId = accessTokenEntity.Id,
-                ExpiresAt = DateTime.UtcNow.AddDays(1),
+                ExpiresAt = DateTime.UtcNow + _ttlsOptions.Value.RefreshToken,
                 Acr = "1fa",
                 Amr = ["pwd"]
             };
@@ -98,7 +101,8 @@ namespace Gym.AuthorizationServer.Services.Flows
                 TokenType = "Bearer",
                 ExpiresIn = accessTokenEntity.ExpiresAt.GetSecondsFromUtcNow(),
                 Scope = String.Join(' ', userConsent.GrantedScopes.Select(aScope => aScope.Name)),
-                IdToken = idToken
+                IdToken = idToken,
+                RefreshTokenExpiresIn = refreshTokenEntity.ExpiresAt.GetSecondsFromUtcNow()
             });
         }
 
@@ -120,5 +124,6 @@ namespace Gym.AuthorizationServer.Services.Flows
         public Int32? ExpiresIn { get; init; }
         public String? Scope { get; init; }
         public String? IdToken { get; init; }
+        public Int32? RefreshTokenExpiresIn { get; init; }
     }
 }

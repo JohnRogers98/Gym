@@ -13,7 +13,10 @@ namespace Gym.AuthorizationServer.Services.Tokens
         String GenerateToken(AccessTokenClaimsMetadata accessTokenClaimsMetadata);
     }
 
-    public class AccessTokenGenerator(IRsaSigningCredentialsProvider _rsaSigningService, IOptions<JwtOptions> _jwtOptions) : IAccessTokenGenerator
+    public class AccessTokenGenerator(
+        IRsaSigningCredentialsProvider _rsaSigningService,
+        IOptions<JwtOptions> _jwtOptions,
+        IOptions<TtlsOptions> _ttlsOptions) : IAccessTokenGenerator
     {
         public const String TypHeader = "at+JWT";
 
@@ -36,7 +39,7 @@ namespace Gym.AuthorizationServer.Services.Tokens
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = claimsIdentity,
-                Expires = DateTime.UtcNow.AddMinutes(5),
+                Expires = DateTime.UtcNow + _ttlsOptions.Value.AccessToken,
                 SigningCredentials = _rsaSigningService.GetSigningCredentials(),
                 TokenType = TypHeader
             };

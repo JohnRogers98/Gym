@@ -19,7 +19,9 @@ namespace Gym.WebApplication.Features._Common.Services
                     FallbackAction = args => Outcome.FromResultAsValueTask(
                         AsyncOperation<TResponse>.Failure("Service unavailable", ErrorType.Timeout))
                 })
-                .AddTimeout(TimeSpan.FromSeconds(5))
+#if DEBUG
+                .AddTimeout(TimeSpan.FromSeconds(20))
+#endif
                 .AddRetry(new()
                 {
                     MaxRetryAttempts = 3,

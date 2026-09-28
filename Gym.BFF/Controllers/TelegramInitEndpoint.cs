@@ -3,6 +3,8 @@ using Gym.BFF.Options;
 using Gym.BFF.Services;
 using Gym.BFF.Services.Session;
 using Gym.OAuth.Extensions;
+using Gym.Redis.Client;
+using Gym.Redis.Client.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using System.Security.Claims;
@@ -14,7 +16,9 @@ namespace Gym.BFF.Controllers
         IOptions<ResourceUrisOptions> _resourceUrisOptions,
         ITelegramAssertionService _telegramAssertionService,
         IOAuthIdTokenValidator _idTokenValidator,
-        ISetTokensToClientSideSessionService _setTokensToClientSideSessionService) : ControllerBase
+        ISessionKeyGenerator _sessionKeyGenerator,
+        ISaveSessionTokensService _saveSessionTokens,
+        ISetSessionKeyToClientSession _setSessionKeyToClientSession) : ControllerBase
     {
         [HttpPost("telegram-init")]
         public async Task<IActionResult> HandleAsync([FromForm] String initData, CancellationToken cancellationToken)
@@ -35,8 +39,17 @@ namespace Gym.BFF.Controllers
                     return BadRequest(new { error = result.ErrorCode, error_description = result.ErrorDescription });
             }
 
-            await _setTokensToClientSideSessionService
-                .HandleAsync(tokenResponseResult.Value.AccessToken, tokenResponseResult.Value.RefreshToken, tokenResponseResult.Value.IdToken);
+            var clientSessionKey = _sessionKeyGenerator.Generate();
+            await _saveSessionTokens.HandleAsync(
+                clientSessionKey,
+                new SessionTokens
+                {
+                    AccessToken = tokenResponseResult.Value.AccessToken,
+                    RefreshToken = tokenResponseResult.Value.RefreshToken,
+                    IdToken = tokenResponseResult.Value.IdToken
+                }
+            );
+            await _setSessionKeyToClientSession.HandleAsync(clientSessionKey);
 
             return base.Ok();
         }

@@ -10,7 +10,7 @@ namespace Gym.BFF.Controllers.Api
         [HttpPost("api/clients/{clientId}/account/charge")]
         public async Task<IActionResult> HandleAsync(CancellationToken cancellationToken)
         {
-            if (this.IsAccessTokenPresent() is false)
+            if (this.IsSessionKeyPresent() is false)
                 return Unauthorized();
 
             var clientId = base.RouteData.Values["clientId"]?.ToString();
