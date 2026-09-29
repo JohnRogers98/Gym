@@ -12,5 +12,12 @@
 
             return $"{baseUrl}/{endpoint}";
         }
+
+        public static PathString AsPathString(String endpoint)
+        {
+            if (String.IsNullOrEmpty(endpoint)) return PathString.Empty;
+            return new PathString($"/{endpoint.TrimStart('/')}");
+        }
+
     }
 }

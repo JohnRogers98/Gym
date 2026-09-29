@@ -37,21 +37,6 @@ public static class IWebHostBuilderExtensions
         });
     }
 
-    public static IWebHostBuilder ReconfigureXStaticHeaderExcludedEndpoints(this IWebHostBuilder builder)
-    {
-        return builder.ConfigureAppConfiguration((context, config) =>
-        {
-            config.AddInMemoryCollection(new Dictionary<String, String?>
-            {
-                // Переопределяем весь массив целиком
-                { "StaticHeaderCheck:ExcludedPaths:0", "login" },
-                { "StaticHeaderCheck:ExcludedPaths:1", "callback" },
-                { "StaticHeaderCheck:ExcludedPaths:2", "logout" },
-                { "StaticHeaderCheck:ExcludedPaths:3", FakeProtectedResourceProxyController.GetUri.OriginalString }
-            });
-        });
-    }
-
     public static IWebHostBuilder AddProtectedResourceOptions(this IWebHostBuilder builder,
         String protectedResourceBaseUrl, String clientName = "protected-resource-client")
     {
@@ -100,6 +85,7 @@ public static class IWebHostBuilderExtensions
                 options.ExcludedPaths.Add("/token");
                 options.ExcludedPaths.Add("/.well-known/jwks.json");
                 options.ExcludedPaths.Add("/userinfo");
+                options.ExcludedPaths.Add(FakeProtectedResourceProxyController.GetUri.OriginalString);
             });
         });
     }

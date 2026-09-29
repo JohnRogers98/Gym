@@ -1,4 +1,5 @@
 ﻿using Gym.AuthorizationServer.Client.Options;
+using Gym.BFF.Helpers;
 using Gym.BFF.Options;
 using Gym.BFF.Services;
 using Gym.OAuth.Extensions;
@@ -41,7 +42,7 @@ namespace Gym.BFF.Controllers
                 Resource = _resourceUrisOptions.Value.Api
             };
 
-            return base.Redirect($"{_authorizationServerOptions.Value.BaseUrl}/{_authorizationServerOptions.Value.AuthorizeEndpoint}{authorizeQuery.ToQueryString()}");
+            return base.Redirect($"{UrlHelper.Combine(_authorizationServerOptions.Value.BaseUrl, _authorizationServerOptions.Value.AuthorizeEndpoint)}{authorizeQuery.ToQueryString()}");
         }
     }
 

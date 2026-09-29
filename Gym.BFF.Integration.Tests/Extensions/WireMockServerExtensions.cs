@@ -1,4 +1,5 @@
-﻿using Gym.OAuth.Extensions;
+﻿using Gym.BFF.Helpers;
+using Gym.OAuth.Extensions;
 using Microsoft.AspNetCore.Http;
 using System.Text.Json;
 using WireMock.Matchers;
@@ -20,7 +21,7 @@ namespace WireMock.Server
                 var jwksJson = JsonSerializer.Serialize(jwks);
 
                 server
-                    .Given(Request.Create().WithPath(new PathString("/" + path)).UsingGet())
+                    .Given(Request.Create().WithPath(UrlHelper.AsPathString(path)).UsingGet())
                     .RespondWith(
                         Response.Create()
                         .WithStatusCode(200)
@@ -44,7 +45,7 @@ namespace WireMock.Server
                 var tokenResponseJson = JsonSerializer.Serialize(tokenResponse);
 
                 server
-                    .Given(Request.Create().WithPath(new PathString("/" + path)).UsingPost().WithBody(matcher))
+                    .Given(Request.Create().WithPath(UrlHelper.AsPathString(path)).UsingPost().WithBody(matcher))
                     .RespondWith(
                         Response.Create()
                         .WithStatusCode(200)
@@ -68,7 +69,7 @@ namespace WireMock.Server
                 var tokenResponseJson = JsonSerializer.Serialize(tokenResponse);
 
                 server
-                    .Given(Request.Create().WithPath(new PathString("/" + path)).UsingPost().WithBody(matcher))
+                    .Given(Request.Create().WithPath(UrlHelper.AsPathString(path)).UsingPost().WithBody(matcher))
                     .RespondWith(
                         Response.Create()
                         .WithStatusCode(200)

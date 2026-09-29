@@ -56,7 +56,6 @@ public partial class BFFServerFixture : WebApplicationFactory<Program>, IAsyncLi
             .AddProtectedResourceOptions(ProtectedResourceServerMock.Url!)
             .UseSetting("Urls:AuthorizationServer:BaseUrl", AuthorizationServerMock.Url)
             .UseSetting("Redis:ConnectionString", "localhost:6379,defaultDatabase=1")
-            .ReconfigureXStaticHeaderExcludedEndpoints()
             .ConfigureLogging((loggingBuilder) => loggingBuilder.ClearProviders().AddXUnit());
     }
 
