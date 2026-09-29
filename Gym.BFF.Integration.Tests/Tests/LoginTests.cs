@@ -20,7 +20,7 @@ public class LoginTests(BFFServerFixture _fixture, ITestOutputHelper _outputHelp
 
         var urls = Fixture.Services.GetRequiredOption<AuthorizationServerOptions>();
 
-        Fixture.AuthorizationServerMock.SetupExchageCodeToken(urls.TokenEndpoint, "test_access_token", "test_refresh_token");
+        Fixture.AuthorizationServerMock.SetupExchangeCodeToken(urls.TokenEndpoint, "test_access_token", "test_refresh_token");
 
         var loginResponse = await httpClient.GetAsync("/login", TestContext.Current.CancellationToken);
         var queryParams = QueryHelpers.ParseQuery(loginResponse.Headers.Location!.Query);
@@ -74,7 +74,7 @@ public class LoginTests(BFFServerFixture _fixture, ITestOutputHelper _outputHelp
         };
         var signedIdToken = idToken.Sign(signingCredentials);
 
-        Fixture.AuthorizationServerMock.SetupExchageCodeToken(urls.TokenEndpoint, "test_access_token", "test_refresh_token", signedIdToken);
+        Fixture.AuthorizationServerMock.SetupExchangeCodeToken(urls.TokenEndpoint, "test_access_token", "test_refresh_token", signedIdToken);
 
         var callbackResponse = await httpClient.GetAsync($"/callback?code=test_code&state={state}", TestContext.Current.CancellationToken);
         Assert.Equal(HttpStatusCode.Redirect, callbackResponse.StatusCode);

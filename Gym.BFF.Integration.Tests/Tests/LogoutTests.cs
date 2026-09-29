@@ -18,7 +18,7 @@ namespace Gym.BFF.Integration.Tests.Tests
 
             var urls = Fixture.Services.GetRequiredOption<AuthorizationServerOptions>();
 
-            Fixture.AuthorizationServerMock.SetupExchageCodeToken(urls.TokenEndpoint, "test_access_token", "test_refresh_token");
+            Fixture.AuthorizationServerMock.SetupExchangeCodeToken(urls.TokenEndpoint, "test_access_token", "test_refresh_token");
 
             var loginResponse = await httpClient.GetAsync("/login", TestContext.Current.CancellationToken);
             var queryParams = QueryHelpers.ParseQuery(loginResponse.Headers.Location!.Query);

@@ -1,6 +1,10 @@
-﻿using Gym.BFF.Integration.Tests.Rsa;
+﻿using Gym.BFF.DelegatingHandlers;
+using Gym.BFF.Integration.Tests.Controllers;
+using Gym.BFF.Integration.Tests.Options;
+using Gym.BFF.Integration.Tests.Rsa;
 using Gym.BFF.Options;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.ComponentModel;
 
@@ -30,6 +34,50 @@ public static class IWebHostBuilderExtensions
         {
             services.AddSingleton<FakeRsaKeyProvider>();
             services.AddSingleton<FakeRsaSecutiryKey>();
+        });
+    }
+
+    public static IWebHostBuilder ReconfigureXStaticHeaderExcludedEndpoints(this IWebHostBuilder builder)
+    {
+        return builder.ConfigureAppConfiguration((context, config) =>
+        {
+            config.AddInMemoryCollection(new Dictionary<String, String?>
+            {
+                // Переопределяем весь массив целиком
+                { "StaticHeaderCheck:ExcludedPaths:0", "login" },
+                { "StaticHeaderCheck:ExcludedPaths:1", "callback" },
+                { "StaticHeaderCheck:ExcludedPaths:2", "logout" },
+                { "StaticHeaderCheck:ExcludedPaths:3", FakeProtectedResourceProxyController.GetUri.OriginalString }
+            });
+        });
+    }
+
+    public static IWebHostBuilder AddProtectedResourceOptions(this IWebHostBuilder builder,
+        String protectedResourceBaseUrl, String clientName = "protected-resource-client")
+    {
+        if (builder == null)
+            throw new ArgumentNullException(nameof(builder));
+
+        builder.UseSetting("Urls:TestProtectedResource:ClientName", clientName);
+        builder.UseSetting("Urls:TestProtectedResource:BaseUrl", protectedResourceBaseUrl);
+
+        return builder.ConfigureServices((context, services) =>
+        {
+            services.AddOptions<ProtectedResourceOptions>()
+                .Bind(context.Configuration.GetSection("Urls:TestProtectedResource"))
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
+
+            services.AddHttpClient(clientName, client =>
+            {
+                client.BaseAddress = new Uri(protectedResourceBaseUrl);
+            })
+            .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+            {
+                UseCookies = false,
+                UseDefaultCredentials = false
+            })
+            .AddHttpMessageHandler<AccessTokenHandler>();
         });
     }
 

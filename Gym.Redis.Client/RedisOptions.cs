@@ -7,6 +7,8 @@ namespace Gym.Redis.Client
         [Required]
         public String ConnectionString { get; set; } = "localhost:6379";
 
+        public String? KeyPrefix { get; set; } = String.Empty;
+
         public TimeSpan SessionKeyTtl { get; set; } = TimeSpan.FromDays(1);
 
         public TimeSpan LockKeyExpiry { get; set; } = TimeSpan.FromSeconds(30);

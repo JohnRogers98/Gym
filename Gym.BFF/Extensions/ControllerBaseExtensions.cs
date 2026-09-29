@@ -8,11 +8,11 @@ public static class ControllerBaseExtensions
 {
     extension(ControllerBase controllerBase)
     {
-        public async Task<HttpRequestMessage> CreateProxyRequestAsync(String url, Boolean enableBuffering = false, CancellationToken cancellationToken = default)
+        public async Task<HttpRequestMessage> CreateProxyRequestAsync(String url, String? httpMethod = null, Boolean enableBuffering = false, CancellationToken cancellationToken = default)
         {
             HttpRequestMessage httpRequestMessage = new HttpRequestMessage
             {
-                Method = new HttpMethod(controllerBase.Request.Method),
+                Method = new HttpMethod(httpMethod ?? controllerBase.Request.Method),
                 RequestUri = new Uri(url, UriKind.Relative)
             };
 

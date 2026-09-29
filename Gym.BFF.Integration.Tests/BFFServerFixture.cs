@@ -17,6 +17,8 @@ public partial class BFFServerFixture : WebApplicationFactory<Program>, IAsyncLi
 {
     public WireMockServer AuthorizationServerMock { get; private set; }
 
+    public WireMockServer ProtectedResourceServerMock { get; private set; }
+
     public BFFServerFixture() : base()
     {
         WireMockServerSettings authorizationServerSettings = new()
@@ -24,6 +26,12 @@ public partial class BFFServerFixture : WebApplicationFactory<Program>, IAsyncLi
             Logger = new WireMockConsoleLogger()
         };
         AuthorizationServerMock = WireMockServer.Start(authorizationServerSettings);
+
+        WireMockServerSettings protectedResourceServerSettings = new()
+        {
+            Logger = new WireMockConsoleLogger()
+        };
+        ProtectedResourceServerMock = WireMockServer.Start(protectedResourceServerSettings);
 
         base.ClientOptions.AllowAutoRedirect = false;
         base.ClientOptions.BaseAddress = new Uri("https://localhost");
@@ -45,7 +53,10 @@ public partial class BFFServerFixture : WebApplicationFactory<Program>, IAsyncLi
             .AddApplicationParts()
             .AddFakeRsaInfrastructure()
             .ExludeAuthorizeServerEndpoints()
+            .AddProtectedResourceOptions(ProtectedResourceServerMock.Url!)
             .UseSetting("Urls:AuthorizationServer:BaseUrl", AuthorizationServerMock.Url)
+            .UseSetting("Redis:ConnectionString", "localhost:6379,defaultDatabase=1")
+            .ReconfigureXStaticHeaderExcludedEndpoints()
             .ConfigureLogging((loggingBuilder) => loggingBuilder.ClearProviders().AddXUnit());
     }
 

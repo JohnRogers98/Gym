@@ -1,6 +1,7 @@
 ﻿using Gym.OAuth.Extensions;
 using Microsoft.AspNetCore.Http;
 using System.Text.Json;
+using WireMock.Matchers;
 using WireMock.RequestBuilders;
 using WireMock.ResponseBuilders;
 
@@ -28,8 +29,10 @@ namespace WireMock.Server
                     );
             }
 
-            public void SetupExchageCodeToken(String path, String accessToken, String refreshToken, String? idToken = null)
+            public void SetupExchangeCodeToken(String path, String accessToken, String refreshToken, String? idToken = null)
             {
+                var matcher = new WildcardMatcher($"*grant_type={GrantTypes.AuthorizationCode}*");
+
                 var tokenResponse = new TokenResponse
                 {
                     AccessToken = accessToken,
@@ -41,7 +44,7 @@ namespace WireMock.Server
                 var tokenResponseJson = JsonSerializer.Serialize(tokenResponse);
 
                 server
-                    .Given(Request.Create().WithPath(new PathString("/" + path)))
+                    .Given(Request.Create().WithPath(new PathString("/" + path)).UsingPost().WithBody(matcher))
                     .RespondWith(
                         Response.Create()
                         .WithStatusCode(200)
@@ -49,6 +52,31 @@ namespace WireMock.Server
                         .WithBody(tokenResponseJson)
                     );
             }
+
+            public void SetupRefreshTokenExchangeMock(String path, String oldRefreshToken, String newAccessToken, String newRefreshToken, String? newIdToken = null)
+            {
+                var matcher = new WildcardMatcher($"*grant_type={GrantTypes.RefreshToken}*refresh_token={oldRefreshToken}");
+
+                var tokenResponse = new TokenResponse
+                {
+                    AccessToken = newAccessToken,
+                    RefreshToken = newRefreshToken,
+                    IdToken = newIdToken,
+                    ExpiresIn = 3600,
+                    TokenType = "Bearer"
+                };
+                var tokenResponseJson = JsonSerializer.Serialize(tokenResponse);
+
+                server
+                    .Given(Request.Create().WithPath(new PathString("/" + path)).UsingPost().WithBody(matcher))
+                    .RespondWith(
+                        Response.Create()
+                        .WithStatusCode(200)
+                        .WithHeader("Content-Type", "application/json")
+                        .WithBody(tokenResponseJson)
+                    );
+            }
+
         }
     }
 }
