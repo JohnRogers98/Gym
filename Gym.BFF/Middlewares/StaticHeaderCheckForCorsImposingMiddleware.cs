@@ -3,12 +3,12 @@ using Microsoft.Extensions.Options;
 
 namespace Gym.BFF.Middlewares
 {
-    public class StaticHeaderCheckForCorsImposing
+    public class StaticHeaderCheckForCorsImposingMiddleware
     {
         private readonly RequestDelegate _next;
         private readonly StaticHeaderCheckOptions _options;
 
-        public StaticHeaderCheckForCorsImposing(RequestDelegate next, IOptions<StaticHeaderCheckOptions> options)
+        public StaticHeaderCheckForCorsImposingMiddleware(RequestDelegate next, IOptions<StaticHeaderCheckOptions> options)
         {
             _next = next;
             _options = options.Value;

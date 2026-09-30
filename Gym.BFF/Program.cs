@@ -55,7 +55,7 @@ app.UseCors("BffCorsPolicy");
 app.UseSession();
 
 app.UseAuthentication();
-app.UseMiddleware<StaticHeaderCheckForCorsImposing>();
+app.UseMiddleware<StaticHeaderCheckForCorsImposingMiddleware>();
 app.UseAuthorization();
 
 app.MapControllers();
