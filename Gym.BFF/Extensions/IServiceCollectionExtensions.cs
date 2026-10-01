@@ -121,6 +121,9 @@ public static class IServiceCollectionExtensions
             services.AddSingleton<ISessionKeyGenerator, SessionKeyGenerator>();
             services.AddSingleton<ISetSessionKeyToClientSession, SetSessionKeyToClientSession>();
 
+            services.AddSingleton<IIdempotencyKeyValidator, IdempotencyKeyValidator>();
+            services.AddSingleton<IIdempotencyRecordKeyGenerator, IdempotencyRecordKeyGenerator>();
+
             return services;
         }
 

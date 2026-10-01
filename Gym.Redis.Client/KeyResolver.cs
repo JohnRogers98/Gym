@@ -6,5 +6,9 @@
         {
             return $"session:{clientSessionKey}";
         }
+        public static String ResolveIdempotencyRecordKey(String idempotencyRecordKey)
+        {
+            return $"idempotency:{idempotencyRecordKey}";
+        }
     }
 }

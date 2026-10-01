@@ -1,33 +1,24 @@
-﻿using Gym.AuthorizationServer.Client.Options;
-using Microsoft.AspNetCore.WebUtilities;
-using Microsoft.Extensions.DependencyInjection;
-using System.Net.Http.Headers;
+﻿using System.Net.Http.Headers;
 using System.Net.Http.Json;
-using WireMock.Server;
 
 namespace Gym.BFF.Integration.Tests.Tests
 {
     [Collection<BFFServerCollection>]
-    public class LogoutTests(BFFServerFixture _fixture, ITestOutputHelper _outputHelper) : IntegrationTest(_fixture, _outputHelper)
+    public class LogoutTests(BFFServerFixture _fixture, ITestOutputHelper _outputHelper) 
+        : ExtendedIntegrationTest(_fixture, _outputHelper)
     {
         [Fact]
         public async Task Check_Logout()
         {
             #region Given
-            var httpClient = Fixture.CreateClient();
+            using var httpClient = Fixture.CreateClient();
 
-            var urls = Fixture.Services.GetRequiredOption<AuthorizationServerOptions>();
-
-            Fixture.AuthorizationServerMock.SetupExchangeCodeToken(urls.TokenEndpoint, "test_access_token", "test_refresh_token");
-
-            var loginResponse = await httpClient.GetAsync("/login", TestContext.Current.CancellationToken);
-            var queryParams = QueryHelpers.ParseQuery(loginResponse.Headers.Location!.Query);
-            String state = queryParams["state"]!;
-
-            var callbackResponse = await httpClient.GetAsync($"/callback?code=test_code&state={state}", TestContext.Current.CancellationToken);
+            String refreshToken = Guid.NewGuid().ToString();
+            String accessToken = base.CreateJwtToken();
+            await base.MakeLoginCallToSetupSesionCookieAsync(httpClient, accessToken, refreshToken);
             #endregion
 
-            var request = new HttpRequestMessage(HttpMethod.Get, "/check-session");
+            using var request = new HttpRequestMessage(HttpMethod.Get, "/check-session");
             request.Headers.AddXStaticHeader();
 
             var checkSessionBeforeLogout = await httpClient.SendAsync(request, TestContext.Current.CancellationToken);
@@ -37,10 +28,10 @@ namespace Gym.BFF.Integration.Tests.Tests
             var logoutResponse = await httpClient.PostAsync("/logout", null, cancellationToken: TestContext.Current.CancellationToken);
             logoutResponse.EnsureSuccessStatusCode();
 
-            request = new HttpRequestMessage(HttpMethod.Get, "/check-session");
-            request.Headers.AddXStaticHeader();
+            using var newRequest = new HttpRequestMessage(HttpMethod.Get, "/check-session");
+            newRequest.Headers.AddXStaticHeader();
 
-            var checkSessionAfterLogout = await httpClient.SendAsync(request, TestContext.Current.CancellationToken);
+            var checkSessionAfterLogout = await httpClient.SendAsync(newRequest, TestContext.Current.CancellationToken);
             var checkSessionAfterLogoutResponse = await checkSessionAfterLogout.Content.ReadFromJsonAsync<SessionResponse>(TestContext.Current.CancellationToken);
             Assert.False(checkSessionAfterLogoutResponse!.Authenticated);
         }

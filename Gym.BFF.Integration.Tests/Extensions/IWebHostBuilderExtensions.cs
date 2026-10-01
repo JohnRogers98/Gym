@@ -86,6 +86,7 @@ public static class IWebHostBuilderExtensions
                 options.ExcludedPaths.Add("/.well-known/jwks.json");
                 options.ExcludedPaths.Add("/userinfo");
                 options.ExcludedPaths.Add(FakeProtectedResourceProxyController.GetUri.OriginalString);
+                options.ExcludedPaths.Add(RandomGuidGeneratorController.GetUri.OriginalString);
             });
         });
     }

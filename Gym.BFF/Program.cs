@@ -17,6 +17,8 @@ builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddServerSideSession();
 
+builder.Services.AddProblemDetails();
+
 builder.Services.AddCorsPolicy("BffCorsPolicy", builder.Configuration);
 
 builder.Services.AddOptionsFromConfiguration(builder.Configuration);
@@ -52,11 +54,15 @@ app.UseHttpsRedirection();
 
 app.UseCors("BffCorsPolicy");
 
+app.UseRouting();
+
 app.UseSession();
 
 app.UseAuthentication();
 app.UseMiddleware<StaticHeaderCheckForCorsImposingMiddleware>();
 app.UseAuthorization();
+
+app.UseMiddleware<IdempotencyMiddleware>();
 
 app.MapControllers();
 

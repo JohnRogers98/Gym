@@ -16,24 +16,24 @@ public class LoginTests(BFFServerFixture _fixture, ITestOutputHelper _outputHelp
     [Fact]
     public async Task Successful_Login_Without_OIDC() 
     {
-        var httpClient = Fixture.CreateClient();
+        using var httpClient = Fixture.CreateClient();
 
         var urls = Fixture.Services.GetRequiredOption<AuthorizationServerOptions>();
 
         Fixture.AuthorizationServerMock.SetupExchangeCodeToken(urls.TokenEndpoint, "test_access_token", "test_refresh_token");
 
-        var loginResponse = await httpClient.GetAsync("/login", TestContext.Current.CancellationToken);
+        using var loginResponse = await httpClient.GetAsync("/login", TestContext.Current.CancellationToken);
         var queryParams = QueryHelpers.ParseQuery(loginResponse.Headers.Location!.Query);
         String state = queryParams["state"]!;
 
-        var callbackResponse = await httpClient.GetAsync($"/callback?code=test_code&state={state}", TestContext.Current.CancellationToken);
+        using var callbackResponse = await httpClient.GetAsync($"/callback?code=test_code&state={state}", TestContext.Current.CancellationToken);
         Assert.Equal(HttpStatusCode.Redirect, callbackResponse.StatusCode);
     }
 
     [Fact]
     public async Task Successful_Login_With_OIDC()
     {
-        var httpClient = Fixture.CreateClient();
+        using var httpClient = Fixture.CreateClient();
 
         var urls = Fixture.Services.GetRequiredOption<AuthorizationServerOptions>();
         var clientCredentials = Fixture.Services.GetRequiredOption<ClientCredentialsOptions>();
@@ -57,7 +57,7 @@ public class LoginTests(BFFServerFixture _fixture, ITestOutputHelper _outputHelp
         };
         Fixture.AuthorizationServerMock.SetupJwks(urls.JwksEndpoint, jwk);
 
-        var loginResponse = await httpClient.GetAsync("/login", TestContext.Current.CancellationToken);
+        using var loginResponse = await httpClient.GetAsync("/login", TestContext.Current.CancellationToken);
         var queryParams = QueryHelpers.ParseQuery(loginResponse.Headers.Location!.Query);
         String state = queryParams["state"]!;
         String nonce = queryParams["nonce"]!;
@@ -76,7 +76,7 @@ public class LoginTests(BFFServerFixture _fixture, ITestOutputHelper _outputHelp
 
         Fixture.AuthorizationServerMock.SetupExchangeCodeToken(urls.TokenEndpoint, "test_access_token", "test_refresh_token", signedIdToken);
 
-        var callbackResponse = await httpClient.GetAsync($"/callback?code=test_code&state={state}", TestContext.Current.CancellationToken);
+        using var callbackResponse = await httpClient.GetAsync($"/callback?code=test_code&state={state}", TestContext.Current.CancellationToken);
         Assert.Equal(HttpStatusCode.Redirect, callbackResponse.StatusCode);
     }
 }

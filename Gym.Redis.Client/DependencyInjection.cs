@@ -53,6 +53,9 @@ public static class DependencyInjection
             services.AddSingleton<IGetSessionTokensService, GetSessionTokensService>();
             services.AddSingleton<IRefreshSessionTokensService, RefreshSessionTokensService>();
 
+            services.AddSingleton<ISaveIdempotencyRecordService, SaveIdempotencyRecordService>();
+            services.AddSingleton<IGetIdempotencyRecordService, GetIdempotencyRecordService>();
+
             return services;
         }
     }
