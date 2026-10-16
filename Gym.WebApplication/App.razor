@@ -1,6 +1,10 @@
-﻿<Router AppAssembly="@typeof(App).Assembly" NotFoundPage="typeof(Features.NotFound.NotFound)">
+﻿@using Gym.Chat.Client
+
+@implements IAsyncDisposable
+
+<Router AppAssembly="@typeof(App).Assembly" NotFoundPage="typeof(Features.NotFound.NotFound)">
     <Found Context="routeData">
-        <AuthorizeRouteView  RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
+        <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
             <NotAuthorized>
                 @{
                     NavigationManager.NavigateTo(UrlHelper.Combine(BffOptions.Value.BaseUrl, BffOptions.Value.LoginEndpoint), true);
@@ -18,4 +22,31 @@
 @code {
     [Inject] private NavigationManager NavigationManager { get; set; } = default!;
     [Inject] private IOptions<BffOptions> BffOptions { get; set; } = default!;
+    [Inject] private ChatMediator ChatMediator { get; set; } = default!;
+    [Inject] private ILogger<App> Logger { get; set; } = default!;
+
+
+    // Protection from prerendering duble call (for example, in Blazor Web App), in WASM protection is not needed, because OnInitializedAsync is called only once.
+    private Boolean _started;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (_started) return;
+        _started = true;
+
+        try
+        {
+            await ChatMediator.StartAsync();
+            Logger.LogInformation("SignalR connection started.");
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Cannot start SignalR connection.");
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        await ChatMediator.DisposeAsync();
+    }
 }

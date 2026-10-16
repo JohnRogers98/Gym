@@ -9,7 +9,16 @@ builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
-builder.Services.AddBffAuthentication();
+builder.Services.AddOptionsFromConfiguration(builder.Configuration);
+
+var cookieOptions = builder.Configuration
+    .GetRequiredSection(Gym.BFF.Options.CookieOptions.SectionName)
+    .Get<Gym.BFF.Options.CookieOptions>() ?? throw new InvalidOperationException("Cookie section is missing.");
+
+builder.Services.AddRedisClient(builder.Configuration)
+    .AddRedisDataProtection(cookieOptions.DataProtectorPurpose);
+
+builder.Services.AddBffAuthentication(cookieOptions.Name, cookieOptions.DataProtectorPurpose);
 
 builder.Services.AddMemoryCache();
 
@@ -19,9 +28,7 @@ builder.Services.AddServerSideSession();
 
 builder.Services.AddProblemDetails();
 
-builder.Services.AddCorsPolicy("BffCorsPolicy", builder.Configuration);
-
-builder.Services.AddOptionsFromConfiguration(builder.Configuration);
+builder.Services.AddCorsPolicy("CorsPolicy", builder.Configuration);
 
 builder.Services.AddHttpLogging(options =>
 {
@@ -33,8 +40,7 @@ builder.Services.AddHttpLogging(options =>
 builder.Services.AddDelegatingHandlers();
 
 builder.Services
-    .AddAuthorizationServerClient(builder.Configuration)
-    .AddRedisClient(builder.Configuration)
+    .AddAuthorizationServerClient(builder.Configuration)    
     .AddAuthorizationServerAdminApiNamedClient(builder.Configuration)
     .AddWebApiNamedClient(builder.Configuration);
 
@@ -52,7 +58,7 @@ app.UseHttpLogging();
 
 app.UseHttpsRedirection();
 
-app.UseCors("BffCorsPolicy");
+app.UseCors("CorsPolicy");
 
 app.UseRouting();
 

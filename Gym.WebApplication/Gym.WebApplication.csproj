@@ -40,6 +40,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Gym.Chat.Client\Gym.Chat.Client.csproj" />
     <ProjectReference Include="..\Gym.WebDto\Gym.WebDto.csproj" />
   </ItemGroup>
 

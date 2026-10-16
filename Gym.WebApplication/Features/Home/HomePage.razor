@@ -1,6 +1,7 @@
 ﻿@page "/"
 
 @using Gym.WebApplication.Authentication
+@using Gym.WebApplication.Features.Chat.EchoMessage
 
 @inject UserAuthState UserAuthState
 
@@ -37,6 +38,8 @@
                     </MudPaper>
                 </MudItem>
             </MudGrid>
+
+            <EchoMessage />
 
         </MudContainer>
     </Authorized>

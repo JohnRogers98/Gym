@@ -1,5 +1,8 @@
 ﻿using Gym.Redis.Client;
 using Gym.Redis.Client.Services;
+using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.DataProtection.KeyManagement;
+using Microsoft.AspNetCore.DataProtection.StackExchangeRedis;
 using Microsoft.Extensions.Options;
 using RedLockNet.SERedis;
 using RedLockNet.SERedis.Configuration;
@@ -19,7 +22,6 @@ public static class DependencyInjection
                 .ValidateOnStart();
 
             services.ConfigureConnection();
-            services.AddServices();
 
             return services;
         }
@@ -47,14 +49,39 @@ public static class DependencyInjection
             return services;
         }
 
-        private IServiceCollection AddServices()
+        public IServiceCollection AddIdempotencyServices()
+        {
+            services.AddSingleton<ISaveIdempotencyRecordService, SaveIdempotencyRecordService>();
+            services.AddSingleton<IGetIdempotencyRecordService, GetIdempotencyRecordService>();
+
+            return services;
+        }
+
+        public IServiceCollection AddSessionServices()
         {
             services.AddSingleton<ISaveSessionTokensService, SaveSessionTokensService>();
             services.AddSingleton<IGetSessionTokensService, GetSessionTokensService>();
             services.AddSingleton<IRefreshSessionTokensService, RefreshSessionTokensService>();
 
-            services.AddSingleton<ISaveIdempotencyRecordService, SaveIdempotencyRecordService>();
-            services.AddSingleton<IGetIdempotencyRecordService, GetIdempotencyRecordService>();
+            return services;
+        }
+
+        public IServiceCollection AddRedisDataProtection(String applicationName)
+        {
+            services.AddDataProtection()
+                .SetApplicationName(applicationName);
+
+            // Register RedisXmlRepository through IConfigureOptions as a workaround for the fact that DataProtection is registered as a singleton and we need to resolve IConnectionMultiplexer from the DI container. See https://github.com/dotnet/aspnetcore/issues/61768
+            services.AddSingleton<IConfigureOptions<KeyManagementOptions>>(sp =>
+            {
+                var redis = sp.GetRequiredService<IConnectionMultiplexer>();
+                return new ConfigureOptions<KeyManagementOptions>(options =>
+                {
+                    options.XmlRepository = new RedisXmlRepository(
+                        () => redis.GetDatabase(),
+                        "DataProtection-Keys");
+                });
+            });
 
             return services;
         }

@@ -25,6 +25,11 @@
         "Path": "Gym.WebApi\\Gym.WebApi.csproj",
         "Action": "Start",
         "DebugTarget": "Staging"
+      },
+      {
+        "Path": "Gym.Chat.WSApi\\Gym.Chat.WSApi.csproj",
+        "Action": "Start",
+        "DebugTarget": "Staging"
       }
     ]
   }

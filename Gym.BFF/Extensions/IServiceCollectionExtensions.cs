@@ -1,11 +1,13 @@
-﻿using Gym.BFF.DelegatingHandlers;
+﻿using Gym.AuthorizationServer.Client;
+using Gym.BFF.DelegatingHandlers;
 using Gym.BFF.Options;
 using Gym.BFF.Services;
 using Gym.BFF.Services.Session;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Session;
-using Gym.AuthorizationServer.Client;
 using Gym.Redis.Client.Services.Ports;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.Session;
 
 namespace Gym.BFF.Extensions;
 
@@ -13,18 +15,27 @@ public static class IServiceCollectionExtensions
 {
     extension(IServiceCollection services) { 
     
-        public IServiceCollection AddBffAuthentication()
+        public IServiceCollection AddBffAuthentication(String cookieName, String applicationName)
         {
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie(options =>
                 {
-                    options.Cookie.Name = "__Host-Gym.BFF.Client";
+                    options.Cookie.Name = cookieName;
                     options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
                     options.Cookie.HttpOnly = true;
                     options.Cookie.SameSite = SameSiteMode.Lax;
                     options.Cookie.Path = SessionDefaults.CookiePath;
                     options.Cookie.Domain = null;
                     options.Cookie.IsEssential = true;
+                });
+
+            // Configure the data protection provider for cookie authentication
+            services.AddOptions<CookieAuthenticationOptions>(
+                    CookieAuthenticationDefaults.AuthenticationScheme)
+                .Configure<IDataProtectionProvider>((options, provider) =>
+                {
+                    var protector = provider.CreateProtector(applicationName);
+                    options.TicketDataFormat = new TicketDataFormat(protector);
                 });
 
             return services;
@@ -176,10 +187,20 @@ public static class IServiceCollectionExtensions
                     {
                         clientOptions.SessionKeyTtl = TimeSpan.Parse(sessionKeyTtlString);
                     }
+
+                    var idempotencyKeyTtlString = configuration.GetRequiredConfiguration("Redis:IdempotencyKeyTtl");
+                    if (!String.IsNullOrWhiteSpace(idempotencyKeyTtlString))
+                    {
+                        clientOptions.IdempotencyKeyTtl = TimeSpan.Parse(idempotencyKeyTtlString);
+                    }
                 }
             );
 
+            // Port
             services.AddSingleton<IExchangeRefreshTokenService, ExchangeRefreshTokenService>();
+
+            services.AddSessionServices();
+            services.AddIdempotencyServices();
 
             return services;
         }

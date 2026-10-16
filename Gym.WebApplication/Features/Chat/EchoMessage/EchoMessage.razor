@@ -1,0 +1,65 @@
+﻿@using Gym.Chat.Client
+
+@implements IAsyncDisposable 
+
+@inject ChatMediator ChatMediator
+
+<MudPaper Class="pa-4">
+    <MudStack Spacing="2">
+        <MudText Typo="Typo.body2" Align="Align.Left">
+            @(_echoMessages.Count == 0 ? "No echo message received" : $"Echo message: " + _echoMessages.Last())
+        </MudText>
+
+        <MudStack Row="true" Spacing="2">
+            <MudTextField @bind-Value="_inputText"
+                          Placeholder="Enter message..."
+                          Variant="Variant.Outlined"
+                          Margin="Margin.Dense"
+                          FullWidth="true"
+                          Immediate="true"
+                          Clearable="true"
+                          OnKeyUp="@HandleKeyUpAsync" />
+
+            <MudIconButton Icon="@Icons.Material.Filled.Send"
+                           Color="Color.Primary"
+                           Size="Size.Medium"
+                           Variant="Variant.Text"
+                           OnClick="@SendMessageAsync"
+                           Disabled="String.IsNullOrWhiteSpace(_inputText)" />
+        </MudStack>
+    </MudStack>
+</MudPaper>
+
+@code {
+    private String _inputText = String.Empty;
+    private List<String> _echoMessages = new();
+
+    protected override Task OnInitializedAsync()
+    {
+        ChatMediator.ReceiveEchoMessage += this.ReceiveMessageAsync;
+        return Task.CompletedTask;
+    }
+
+    private async Task HandleKeyUpAsync(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter") await SendMessageAsync();
+    }
+
+    private async Task SendMessageAsync()
+    {
+        if (String.IsNullOrWhiteSpace(_inputText))
+            return;
+
+        await ChatMediator.SendEchoMessageAsync(_inputText);
+        _inputText = String.Empty;
+    }
+
+    private Task ReceiveMessageAsync(String message)
+    {
+        _echoMessages.Add(message);
+        base.InvokeAsync(StateHasChanged);
+        return Task.CompletedTask;
+    }
+
+    public async ValueTask DisposeAsync() => ChatMediator.ReceiveEchoMessage -= this.ReceiveMessageAsync;
+}

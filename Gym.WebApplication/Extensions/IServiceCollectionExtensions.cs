@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Gym.Chat.Client;
 using Gym.WebApplication.Authentication;
 using Gym.WebApplication.JSAdapters;
 using Gym.WebApplication.Operations;
@@ -6,7 +7,11 @@ using Gym.WebApplication.Options;
 using Gym.WebApplication.RequestHandlers;
 using Gym.WebApplication.Scanners;
 using Gym.WebApplication.ViewModels.AccountHistory;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Http.Connections;
+using Microsoft.AspNetCore.SignalR.Client;
+using Microsoft.Extensions.Options;
 
 namespace Gym.WebApplication.Extensions;
 
@@ -19,6 +24,11 @@ public static class IServiceCollectionExtensions
             .ValidateDataAnnotations()
             .ValidateOnStart();
 
+        services.AddOptions<ChatWSOptions>()
+            .Bind(configuration.GetRequiredSection(ChatWSOptions.SectionName))
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+
         return services;
     }
 
@@ -28,6 +38,23 @@ public static class IServiceCollectionExtensions
         {
             client.BaseAddress = new Uri(baseUrl);
             client.DefaultRequestHeaders.Add("X-Static-Header", "1");
+        });
+
+        return services;
+    }
+
+    public static IServiceCollection AddChatClientMediator(this IServiceCollection services)
+    {
+        services.AddSingleton<ChatMediator>(sp =>
+        {
+            var options = sp.GetRequiredService<IOptions<ChatWSOptions>>();
+
+            return new ChatMediator(() =>
+                new HubConnectionBuilder()
+                    .WithUrl(options.Value.Url, HttpTransportType.WebSockets)
+                    .WithAutomaticReconnect(new ChatWSForeverRetryPolicy())
+                    .WithStatefulReconnect()
+                    .Build());
         });
 
         return services;

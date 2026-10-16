@@ -23,6 +23,8 @@ builder.Services.AddBffNamedClient(
     builder.Configuration.GetRequiredConfiguration("Bff:BaseUrl")
 );
 
+builder.Services.AddChatClientMediator();
+
 builder.Services.AddAutoMapper(cfg => { }, typeof(Program).Assembly);
 
 builder.Services.AddMudServices(config =>
