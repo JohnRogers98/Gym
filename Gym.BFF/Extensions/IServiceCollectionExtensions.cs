@@ -196,8 +196,9 @@ public static class IServiceCollectionExtensions
                 }
             );
 
-            // Port
+            // Ports
             services.AddSingleton<IExchangeRefreshTokenService, ExchangeRefreshTokenService>();
+            services.AddSingleton<IAccessTokenValidator, AccessTokenValidator>();
 
             services.AddSessionServices();
             services.AddIdempotencyServices();

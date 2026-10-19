@@ -4,7 +4,8 @@
     "Projects": [
       {
         "Path": "Gym.WebApplication\\Gym.WebApplication.csproj",
-        "Action": "StartWithoutDebugging"
+        "Action": "StartWithoutDebugging",
+        "DebugTarget": "Staging"
       },
       {
         "Path": "Gym.BFF\\Gym.BFF.csproj",

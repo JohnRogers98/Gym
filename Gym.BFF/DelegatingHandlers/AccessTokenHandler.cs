@@ -1,18 +1,14 @@
 ﻿using Gym.BFF.Options;
 using Gym.Redis.Client;
 using Gym.Redis.Client.Services;
-using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http.Headers;
 
 namespace Gym.BFF.DelegatingHandlers;
 
 public class AccessTokenHandler(
     IHttpContextAccessor _httpContextAccessor,
-    IGetSessionTokensService _getSessionTokens,
-    IRefreshSessionTokensService _refreshSessionTokensService) : DelegatingHandler
+    IGetValidSessionTokensService _getValidSessionTokensService) : DelegatingHandler
 {
-    JwtSecurityTokenHandler _jwtHandler = new JwtSecurityTokenHandler();
-
     protected override async Task<HttpResponseMessage> SendAsync(
         HttpRequestMessage request,
         CancellationToken cancellationToken)
@@ -33,29 +29,13 @@ public class AccessTokenHandler(
         if (_httpContextAccessor.HttpContext?.Request.Headers.Authorization.Count > 0)
             return;
 
-        SessionTokens? sessionTokens = await _getSessionTokens.HandleAsync(clientSessionKey);
+        SessionTokens? sessionTokens = await _getValidSessionTokensService.HandleAsync(clientSessionKey, cancellationToken);
         if (String.IsNullOrWhiteSpace(sessionTokens?.AccessToken))
             return;
 
-        if (this.IsTokenValid(sessionTokens.AccessToken))
-        {
-            this.AppendAuthorizationHeader(request, sessionTokens.AccessToken);
-        }
-        else
-        {
-            SessionTokens? refreshedSessionTokens = await _refreshSessionTokensService
-                .HandleAsync(clientSessionKey, sessionTokens, cancellationToken);
-            if (refreshedSessionTokens is not null)
-            {
-                this.AppendAuthorizationHeader(request, refreshedSessionTokens.AccessToken);
-            }
-        }
+        this.AppendAuthorizationHeader(request, sessionTokens.AccessToken);
     }
-    private Boolean IsTokenValid(String accessToken)
-    {
-        var jwtToken = _jwtHandler.ReadJwtToken(accessToken);
-        return jwtToken.ValidTo > DateTime.UtcNow;
-    }
+
     private void AppendAuthorizationHeader(HttpRequestMessage request, String accessToken)
     {
         request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);

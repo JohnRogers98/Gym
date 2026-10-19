@@ -8,7 +8,9 @@ using System.Text.Json.Serialization;
 namespace Gym.BFF.Controllers.Api
 {
     [ApiController]
-    public class SessionInfoEndpoint(IGetUserInfoService _getUserInfoService, IGetSessionTokensService _getSessionTokensService) : ControllerBase
+    public class SessionInfoEndpoint(
+        IGetUserInfoService _getUserInfoService,
+        IGetValidSessionTokensService _getValidSessionTokensService) : ControllerBase
     {
         [HttpGet("api/session-info")]
         public async Task<ActionResult<SessionInfo>> HandleAsync(CancellationToken cancellationToken)
@@ -17,7 +19,7 @@ namespace Gym.BFF.Controllers.Api
             if (String.IsNullOrEmpty(clientSessionKey))
                 return Unauthorized();
 
-            var sessionTokens =  await _getSessionTokensService.HandleAsync(clientSessionKey);
+            var sessionTokens =  await _getValidSessionTokensService.HandleAsync(clientSessionKey, cancellationToken);
             if(sessionTokens is null)
                 return Unauthorized();
 
