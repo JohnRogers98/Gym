@@ -1,0 +1,32 @@
+﻿@using Gym.Chat.Client
+
+@implements IAsyncDisposable
+
+@code {
+    [Inject] private ChatMediator ChatMediator { get; set; } = default!;
+    [Inject] private ILogger<ChatConnectionInitializer> Logger { get; set; } = default!;
+
+    private Boolean _started;
+
+    protected override async Task OnAfterRenderAsync(Boolean firstRender)
+    {
+        if (!firstRender || _started) 
+            return;
+            
+        _started = true;
+        try
+        {
+            await ChatMediator.StartAsync();
+            Logger.LogInformation("SignalR connection started.");
+        }
+        catch (Exception e)
+        {
+            Logger.LogError(e, "Cannot start SignalR connection.");
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        await ChatMediator.DisposeAsync();
+    }
+}

@@ -50,7 +50,6 @@ public static class IServiceCollectionExtensions
             var encryptedClientSessionCookie = context.Request.Cookies[authenticationCookieOptions.Value.Name];
             if (String.IsNullOrEmpty(encryptedClientSessionCookie))
             {
-                context.Fail("Client session cookie not exist");
                 return;
             }
             #endregion
@@ -65,7 +64,6 @@ public static class IServiceCollectionExtensions
                 var ticket = ticketDataFormat.Unprotect(encryptedClientSessionCookie);
                 if (ticket is null)
                 {
-                    context.Fail("Cannot unprotect ticket");
                     return;
                 }
                 #endregion
@@ -75,7 +73,6 @@ public static class IServiceCollectionExtensions
                     .FirstOrDefault(c => c.Type == ExtendedClaimTypes.ClientSessionKey)?.Value;
                 if (String.IsNullOrEmpty(clientSessionKey))
                 {
-                    context.Fail("Required client session key claim not found");
                     return;
                 }
 
@@ -85,7 +82,6 @@ public static class IServiceCollectionExtensions
                 var tokens = await getSessionTokensService.HandleAsync(clientSessionKey);
                 if (tokens?.AccessToken is null)
                 {
-                    context.Fail("Invalid token");
                     return;
                 }
 
